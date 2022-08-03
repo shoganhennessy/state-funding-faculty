@@ -2,6 +2,5 @@
 *.csv
 data/*
 programs/analysis/old/*
-text/*
 text/presentation/*
 text/readings/*
