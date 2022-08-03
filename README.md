@@ -2,9 +2,10 @@
 
 ## Senan Hogan-Hennessy, 17 August 2021
 
-The code in this replication package for the economics research paper "TITLE HERE", analysis IPEDS data AND OTHERS using Python and R.
-Two master files run all of the code to generate the data for the 15 figures and 3 tables in the paper.
-The replicator should expect the code to run for about 14 hours, and use X resources.
+The code in this replication package for the economics research paper "Stagnating Public University Finances and Faculty
+Composition", analysis using IPEDS and public Illinois data using R.
+A master bash file calls all code to build analysis data from raw files, and then produce analysis files.
+The replicator should expect the code to run for less than 10 minutes, using at maximum 6GB of RAM.
 
 Data Availability and Provenance Statements
 ----------------------------
