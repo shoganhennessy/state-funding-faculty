@@ -333,6 +333,10 @@ urban_ipeds.data <- urban_ipeds.data %>%
 urban_ipeds.data <- urban_ipeds.data %>%
     distinct(unitid, year, .keep_all = TRUE)
 
+# Make year refer to the year of spring term, and not autumn of calendar year
+urban_ipeds.data <- urban_ipeds.data %>%
+    mutate(year = year + 1)
+
 
 ################################################################################
 ## Save the constructed data file.

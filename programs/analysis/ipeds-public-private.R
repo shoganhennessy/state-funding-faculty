@@ -27,7 +27,7 @@ ipeds.data <- ipeds.data %>%
     # Non for-profit unis, 4-year
     filter(fouryear == 1, forprofit == 0) %>%
     # Remove years with incomplete data
-    filter(1990 <= year, year != 2000) %>%
+    filter(1990 <= year, year != 2001, year <= 2021) %>%
     # Restrict to relevant columns and rows.
     select(
         # Identifiers and controls
@@ -76,7 +76,6 @@ enrollment.data <- ipeds.data %>%
     ungroup()
 # Draw the graph for enrollment total
 enrollment_total.plot <- enrollment.data %>%
-    filter(year > 1990) %>%
     ggplot(aes(x = year, y = enrollment_total, colour = factor(public))) +
     geom_point() +
     geom_line() +
@@ -230,13 +229,14 @@ lecturer_fte_perprof.plot <- prof_perfte.data %>%
     scale_x_continuous(name = "Year",
         breaks = seq(1985, 2020, by = 5)) +
     scale_y_continuous(name = "",
-        limits = c(0, 0.004),
-        breaks = seq(0, 0.005, by = 0.001),
+        limits = c(0.003, 0.007),
+        breaks = seq(0, 0.007, by = 0.001),
         labels = scales::comma) +
     theme_bw() +
     theme(plot.title = element_text(hjust = 0.5),
         legend.position = "top") +
     scale_colour_discrete(name = "", labels = c("Private", "Public"))
+lecturer_fte_perprof.plot
 ggsave("../../text/figures/lecturer-fte-perprof.png",
     plot = lecturer_fte_perprof.plot,
     units = "cm", width = fig.width, height = fig.height)

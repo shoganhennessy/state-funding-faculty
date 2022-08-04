@@ -218,6 +218,84 @@ print((
     ) / (enrollment_yearly.data %>% filter(year == 1991) %>% pull(enrollment_reported)
 ))
 
+# Repeat the analysis for Illinois
+# Plot total gov funding by year.
+illinois_funding_fte.data <- reg.data %>%
+    filter(state == "IL") %>%
+    group_by(year) %>%
+    summarise(
+        totalrevenues_real =
+            mean(totalrevenues_real / enrollment_reported, na.rm = TRUE),
+        nonauxrevenues_real =
+            mean(nonauxrevenues_real / enrollment_reported, na.rm = TRUE),
+        stateappropriations_real =
+            mean(stateappropriations_real / enrollment_reported, na.rm = TRUE),
+        tuitionrev_real =
+            mean(tuitionrev_real / enrollment_reported, na.rm = TRUE))
+# Define the plot
+illinois_funding_fte.graph <- illinois_funding_fte.data %>%
+    pivot_longer(!year, names_to = "variable", values_to = "millions") %>%
+    ggplot(aes(x = year, y = millions, colour = variable)) +
+    geom_point() +
+    geom_line() +
+    # Adjust the names and axis
+    scale_x_continuous(name = "Year",
+        breaks = seq(1985, 2020, by = 5)) +
+    scale_y_continuous(name = "",
+        limits = c(0, 52000),
+        breaks = seq(0, 50000, by = 10000),
+        labels = scales::comma) +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5),
+        legend.position = "top") +
+    scale_colour_discrete(name = "",
+        breaks = c("totalrevenues_real", "nonauxrevenues_real",
+        "stateappropriations_real", "tuitionrev_real"),
+        labels = c("Total", "Non-inst.", "State", "Tution"))
+# Save this plot
+ggsave("../../text/figures/illinois-funding-fte.png",
+    plot = illinois_funding_fte.graph,
+    units = "cm", width = fig.width, height = fig.height)
+
+# Plot total gov funding by year.
+illinois_funding.data <- reg.data %>%
+    filter(state == "IL") %>%
+    group_by(year) %>%
+    summarise(
+        totalrevenues_real =
+            mean(totalrevenues_real, na.rm = TRUE) / (10^6),
+        nonauxrevenues_real =
+            mean(nonauxrevenues_real, na.rm = TRUE) / (10^6),
+        stateappropriations_real =
+            mean(stateappropriations_real, na.rm = TRUE) / (10^6),
+        tuitionrev_real =
+            mean(tuitionrev_real, na.rm = TRUE) / (10^6))
+# Define the plot
+illinois_funding.graph <- illinois_funding.data %>%
+    pivot_longer(!year, names_to = "variable", values_to = "millions") %>%
+    ggplot(aes(x = year, y = millions, colour = variable)) +
+    geom_point() +
+    geom_line() +
+    # Adjust the names and axis
+    scale_x_continuous(name = "Year",
+        breaks = seq(1985, 2020, by = 5)) +
+    scale_y_continuous(name = "",
+        limits = c(0, 970),
+        breaks = seq(0, 1000, by = 100),
+        labels = scales::comma) +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5),
+        legend.position = "top") +
+    scale_colour_discrete(name = "",
+        breaks = c("totalrevenues_real", "nonauxrevenues_real",
+        "stateappropriations_real", "tuitionrev_real"),
+        labels = c("Total", "Non-inst.", "State", "Tution"))
+# Save this plot
+ggsave("../../text/figures/illinois-funding-total.png",
+    plot = illinois_funding.graph,
+    units = "cm", width = fig.width, height = fig.height)
+
+
 
 # First stage Regressions ------------------------------------------------------
 
@@ -418,7 +496,7 @@ stargazer(
     omit = "factor|count|year",
     intercept.bottom = TRUE,
     order = c(2, 1, 3),
-    covariate.labels = c("Appropriations Shock", "Tuition Revenue", "Constant"),
+    covariate.labels = c("Non-inst. Revenues", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
     star.cutoffs = NA,
     header = FALSE, float = FALSE, no.space = TRUE,
@@ -541,7 +619,7 @@ stargazer(
     omit = "factor|count|year",
     intercept.bottom = TRUE,
     order = c(2, 1, 3),
-    covariate.labels = c("Appropriations Shock", "Tuition Revenue", "Constant"),
+    covariate.labels = c("Non-inst. Revenues", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
     star.cutoffs = NA,
     header = FALSE, float = FALSE, no.space = TRUE,
@@ -666,7 +744,7 @@ stargazer(
     omit = "factor|count|year",
     intercept.bottom = TRUE,
     order = c(2, 1, 3),
-    covariate.labels = c("Appropriations Shock", "Tuition Revenue", "Constant"),
+    covariate.labels = c("Non-inst. Revenues", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
     star.cutoffs = NA,
     header = FALSE, float = FALSE, no.space = TRUE,

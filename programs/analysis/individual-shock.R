@@ -1,6 +1,6 @@
 #!/usr/bin/R
-## Senan Hogan-Hennessy, 13 June 2022
-## IV for Prof's salaries, using Illinois data.
+## Senan Hogan-Hennessy, 3 August 2022
+## IV for Prof's outcomes, using Illinois data.
 library(tidyverse) ## functions for data manipulation and visualization
 library(lfe)
 # My custom flavour of Stargazer TeX tables:
@@ -63,39 +63,14 @@ reg.data <- reg.data %>%
     mutate(firstyear = min(year, na.rm = TRUE)) %>%
     ungroup()
 
-# Calculate the rolling shock to state appropriations (Lovenheim 2020 p. 13)
-# and link it to the prof's first year
-
-# Generate a Professor's first year
-reg.data <- reg.data %>%
-    arrange(name, year, unitid) %>%
-    group_by(name, unitid) %>%
-    mutate(firstyear = min(year, na.rm = TRUE)) %>%
-    ungroup()
-# Generate the rolling share, for a Professor's first year of employment.
-reg.data <- ipeds.data %>%
-    transmute(unitid = unitid,
-        firstyear = year,
-        staterevenues_rollshare =
-            stateappropriations_real / totalrevenues_real) %>%
-    right_join(reg.data, by = c("unitid", "firstyear")) %>%
-    # Remove the rolling shock if the panel does not include first year for prof
-    mutate(staterevenues_rollshare =
-        ifelse(2010 < firstyear & firstyear < 2021,
-            staterevenues_rollshare, NA)) %>%
-    # Get the shock as a product of rolling share and yearly state approp
-    mutate(appropriationshock_perEnroll_rolling =
-        staterevenues_rollshare * (
-            allstate_stateappropriations_real / stateEnroll_count))
-
 # Remove IPEDS + Illinois data to save memory
 rm(ipeds.data)
 rm(illinois.data)
 gc()
 
-# How many individual professors in 2010 and 2020?
+# How many individual professors in 2010 and 2021?
 reg.data %>% filter(year == 2010) %>% count(unitid, name) %>% nrow() %>% print()
-reg.data %>% filter(year == 2020) %>% count(unitid, name) %>% nrow() %>% print()
+reg.data %>% filter(year == 2021) %>% count(unitid, name) %>% nrow() %>% print()
 
 # Binary for professor position
 reg.data <- reg.data %>%
@@ -118,6 +93,18 @@ reg.data <- reg.data %>%
     filter(!is.na(enrollment_reported), enrollment_reported > 0,
         (lecturer + assistant + full + administrator) > 0)
 
+# For Profs who are at multi-unis/jobs, take their main job (most salary)
+reg.data <- reg.data %>%
+    group_by(name, year) %>%
+    mutate(main_job =
+        as.integer(salary_real == max(salary_real, na.rm = TRUE))) %>%
+    filter(main_job == 1) %>%
+    ungroup()
+
+# Remove duplicate observations
+reg.data <- reg.data %>%
+    distinct(name, unitid, year, .keep_all = TRUE)
+
 # Get indicator for whether a professor next year.
 year.max <- reg.data %>% pull(year) %>% max(na.rm = TRUE)
 year.min <- reg.data %>% pull(year) %>% min(na.rm = TRUE)
@@ -135,22 +122,6 @@ reg.data <- reg.data %>%
             as.integer(dplyr::lag(ranked_position, 1) > ranked_position))) %>%
     ungroup()
 
-# For Profs who are at multi-unis/jobs, take their main job (most salary)
-reg.data <- reg.data %>%
-    group_by(name, year) %>%
-    mutate(main_job =
-        as.integer(salary_real == max(salary_real, na.rm = TRUE))) %>%
-    filter(main_job == 1) %>%
-    ungroup()
-
-# Remove duplicate observations
-reg.data <- reg.data %>%
-    distinct(name, unitid, year, .keep_all = TRUE)
-
-# How many individual professors in 2010 and 2020?
-reg.data %>% filter(year == 2010) %>% count(unitid, name) %>% nrow() %>% print()
-reg.data %>% filter(year == 2020) %>% count(unitid, name) %>% nrow() %>% print()
-
 # Select non-missing values
 reg.data <- reg.data %>%
     mutate(extra_salary_real = ifelse(is.na(extra_salary_real), 0,
@@ -160,17 +131,17 @@ reg.data <- reg.data %>%
         !is.na(enrollment_reported), enrollment_reported > 0,
         !is.na(nonauxrevenues_real),
         !is.na(stateappropriations_real),
-        !is.na(appropriationshock_perEnroll_rolling))
+        !is.na(appropriationshock_perEnroll_real))
 
-# How many individual professors in 2010 and 2020,
-# who were hired in 2011 and later.
-reg.data %>% filter(year == 2011) %>% count(unitid, name) %>% nrow() %>% print()
-reg.data %>% filter(year == 2020) %>% count(unitid, name) %>% nrow() %>% print()
+# How many individual professors in 2010 and 2021?
+reg.data %>% filter(year == 2010) %>% count(unitid, name) %>% nrow() %>% print()
+reg.data %>% filter(year == 2021) %>% count(unitid, name) %>% nrow() %>% print()
 
 # Factor out the unitid, name designations for FELM functionality
 reg.data <- reg.data %>%
     mutate(unitid = factor(unitid),
         name = factor(name))
+
 
 # Summary Table ----------------------------------------------------------------
 
@@ -222,10 +193,10 @@ reg.data %>%
 # Explain Revenues with a shock to (only) state appropriations.
 firststage_approp.reg <- reg.data %>%
     felm(log(nonauxrevenues_real / enrollment_reported) ~ 1 +
-        log(appropriationshock_perEnroll_rolling) |
+        log(appropriationshock_perEnroll_real) |
         unitid + firstyear |
         0 |
-        unitid + firstyear,
+        unitid + year,
         data = .)
 # Get the F.Stat
 firststage_approp.fstat <-
@@ -237,10 +208,10 @@ firststage_approp.fstat <-
 # Explain State appropriations with a shock to (only) state appropriations.
 firststage_approp_noFE.reg <- reg.data %>%
     felm(log(nonauxrevenues_real / enrollment_reported) ~ 1 +
-        log(appropriationshock_perEnroll_rolling) |
+        log(appropriationshock_perEnroll_real) |
         0 |
         0 |
-        unitid + firstyear,
+        unitid + year,
         data = .)
 # Get the F.Stat
 firststage_approp_noFE.fstat <-
@@ -251,11 +222,11 @@ firststage_approp_noFE.fstat <-
 # Explain Revenues with a shock to (only) state appropriations.
 firststage_approp_tuit.reg <- reg.data %>%
     felm(log(nonauxrevenues_real / enrollment_reported) ~ 1 +
-        log(appropriationshock_perEnroll_rolling) +
+        log(appropriationshock_perEnroll_real) +
         log(tuitionrev_real / enrollment_reported) |
         unitid + firstyear |
         0 |
-        unitid + firstyear,
+        unitid + year,
         data = .)
 # Get the F.Stat
 firststage_approp_tuit.fstat <-
@@ -267,11 +238,11 @@ firststage_approp_tuit.fstat <-
 # Explain State appropriations with a shock to (only) state appropriations.
 firststage_approp_tuit_noFE.reg <- reg.data %>%
     felm(log(nonauxrevenues_real / enrollment_reported) ~ 1 +
-        log(appropriationshock_perEnroll_rolling) +
+        log(appropriationshock_perEnroll_real) +
         log(tuitionrev_real / enrollment_reported) |
         0 |
         0 |
-        unitid + firstyear,
+        unitid + year,
         data = .)
 # Get the F.Stat
 firststage_approp_tuit_noFE.fstat <-
@@ -315,8 +286,8 @@ shiftshare_lecturer_salaries.reg <- lecturer.data %>%
         log(tuitionrev_real / enrollment_reported) |
         unitid + firstyear |
         (log(nonauxrevenues_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_rolling)) |
-        unitid + firstyear,
+            log(appropriationshock_perEnroll_real)) |
+        unitid + year,
         data = .)
 
 ## Tenure-track faculty salaries
@@ -328,8 +299,8 @@ shiftshare_assistant_salaries.reg <- assistant.data %>%
         log(tuitionrev_real / enrollment_reported) |
         unitid + firstyear |
         (log(nonauxrevenues_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_rolling)) |
-        unitid + firstyear,
+            log(appropriationshock_perEnroll_real)) |
+        unitid + year,
         data = .)
 
 ## full faculty salaries
@@ -341,8 +312,8 @@ shiftshare_full_salaries.reg <- full.data %>%
         log(tuitionrev_real / enrollment_reported) |
         unitid + firstyear |
         (log(nonauxrevenues_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_rolling)) |
-        unitid + firstyear,
+            log(appropriationshock_perEnroll_real)) |
+        unitid + year,
         data = .)
 
 ## Administrator faculty salaries
@@ -354,8 +325,8 @@ shiftshare_administrator_salaries.reg <- administrator.data %>%
         log(tuitionrev_real / enrollment_reported) |
         unitid + firstyear |
         (log(nonauxrevenues_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_rolling)) |
-        unitid + firstyear,
+            log(appropriationshock_perEnroll_real)) |
+        unitid + year,
         data = .)
 
 ## All faculty Salaries
@@ -365,8 +336,8 @@ shiftshare_all_salaries.reg <- reg.data %>%
         log(tuitionrev_real / enrollment_reported) |
         unitid + firstyear |
         (log(nonauxrevenues_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_rolling)) |
-        unitid + firstyear,
+            log(appropriationshock_perEnroll_real)) |
+        unitid + year,
         data = .)
 
 ## Collate the results to a LaTeX table
@@ -385,7 +356,7 @@ stargazer(
     omit = "factor|count|year",
     intercept.bottom = TRUE,
     order = c(2, 1, 3),
-    covariate.labels = c("Appropriations Shock", "Tuition Revenue", "Constant"),
+    covariate.labels = c("Non-inst. Revenues", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
     star.cutoffs = NA,
     header = FALSE, float = FALSE, no.space = TRUE,
@@ -398,7 +369,7 @@ stargazer(
 
 # Repeat analysis among the sample of new-hires, in their first year
 newhire.data <- reg.data %>%
-    filter(firstyear == year)
+    filter(firstyear == year, year > 2010)
 
 ## Non-full faculty salaries
 lecturer.data <- newhire.data %>%
@@ -407,10 +378,10 @@ lecturer.data <- newhire.data %>%
 shiftshare_lecturer_salaries.reg <- lecturer.data %>%
     felm(log(salary_real + extra_salary_real) ~ 1 +
         log(tuitionrev_real / enrollment_reported) |
-        unitid + firstyear |
+        unitid |
         (log(nonauxrevenues_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_rolling)) |
-        unitid + firstyear,
+            log(appropriationshock_perEnroll_real)) |
+        unitid + year,
         data = .)
 
 ## Tenure-track faculty salaries
@@ -420,10 +391,10 @@ assistant.data <- newhire.data %>%
 shiftshare_assistant_salaries.reg <- assistant.data %>%
     felm(log(salary_real + extra_salary_real) ~ 1 +
         log(tuitionrev_real / enrollment_reported) |
-        unitid + firstyear |
+        unitid |
         (log(nonauxrevenues_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_rolling)) |
-        unitid + firstyear,
+            log(appropriationshock_perEnroll_real)) |
+        unitid + year,
         data = .)
 
 ## full faculty salaries
@@ -433,10 +404,10 @@ full.data <- newhire.data %>%
 shiftshare_full_salaries.reg <- full.data %>%
     felm(log(salary_real + extra_salary_real) ~ 1 +
         log(tuitionrev_real / enrollment_reported) |
-        unitid + firstyear |
+        unitid |
         (log(nonauxrevenues_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_rolling)) |
-        unitid + firstyear,
+            log(appropriationshock_perEnroll_real)) |
+        unitid + year,
         data = .)
 
 ## Administrator faculty salaries
@@ -446,10 +417,10 @@ administrator.data <- newhire.data %>%
 shiftshare_administrator_salaries.reg <- administrator.data %>%
     felm(log(salary_real + extra_salary_real) ~ 1 +
         log(tuitionrev_real / enrollment_reported) |
-        unitid + year|
+        unitid |
         (log(nonauxrevenues_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_rolling)) |
-        unitid + firstyear,
+            log(appropriationshock_perEnroll_real)) |
+        unitid + year,
         data = .)
 
 ## All faculty Salaries
@@ -457,10 +428,10 @@ shiftshare_administrator_salaries.reg <- administrator.data %>%
 shiftshare_all_salaries.reg <- newhire.data %>%
     felm(log(salary_real + extra_salary_real) ~ 1 +
         log(tuitionrev_real / enrollment_reported) |
-        unitid + firstyear |
+        unitid |
         (log(nonauxrevenues_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_rolling)) |
-        unitid + firstyear,
+            log(appropriationshock_perEnroll_real)) |
+        unitid + year,
         data = .)
 
 ## Collate the results to a LaTeX table
@@ -479,13 +450,70 @@ stargazer(
     omit = "factor|count|year",
     intercept.bottom = TRUE,
     order = c(2, 1, 3),
-    covariate.labels = c("Appropriations Shock", "Tuition Revenue", "Constant"),
+    covariate.labels = c("Non-inst. Revenues", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
     star.cutoffs = NA,
     header = FALSE, float = FALSE, no.space = TRUE,
     omit.table.layout = "n", notes.append = FALSE,
     type = "text",
     out = "../../text/tables/newhiresalaries-shock-illinois.tex")
+
+# Investigate count + pay for new professors, by position, in each year Illinois
+newhire_yearly.data <- newhire.data %>%
+    mutate(position = ifelse(lecturer == 1, "lecturer",
+        ifelse(assistant == 1, "assistant",
+            ifelse(full == 1, "full",
+                ifelse(administrator == 1, "administrator", NA))))) %>%
+    group_by(year, position) %>%
+    summarise(prof_count = n(),
+        totalsalary_real =
+            mean(salary_real + extra_salary_real, na.rm = TRUE))
+
+# Plot the number for new professors, by position, in each year Illinois
+newhire_count.plot <- newhire_yearly.data %>%
+    ggplot(aes(x = year, y = prof_count, colour = position)) +
+    geom_point() +
+    geom_line() +
+    # Adjust the names and axis
+    scale_x_continuous(name = "Year",
+        breaks = seq(2010, 2021, by = 2)) +
+    scale_y_continuous(name = "",
+        limits = c(0, 1000),
+        breaks = seq(0, 1000, by = 200),
+        labels = scales::comma) +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5),
+        legend.position = "top") +
+    scale_colour_discrete(name = "",
+        breaks = c("lecturer", "assistant", "full", "administrator"),
+        labels = c("Lecturer", "Assistant", "Full", "Administrator"))
+# Save this plot
+ggsave("../../text/figures/newhire-count-illinois.png",
+    plot = newhire_count.plot,
+    units = "cm", width = fig.width, height = fig.height)
+
+# Plot the salaries for new professors, by position, in each year Illinois
+newhire_salary.plot <- newhire_yearly.data %>%
+    ggplot(aes(x = year, y = totalsalary_real, colour = position)) +
+    geom_point() +
+    geom_line() +
+    # Adjust the names and axis
+    scale_x_continuous(name = "Year",
+        breaks = seq(2010, 2021, by = 2)) +
+    scale_y_continuous(name = "",
+        limits = c(0, 125000),
+        breaks = seq(0, 125000, by = 20000),
+        labels = scales::comma) +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5),
+        legend.position = "top") +
+    scale_colour_discrete(name = "",
+        breaks = c("lecturer", "assistant", "full", "administrator"),
+        labels = c("Lecturer", "Assistant", "Full", "Administrator"))
+# Save this plot
+ggsave("../../text/figures/newhire-salary-illinois.png",
+    plot = newhire_salary.plot,
+    units = "cm", width = fig.width, height = fig.height)
 
 
 # Faculty Promotion rates among new Faculty ------------------------------------
@@ -509,8 +537,8 @@ shiftshare_lecturer_promotion.reg <- lecturer.data %>%
         log(tuitionrev_real / enrollment_reported) |
         unitid + firstyear |
         (log(nonauxrevenues_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_rolling)) |
-        unitid + firstyear,
+            log(appropriationshock_perEnroll_real)) |
+        unitid + year,
         data = .)
 
 ## Tenure-track faculty promotion
@@ -522,8 +550,8 @@ shiftshare_assistant_promotion.reg <- assistant.data %>%
         log(tuitionrev_real / enrollment_reported) |
         unitid + firstyear |
         (log(nonauxrevenues_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_rolling)) |
-        unitid + firstyear,
+            log(appropriationshock_perEnroll_real)) |
+        unitid + year,
         data = .)
 
 ## full faculty promotion
@@ -535,8 +563,8 @@ shiftshare_full_promotion.reg <- associate.data %>%
         log(tuitionrev_real / enrollment_reported) |
         unitid + firstyear |
         (log(nonauxrevenues_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_rolling)) |
-        unitid + firstyear,
+            log(appropriationshock_perEnroll_real)) |
+        unitid + year,
         data = .)
 
 ## All faculty promotion
@@ -546,8 +574,8 @@ shiftshare_all_promotion.reg <- reg.data %>%
         log(tuitionrev_real / enrollment_reported) |
         unitid + firstyear |
         (log(nonauxrevenues_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_rolling)) |
-        unitid + firstyear,
+            log(appropriationshock_perEnroll_real)) |
+        unitid + year,
         data = .)
 
 ## Collate the results to a LaTeX table
@@ -565,7 +593,7 @@ stargazer(
     omit = "factor|count|year",
     intercept.bottom = TRUE,
     order = c(2, 1, 3),
-    covariate.labels = c("Appropriations Shock", "Tuition Revenue", "Constant"),
+    covariate.labels = c("Non-inst. Revenues", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
     star.cutoffs = NA,
     header = FALSE, float = FALSE, no.space = TRUE,
@@ -585,8 +613,8 @@ shiftshare_lecturer_exit.reg <- lecturer.data %>%
         log(tuitionrev_real / enrollment_reported) |
         unitid + firstyear |
         (log(nonauxrevenues_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_rolling)) |
-        unitid + firstyear,
+            log(appropriationshock_perEnroll_real)) |
+        unitid + year,
         data = .)
 
 ## Tenure-track faculty salaries
@@ -598,8 +626,8 @@ shiftshare_assistant_exit.reg <- assistant.data %>%
         log(tuitionrev_real / enrollment_reported) |
         unitid + firstyear |
         (log(nonauxrevenues_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_rolling)) |
-        unitid + firstyear,
+            log(appropriationshock_perEnroll_real)) |
+        unitid + year,
         data = .)
 
 ## full faculty salaries
@@ -611,8 +639,8 @@ shiftshare_full_exit.reg <- full.data %>%
         log(tuitionrev_real / enrollment_reported) |
         unitid + firstyear |
         (log(nonauxrevenues_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_rolling)) |
-        unitid + firstyear,
+            log(appropriationshock_perEnroll_real)) |
+        unitid + year,
         data = .)
 
 ## Administrator faculty salaries
@@ -624,8 +652,8 @@ shiftshare_administrator_exit.reg <- administrator.data %>%
         log(tuitionrev_real / enrollment_reported) |
         unitid + firstyear |
         (log(nonauxrevenues_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_rolling)) |
-        unitid + firstyear,
+            log(appropriationshock_perEnroll_real)) |
+        unitid + year,
         data = .)
 
 ## All faculty Salaries
@@ -635,8 +663,8 @@ shiftshare_all_exit.reg <- reg.data %>%
         log(tuitionrev_real / enrollment_reported) |
         unitid + firstyear |
         (log(nonauxrevenues_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_rolling)) |
-        unitid + firstyear,
+            log(appropriationshock_perEnroll_real)) |
+        unitid + year,
         data = .)
 
 ## Collate the results to a LaTeX table
@@ -655,7 +683,7 @@ stargazer(
     omit = "factor|count|year",
     intercept.bottom = TRUE,
     order = c(2, 1, 3),
-    covariate.labels = c("Appropriations Shock", "Tuition Revenue", "Constant"),
+    covariate.labels = c("Non-inst. Revenues", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
     star.cutoffs = NA,
     header = FALSE, float = FALSE, no.space = TRUE,
@@ -694,8 +722,8 @@ firststage.lpreg <-
         endog_data = "nonauxrevenues_real",
         # Predictor variable
         shock = "appropriationshock_perEnroll_real",
-        # Contemporaneous control, plus FE for unitid * firstyear
-        c_exog_data = c("tuitionrev_real", "unitid", "firstyear"),
+        # Contemporaneous control, plus FE for unitid * year
+        c_exog_data = c("tuitionrev_real", "unitid", "year"),
         # Option to use IV for predictor endogeneity (not used here)
         iv_reg = FALSE,
         # Add clustered SEs in the panel
@@ -716,8 +744,8 @@ all_salaries.lpreg <-
         endog_data = "salary_real",
         # Predictor variable
         shock = "nonauxrevenues_real",
-        # Contemporaneous control, plus FE for unitid + firstyear
-        c_exog_data = c("tuitionrev_real", "unitid", "firstyear"),
+        # Contemporaneous control, plus FE for unitid + year
+        c_exog_data = c("tuitionrev_real", "unitid", "year"),
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_real",
@@ -739,8 +767,8 @@ all_promoted.lpreg <-
         endog_data = "promoted",
         # Predictor variable
         shock = "nonauxrevenues_real",
-        # Contemporaneous control, plus FE for unitid + firstyear
-        c_exog_data = c("tuitionrev_real", "unitid", "firstyear"),
+        # Contemporaneous control, plus FE for unitid + year
+        c_exog_data = c("tuitionrev_real", "unitid", "year"),
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_real",
@@ -750,7 +778,6 @@ all_promoted.lpreg <-
         robust_cluster = c("group", "time"),
         confint = 1.96,
         hor = time.horizon)
-plot(all_promoted.lpreg)
 # Save this plot
 ggsave("../../text/figures/promoted-illinois-lp.png",
     plot = plot(all_promoted.lpreg),

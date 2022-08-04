@@ -16,12 +16,14 @@ cd analysis
 Rscript ipeds-public-private.R
 # Analysis and regressions at the institution-level.
 Rscript ipeds-shock.R
-# Analysis and regressions at the individual-level.
+# Analysis and regressions at the individual-level, with base-year shock IV.
 Rscript individual-shock.R
+# Analysis and regressions at the individual-level, with rolling shock IV.
+Rscript individual-shock-rolling.R
 cd ..
 
 # Compile paper, with outputs of progams as inputs for TeX files
-cd ..
+cd text
 latexmk -pdf paper.tex
 latexmk -c
 rm paper.bbl
