@@ -192,7 +192,7 @@ reg.data %>%
 
 # Explain Revenues with a shock to (only) state appropriations.
 firststage_approp.reg <- reg.data %>%
-    felm(log(nonauxrevenues_real / enrollment_reported) ~ 1 +
+    felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
         log(appropriationshock_perEnroll_real) |
         unitid + firstyear |
         0 |
@@ -207,7 +207,7 @@ firststage_approp.fstat <-
 # Without the FEs
 # Explain State appropriations with a shock to (only) state appropriations.
 firststage_approp_noFE.reg <- reg.data %>%
-    felm(log(nonauxrevenues_real / enrollment_reported) ~ 1 +
+    felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
         log(appropriationshock_perEnroll_real) |
         0 |
         0 |
@@ -221,7 +221,7 @@ firststage_approp_noFE.fstat <-
 
 # Explain Revenues with a shock to (only) state appropriations.
 firststage_approp_tuit.reg <- reg.data %>%
-    felm(log(nonauxrevenues_real / enrollment_reported) ~ 1 +
+    felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
         log(appropriationshock_perEnroll_real) +
         log(tuitionrev_real / enrollment_reported) |
         unitid + firstyear |
@@ -237,7 +237,7 @@ firststage_approp_tuit.fstat <-
 # Without the FEs
 # Explain State appropriations with a shock to (only) state appropriations.
 firststage_approp_tuit_noFE.reg <- reg.data %>%
-    felm(log(nonauxrevenues_real / enrollment_reported) ~ 1 +
+    felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
         log(appropriationshock_perEnroll_real) +
         log(tuitionrev_real / enrollment_reported) |
         0 |
@@ -282,10 +282,9 @@ lecturer.data <- reg.data %>%
     filter(lecturer == 1)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_lecturer_salaries.reg <- lecturer.data %>%
-    felm(log(salary_real + extra_salary_real) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid + firstyear |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         unitid + year,
         data = .)
@@ -295,10 +294,9 @@ assistant.data <- reg.data %>%
     filter(assistant == 1)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_assistant_salaries.reg <- assistant.data %>%
-    felm(log(salary_real + extra_salary_real) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid + firstyear |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         unitid + year,
         data = .)
@@ -308,10 +306,9 @@ full.data <- reg.data %>%
     filter(full == 1)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_full_salaries.reg <- full.data %>%
-    felm(log(salary_real + extra_salary_real) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid + firstyear |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         unitid + year,
         data = .)
@@ -321,10 +318,9 @@ administrator.data <- reg.data %>%
     filter(administrator == 1)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_administrator_salaries.reg <- administrator.data %>%
-    felm(log(salary_real + extra_salary_real) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid + firstyear |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         unitid + year,
         data = .)
@@ -332,10 +328,9 @@ shiftshare_administrator_salaries.reg <- administrator.data %>%
 ## All faculty Salaries
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_all_salaries.reg <- reg.data %>%
-    felm(log(salary_real + extra_salary_real) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid + firstyear |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         unitid + year,
         data = .)
@@ -376,10 +371,9 @@ lecturer.data <- newhire.data %>%
     filter(lecturer == 1)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_lecturer_salaries.reg <- lecturer.data %>%
-    felm(log(salary_real + extra_salary_real) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         unitid + year,
         data = .)
@@ -389,10 +383,9 @@ assistant.data <- newhire.data %>%
     filter(assistant == 1)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_assistant_salaries.reg <- assistant.data %>%
-    felm(log(salary_real + extra_salary_real) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         unitid + year,
         data = .)
@@ -402,10 +395,9 @@ full.data <- newhire.data %>%
     filter(full == 1)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_full_salaries.reg <- full.data %>%
-    felm(log(salary_real + extra_salary_real) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         unitid + year,
         data = .)
@@ -415,10 +407,9 @@ administrator.data <- newhire.data %>%
     filter(administrator == 1)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_administrator_salaries.reg <- administrator.data %>%
-    felm(log(salary_real + extra_salary_real) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         unitid + year,
         data = .)
@@ -426,10 +417,9 @@ shiftshare_administrator_salaries.reg <- administrator.data %>%
 ## All faculty Salaries
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_all_salaries.reg <- newhire.data %>%
-    felm(log(salary_real + extra_salary_real) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         unitid + year,
         data = .)
@@ -457,6 +447,8 @@ stargazer(
     omit.table.layout = "n", notes.append = FALSE,
     type = "text",
     out = "../../text/tables/newhiresalaries-shock-illinois.tex")
+quit("no")
+
 
 # Investigate count + pay for new professors, by position, in each year Illinois
 newhire_yearly.data <- newhire.data %>%
@@ -533,10 +525,9 @@ lecturer.data <- reg.data %>%
     filter(ever_lecturer == 1, lecturer + assistant > 0)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_lecturer_promotion.reg <- lecturer.data %>%
-    felm(promoted ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(promoted ~ 1 |
         unitid + firstyear |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         unitid + year,
         data = .)
@@ -546,10 +537,9 @@ assistant.data <- reg.data %>%
     filter(ever_assistant == 1, assistant + associate > 0)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_assistant_promotion.reg <- assistant.data %>%
-    felm(promoted ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(promoted ~ 1 |
         unitid + firstyear |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         unitid + year,
         data = .)
@@ -559,10 +549,9 @@ associate.data <- reg.data %>%
     filter(ever_associate == 1, full > 0)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_full_promotion.reg <- associate.data %>%
-    felm(promoted ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(promoted ~ 1 |
         unitid + firstyear |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         unitid + year,
         data = .)
@@ -570,10 +559,9 @@ shiftshare_full_promotion.reg <- associate.data %>%
 ## All faculty promotion
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_all_promotion.reg <- reg.data %>%
-    felm(promoted ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(promoted ~ 1 |
         unitid + firstyear |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         unitid + year,
         data = .)
@@ -609,10 +597,9 @@ lecturer.data <- reg.data %>%
     filter(lecturer == 1)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_lecturer_exit.reg <- lecturer.data %>%
-    felm(notemployed_nextyear ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(notemployed_nextyear ~ 1 |
         unitid + firstyear |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         unitid + year,
         data = .)
@@ -622,10 +609,9 @@ assistant.data <- reg.data %>%
     filter(assistant == 1)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_assistant_exit.reg <- assistant.data %>%
-    felm(notemployed_nextyear ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(notemployed_nextyear ~ 1 |
         unitid + firstyear |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         unitid + year,
         data = .)
@@ -635,10 +621,9 @@ full.data <- reg.data %>%
     filter(full == 1)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_full_exit.reg <- full.data %>%
-    felm(notemployed_nextyear ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(notemployed_nextyear ~ 1 |
         unitid + firstyear |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         unitid + year,
         data = .)
@@ -648,21 +633,19 @@ administrator.data <- reg.data %>%
     filter(administrator == 1)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_administrator_exit.reg <- administrator.data %>%
-    felm(notemployed_nextyear ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(notemployed_nextyear ~ 1 |
         unitid + firstyear |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         unitid + year,
         data = .)
 
-## All faculty Salaries
+## All faculty exit rate
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_all_exit.reg <- reg.data %>%
-    felm(notemployed_nextyear ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(notemployed_nextyear ~ 1 |
         unitid + firstyear |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         unitid + year,
         data = .)
@@ -710,7 +693,7 @@ lp.data <- reg.data %>%
         salary_real = log(salary_real + extra_salary_real),
         promoted = promoted,
         nonauxrevenues_real =
-            log(nonauxrevenues_real / enrollment_reported),
+            log(stateappropriations_real / enrollment_reported),
         appropriationshock_perEnroll_real =
             log(appropriationshock_perEnroll_real),
         tuitionrev_real = log(tuitionrev_real / enrollment_reported))

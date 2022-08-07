@@ -29,7 +29,7 @@ tenure.data <- read_csv("../../data/urban-ipeds/raw-data/faculty/ipeds-tenure.cs
 # CPI-U from FREDS (since Urban provided cpi has missing years)
 # Yearly average, seasonally adjusted, base year 1982-1984=100
 # https://fred.stlouisfed.org/series/CPIAUCSL
-cpiu.data <- read_csv("../../data/urban-ipeds/raw-data/freds-cpiu.csv")
+cpiu.data <- read_csv("../../data/inflation-indices/freds-cpiu.csv")
 
 
 # Clean data -----------------------------------------------------------------

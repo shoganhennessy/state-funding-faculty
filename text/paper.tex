@@ -750,16 +750,24 @@ Needs comment, and to what extent should this question the empirical strategy.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Appendix section
+% Set-up the section.
 \appendix
+\setcounter{table}{0}
+\renewcommand{\thetable}{A\arabic{table}}
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{A\arabic{figure}}
+
+% Start appendix
 \section{Appendix}
 \label{appendix}
-A number of statistical packages, for the R language \citep{R2022}, made the empirical analysis for this paper possible.
+A number of statistical packages, for the $R$ language \citep{R2022}, made the empirical analysis for this paper possible.
 \begin{itemize}
     \item \textit{Tidyverse} \citep{tidyverse} collected tools for data analysis in the R language.
     \item \textit{LFE} \citep{lfe} implemented linear fixed effect models, with instruments, crucial for the empirical estimation in \autoref{sec:empirics}.
     \item \textit{Stargazer} \citep{stargazer} provided a method to efficiently convert empirical results into presentable output in \LaTeX.
     \item \textit{Lpirfs} \citep{lpirfs2019} implemented estimation of the \cite{jorda2005} local projections methods, with instrumental variables, crucial to the local projections estimates presented in this project.
 \end{itemize}
+
 
 \subsection{First Stage Estimates, Individual Outcomes}
 \label{appendix:part1}

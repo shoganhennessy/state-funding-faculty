@@ -72,7 +72,6 @@ reg.data <- reg.data %>%
     filter(1990 <= year,
         !is.na(enrollment_reported), enrollment_reported > 0,
         !is.na(all_prof_count),
-        !is.na(nonauxrevenues_real),
         !is.na(stateappropriations_real),
         !is.na(appropriationshock_perEnroll_real))
 
@@ -88,7 +87,7 @@ reg.data %>%
         enrollment_reported = enrollment_reported,
         stateappropriations_real = stateappropriations_real / (10^6),
         totalrevenues_real = totalrevenues_real / (10^6),
-        nonauxrevenues_real = nonauxrevenues_real / (10^6),
+        #nonauxrevenues_real = nonauxrevenues_real / (10^6),
         lecturer_prof_count = lecturer_prof_count,
         assistant_prof_count = assistant_prof_count,
         full_prof_count = full_prof_count,
@@ -106,7 +105,7 @@ reg.data %>%
             "Enrollment, full-time equivalent",
             "State appropriations (millions 2021 USD)",
             "Total revenues (millions 2021 USD)",
-            "Non-instutional revenues (millions 2021 USD)",
+            #"Non-instutional revenues (millions 2021 USD)",
             "Lecturers count",
             "Assistant professors count",
             "Full professors count",
@@ -301,7 +300,7 @@ ggsave("../../text/figures/illinois-funding-total.png",
 
 # Explain Revenues with a shock to (only) state appropriations.
 firststage_approp.reg <- reg.data %>%
-    felm(log(nonauxrevenues_real / enrollment_reported) ~ 1 +
+    felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
         log(appropriationshock_perEnroll_real) |
         unitid + year |
         0 |
@@ -316,7 +315,7 @@ firststage_approp.fstat <-
 # Without the FEs
 # Explain State appropriations with a shock to (only) state appropriations.
 firststage_approp_noFE.reg <- reg.data %>%
-    felm(log(nonauxrevenues_real / enrollment_reported) ~ 1 +
+    felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
         log(appropriationshock_perEnroll_real) |
         0 |
         0 |
@@ -330,7 +329,7 @@ firststage_approp_noFE.fstat <-
 
 # Explain Revenues with a shock to (only) state appropriations.
 firststage_approp_tuit.reg <- reg.data %>%
-    felm(log(nonauxrevenues_real / enrollment_reported) ~ 1 +
+    felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
         log(appropriationshock_perEnroll_real) +
         log(tuitionrev_real / enrollment_reported) |
         unitid + year |
@@ -346,7 +345,7 @@ firststage_approp_tuit.fstat <-
 # Without the FEs
 # Explain State appropriations with a shock to (only) state appropriations.
 firststage_approp_tuit_noFE.reg <- reg.data %>%
-    felm(log(nonauxrevenues_real / enrollment_reported) ~ 1 +
+    felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
         log(appropriationshock_perEnroll_real) +
         log(tuitionrev_real / enrollment_reported) |
         0 |
@@ -391,21 +390,19 @@ lecturer.data <- reg.data %>%
     filter(!is.na(lecturer_prof_count), lecturer_prof_count > 0)
 # Naive OLS Regression
 naive_lecturer_count.reg <- lecturer.data %>%
-    mutate(`log(nonauxrevenues_real/enrollment_reported)(fit)` =
-        log(nonauxrevenues_real / enrollment_reported)) %>%
+    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
+        log(stateappropriations_real / enrollment_reported)) %>%
     felm(log(lecturer_prof_count / enrollment_reported) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) +
-        `log(nonauxrevenues_real/enrollment_reported)(fit)` |
+        `log(stateappropriations_real/enrollment_reported)(fit)` |
         unitid + year |
         0 |
         state + year,
         data = .)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_lecturer_count.reg <- lecturer.data %>%
-    felm(log(lecturer_prof_count / enrollment_reported) ~ 1  +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(lecturer_prof_count / enrollment_reported) ~ 1 |
         unitid + year |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         state + year,
         data = .)
@@ -415,21 +412,19 @@ assistant.data <- reg.data %>%
     filter(!is.na(assistant_prof_count), assistant_prof_count > 0)
 # Naive OLS Regression
 naive_assistant_count.reg <- assistant.data %>%
-    mutate(`log(nonauxrevenues_real/enrollment_reported)(fit)` =
-        log(nonauxrevenues_real / enrollment_reported)) %>%
-    felm(log(assistant_prof_count / enrollment_reported) ~ 1  +
-        log(tuitionrev_real / enrollment_reported) +
-        `log(nonauxrevenues_real/enrollment_reported)(fit)` |
+    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
+        log(stateappropriations_real / enrollment_reported)) %>%
+    felm(log(assistant_prof_count / enrollment_reported) ~ 1 +
+        `log(stateappropriations_real/enrollment_reported)(fit)` |
         unitid + year |
         0 |
         state + year,
         data = .)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_assistant_count.reg <- assistant.data %>%
-    felm(log(assistant_prof_count / enrollment_reported) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(assistant_prof_count / enrollment_reported) ~ 1 |
         unitid + year |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         state + year,
         data = .)
@@ -440,21 +435,19 @@ full.data <- reg.data %>%
     filter(!is.na(full_prof_count), full_prof_count > 0)
 # Naive OLS Regression
 naive_full_count.reg <- full.data %>%
-    mutate(`log(nonauxrevenues_real/enrollment_reported)(fit)` =
-        log(nonauxrevenues_real / enrollment_reported)) %>%
+    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
+        log(stateappropriations_real / enrollment_reported)) %>%
     felm(log(full_prof_count / enrollment_reported) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) +
-        `log(nonauxrevenues_real/enrollment_reported)(fit)` |
+        `log(stateappropriations_real/enrollment_reported)(fit)` |
         unitid + year |
         0 |
         state + year,
         data = .)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_full_count.reg <- full.data %>%
-    felm(log(full_prof_count / enrollment_reported) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(full_prof_count / enrollment_reported) ~ 1 |
         unitid + year |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         state + year,
         data = .)
@@ -462,21 +455,19 @@ shiftshare_full_count.reg <- full.data %>%
 ## All faculty Count
 # Naive OLS Regression
 naive_all_count.reg <- reg.data %>%
-    mutate(`log(nonauxrevenues_real/enrollment_reported)(fit)` =
-        log(nonauxrevenues_real / enrollment_reported)) %>%
+    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
+        log(stateappropriations_real / enrollment_reported)) %>%
     felm(log(all_prof_count / enrollment_reported) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) +
-        `log(nonauxrevenues_real/enrollment_reported)(fit)` |
+        `log(stateappropriations_real/enrollment_reported)(fit)` |
         unitid + year |
         0 |
         state + year,
         data = .)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_all_count.reg <- reg.data %>%
-    felm(log(all_prof_count / enrollment_reported) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(all_prof_count / enrollment_reported) ~ 1 |
         unitid + year |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         state + year,
         data = .)
@@ -510,11 +501,10 @@ stargazer(
 # Naive OLS Regression
 naive_nontenured_count.reg <- reg.data %>%
     filter(!is.na(nontenured_tenure_count), nontenured_tenure_count > 0) %>%
-    mutate(`log(nonauxrevenues_real/enrollment_reported)(fit)` =
-        log(nonauxrevenues_real / enrollment_reported)) %>%
+    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
+        log(stateappropriations_real / enrollment_reported)) %>%
     felm(log(nontenured_tenure_count / enrollment_reported) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) +
-        `log(nonauxrevenues_real/enrollment_reported)(fit)` |
+        `log(stateappropriations_real/enrollment_reported)(fit)` |
         unitid + year |
         0 |
         state + year,
@@ -522,10 +512,9 @@ naive_nontenured_count.reg <- reg.data %>%
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_nontenured_count.reg <- reg.data %>%
     filter(!is.na(nontenured_tenure_count), nontenured_tenure_count > 0) %>%
-    felm(log(nontenured_tenure_count / enrollment_reported) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(nontenured_tenure_count / enrollment_reported) ~ 1 |
         unitid + year |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         state + year,
         data = .)
@@ -534,11 +523,10 @@ shiftshare_nontenured_count.reg <- reg.data %>%
 # Naive OLS Regression
 naive_tenuretrack_count.reg <- reg.data %>%
     filter(!is.na(tenuretrack_tenure_count), tenuretrack_tenure_count > 0) %>%
-    mutate(`log(nonauxrevenues_real/enrollment_reported)(fit)` =
-        log(nonauxrevenues_real / enrollment_reported)) %>%
+    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
+        log(stateappropriations_real / enrollment_reported)) %>%
     felm(log(tenuretrack_tenure_count / enrollment_reported) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) +
-        `log(nonauxrevenues_real/enrollment_reported)(fit)` |
+        `log(stateappropriations_real/enrollment_reported)(fit)` |
         unitid + year |
         0 |
         state + year,
@@ -546,10 +534,9 @@ naive_tenuretrack_count.reg <- reg.data %>%
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_tenuretrack_count.reg <- reg.data %>%
     filter(!is.na(tenuretrack_tenure_count), tenuretrack_tenure_count > 0) %>%
-    felm(log(tenuretrack_tenure_count / enrollment_reported) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(tenuretrack_tenure_count / enrollment_reported) ~ 1 |
         unitid + year |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         state + year,
         data = .)
@@ -558,11 +545,10 @@ shiftshare_tenuretrack_count.reg <- reg.data %>%
 # Naive OLS Regression
 naive_tenured_count.reg <- reg.data %>%
     filter(!is.na(tenured_tenure_count), tenured_tenure_count > 0) %>%
-    mutate(`log(nonauxrevenues_real/enrollment_reported)(fit)` =
-        log(nonauxrevenues_real / enrollment_reported)) %>%
+    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
+        log(stateappropriations_real / enrollment_reported)) %>%
     felm(log(tenured_tenure_count / enrollment_reported) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) +
-        `log(nonauxrevenues_real/enrollment_reported)(fit)` |
+        `log(stateappropriations_real/enrollment_reported)(fit)` |
         unitid + year |
         0 |
         state + year,
@@ -570,10 +556,9 @@ naive_tenured_count.reg <- reg.data %>%
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_tenured_count.reg <- reg.data %>%
     filter(!is.na(tenured_tenure_count), tenured_tenure_count > 0) %>%
-    felm(log(tenured_tenure_count / enrollment_reported) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(tenured_tenure_count / enrollment_reported) ~ 1 |
         unitid + year |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         state + year,
         data = .)
@@ -583,11 +568,10 @@ shiftshare_tenured_count.reg <- reg.data %>%
 # Naive OLS Regression
 naive_alltenure_count.reg <- reg.data %>%
     filter(!is.na(all_tenure_count), all_tenure_count > 0) %>%
-    mutate(`log(nonauxrevenues_real/enrollment_reported)(fit)` =
-        log(nonauxrevenues_real / enrollment_reported)) %>%
+    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
+        log(stateappropriations_real / enrollment_reported)) %>%
     felm(log(all_tenure_count / enrollment_reported) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) +
-        `log(nonauxrevenues_real/enrollment_reported)(fit)` |
+        `log(stateappropriations_real/enrollment_reported)(fit)` |
         unitid + year |
         0 |
         state + year,
@@ -596,10 +580,9 @@ naive_alltenure_count.reg <- reg.data %>%
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_alltenure_count.reg <- reg.data %>%
     filter(!is.na(all_tenure_count), all_tenure_count > 0) %>%
-    felm(log(all_tenure_count / enrollment_reported) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(all_tenure_count / enrollment_reported) ~ 1 |
         unitid + year |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         state + year,
         data = .)
@@ -636,21 +619,19 @@ lecturer.data <- reg.data %>%
         lecturer_profmeansalary_real > 0)
 # Naive OLS Regression
 naive_lecturer_salaries.reg <- lecturer.data %>%
-    mutate(`log(nonauxrevenues_real/enrollment_reported)(fit)` =
-        log(nonauxrevenues_real / enrollment_reported)) %>%
+    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
+        log(stateappropriations_real / enrollment_reported)) %>%
     felm(log(lecturer_profmeansalary_real) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) +
-        `log(nonauxrevenues_real/enrollment_reported)(fit)` |
+        `log(stateappropriations_real/enrollment_reported)(fit)` |
         unitid + year |
         0 |
         state + year,
         data = .)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_lecturer_salaries.reg <- lecturer.data %>%
-    felm(log(lecturer_profmeansalary_real) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(lecturer_profmeansalary_real) ~ 1 |
         unitid + year |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         state + year,
         data = .)
@@ -661,21 +642,19 @@ assistant.data <- reg.data %>%
         assistant_profmeansalary_real > 0)
 # Naive OLS Regression
 naive_assistant_salaries.reg <- assistant.data %>%
-    mutate(`log(nonauxrevenues_real/enrollment_reported)(fit)` =
-        log(nonauxrevenues_real / enrollment_reported)) %>%
+    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
+        log(stateappropriations_real / enrollment_reported)) %>%
     felm(log(assistant_profmeansalary_real) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) +
-        `log(nonauxrevenues_real/enrollment_reported)(fit)` |
+        `log(stateappropriations_real/enrollment_reported)(fit)` |
         unitid + year |
         0 |
         state + year,
         data = .)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_assistant_salaries.reg <- assistant.data %>%
-    felm(log(assistant_profmeansalary_real) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(assistant_profmeansalary_real) ~ 1 |
         unitid + year |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         state + year,
         data = .)
@@ -686,21 +665,19 @@ full.data <- reg.data %>%
         full_profmeansalary_real > 0)
 # Naive OLS Regression
 naive_full_salaries.reg <- full.data %>%
-    mutate(`log(nonauxrevenues_real/enrollment_reported)(fit)` =
-        log(nonauxrevenues_real / enrollment_reported)) %>%
+    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
+        log(stateappropriations_real / enrollment_reported)) %>%
     felm(log(full_profmeansalary_real) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) +
-        `log(nonauxrevenues_real/enrollment_reported)(fit)` |
+        `log(stateappropriations_real/enrollment_reported)(fit)` |
         unitid + year |
         0 |
         state + year,
         data = .)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_full_salaries.reg <- full.data %>%
-    felm(log(full_profmeansalary_real) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(full_profmeansalary_real) ~ 1 |
         unitid + year |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         state + year,
         data = .)
@@ -710,21 +687,19 @@ all.data <- reg.data %>%
     filter(!is.na(all_profmeansalary_real), all_profmeansalary_real > 0)
 # Naive OLS Regression
 naive_all_salaries.reg <- all.data %>%
-    mutate(`log(nonauxrevenues_real/enrollment_reported)(fit)` =
-        log(nonauxrevenues_real / enrollment_reported)) %>%
+    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
+        log(stateappropriations_real / enrollment_reported)) %>%
     felm(log(all_profmeansalary_real) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) +
-        `log(nonauxrevenues_real/enrollment_reported)(fit)` |
+        `log(stateappropriations_real/enrollment_reported)(fit)` |
         unitid + year |
         0 |
         state + year,
         data = .)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_all_salaries.reg <- all.data %>%
-    felm(log(all_profmeansalary_real) ~ 1 +
-        log(tuitionrev_real / enrollment_reported) |
+    felm(log(all_profmeansalary_real) ~ 1 |
         unitid + year |
-        (log(nonauxrevenues_real / enrollment_reported) ~
+        (log(stateappropriations_real / enrollment_reported) ~
             log(appropriationshock_perEnroll_real)) |
         state + year,
         data = .)
@@ -756,6 +731,7 @@ stargazer(
 # Local Projections for staying-power of effects -------------------------------
 # install.packages("lpirfs")
 # https://cran.r-project.org/web/packages/lpirfs/lpirfs.pdf
+quit("no")
 library(plm)
 library(lpirfs)
 time.horizon <- 10
@@ -766,7 +742,7 @@ lp.data <- reg.data %>%
         year = year,
         all_prof_count = log(all_prof_count / enrollment_reported),
         all_profmeansalary_real = log(all_profmeansalary_real),
-        nonauxrevenues_real = log(nonauxrevenues_real / enrollment_reported),
+        nonauxrevenues_real = log(stateappropriations_real / enrollment_reported),
         appropriationshock_perEnroll_real =
             log(appropriationshock_perEnroll_real),
         tuitionrev_real = log(tuitionrev_real / enrollment_reported))
@@ -802,7 +778,7 @@ all_count.lpreg <-
         # Predictor variable
         shock = "nonauxrevenues_real",
         # Contemporaneous control
-        c_exog_data = "tuitionrev_real",
+        #c_exog_data = "tuitionrev_real",
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_real",
@@ -826,7 +802,7 @@ all_salaries.lpreg <-
         # Predictor variable
         shock = "nonauxrevenues_real",
         # Contemporaneous control
-        c_exog_data = "tuitionrev_real",
+        #c_exog_data = "tuitionrev_real",
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_real",
