@@ -1,0 +1,823 @@
+
+R version 4.2.1 (2022-06-23) -- "Funny-Looking Kid"
+Copyright (C) 2022 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> #!/usr/bin/R
+> ## Senan Hogan-Hennessy, 3 August 2022
+> ## IV for Prof's outcomes, using Illinois data.
+> ## Using a rolling-share variant of the instrument.
+> library(tidyverse) ## functions for data manipulation and visualization
+── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+✔ ggplot2 3.3.5     ✔ purrr   0.3.4
+✔ tibble  3.1.6     ✔ dplyr   1.0.9
+✔ tidyr   1.2.0     ✔ stringr 1.4.0
+✔ readr   2.1.2     ✔ forcats 0.5.1
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+> library(lfe)
+Loading required package: Matrix
+
+Attaching package: ‘Matrix’
+
+The following objects are masked from ‘package:tidyr’:
+
+    expand, pack, unpack
+
+> # My custom flavour of Stargazer TeX tables:
+> # devtools::install_github("shoganhennessy/stargazer")
+> library(stargazer) ## TeX tables
+
+Please cite as: 
+
+ Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+ R package version 5.2.3. https://CRAN.R-project.org/package=stargazer 
+
+> set.seed(47)
+> # This file follows an adjusted Deming Walters (2017, p.10) approach to
+> # appropriations shock instrument.
+> 
+> # Define number of digits in tables and graphs
+> digits.no <- 3
+> 
+> # Size for figures
+> fig.width <- 10
+> fig.height <- fig.width * 0.85
+> 
+> 
+> # Load data --------------------------------------------------------------------
+> 
+> # Data on Illinois Professors
+> illinois.data <- read_csv("../../data/states/illinois-professors.csv")
+Rows: 214795 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (3): inst_name, name, position
+dbl (4): unitid, year, salary_real, extra_salary_real
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+> 
+> # Data from IPEDS, with relevant variables
+> ipeds.data <- read_csv("../../data/urban-ipeds/urban-clean-publicunis.csv") %>%
++     select(
++         # Identifiers and controls
++         unitid,
++         year,
++         state,
++         # Appropriations to the uni
++         totalrevenues_real,
++         nonauxrevenues_real,
++         stateappropriations_real,
++         tuitionrev_real,
++         # Uni spending.
++         nonauxspending_real,
++         # Uni enrollment
++         enrollment_reported,
++         enrollment_fte,
++         # Appropriation shocks Per student
++         appropriationshock_perEnroll_real,
++         appropriationshock_perFTE_real,
++         appropriationshock_peruni_real,
++         # State-level values
++         allstate_stateappropriations_real,
++         stateEnroll_count)
+Rows: 26168 Columns: 48
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (2): inst_name, state
+dbl (46): unitid, year, public, forprofit, fouryear, associatescollege, cpi2...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+> 
+> 
+> # Clean data -------------------------------------------------------------------
+> 
+> # Join IPEDS data to the individual level
+> reg.data <- illinois.data %>%
++     # Join the IPEDS finance data.
++     left_join(ipeds.data, by = c("unitid", "year"))
+> 
+> # Generate a Professor's first year
+> reg.data <- reg.data %>%
++     arrange(name, year, unitid) %>%
++     group_by(name, unitid) %>%
++     mutate(firstyear = min(year, na.rm = TRUE)) %>%
++     ungroup()
+> 
+> # Calculate the rolling shock to state appropriations (Lovenheim 2021 p. 13)
+> # and link it to the prof's first year
+> 
+> # Generate a Professor's first year
+> reg.data <- reg.data %>%
++     arrange(name, year, unitid) %>%
++     group_by(name, unitid) %>%
++     mutate(firstyear = min(year, na.rm = TRUE)) %>%
++     ungroup()
+> # Generate the rolling share, for a Professor's first year of employment.
+> reg.data <- ipeds.data %>%
++     transmute(unitid = unitid,
++         firstyear = year,
++         staterevenues_rollshare =
++             stateappropriations_real / totalrevenues_real) %>%
++     right_join(reg.data, by = c("unitid", "firstyear")) %>%
++     # Remove the rolling shock if the panel does not include first year for prof
++     mutate(staterevenues_rollshare =
++         ifelse(2010 < firstyear & firstyear < 2021,
++             staterevenues_rollshare, NA)) %>%
++     # Get the shock as a product of rolling share and yearly state approp
++     mutate(appropriationshock_perEnroll_rolling =
++         staterevenues_rollshare * (
++             allstate_stateappropriations_real / stateEnroll_count))
+> 
+> # Remove IPEDS + Illinois data to save memory
+> rm(ipeds.data)
+> rm(illinois.data)
+> gc()
+          used  (Mb) gc trigger  (Mb) max used  (Mb)
+Ncells 2138980 114.3    4345291 232.1  3310401 176.8
+Vcells 8575557  65.5   21512325 164.2 21500599 164.1
+> 
+> # How many individual professors in 2010 and 2021?
+> reg.data %>% filter(year == 2010) %>% count(unitid, name) %>% nrow() %>% print()
+[1] 19757
+> reg.data %>% filter(year == 2021) %>% count(unitid, name) %>% nrow() %>% print()
+[1] 17280
+> 
+> # Binary for professor position
+> reg.data <- reg.data %>%
++     mutate(
++         lecturer = as.integer(position %in% c("Instructor", "Lecturer")),
++         assistant = as.integer(position == "Assistant Professor"),
++         full = as.integer(position %in% c("Associate Professor", "Professor")),
++         administrator = as.integer(position %in% c("Chancellor",
++             "Other Administrator", "President", "Senior Officer",
++             "Unit Director", "Vice Chancellor", "Vice President")),
++         other = as.integer(position == "No Rank or Other"),
++         ranked_position = ifelse(lecturer == 1, 1,
++             ifelse(assistant == 1, 2,
++                 ifelse(position == "Associate Professor", 3,
++                     ifelse(position == "Professor", 4,
++                         ifelse(administrator == 1, 5, NA))))))
+> 
+> # Restrict to only instructional staff (i.e. professors) with rank
+> reg.data <- reg.data %>%
++     filter(!is.na(enrollment_reported), enrollment_reported > 0,
++         (lecturer + assistant + full + administrator) > 0)
+> 
+> # For Profs who are at multi-unis/jobs, take their main job (most salary)
+> reg.data <- reg.data %>%
++     group_by(name, year) %>%
++     mutate(main_job =
++         as.integer(salary_real == max(salary_real, na.rm = TRUE))) %>%
++     filter(main_job == 1) %>%
++     ungroup()
+> 
+> # Remove duplicate observations
+> reg.data <- reg.data %>%
++     distinct(name, unitid, year, .keep_all = TRUE)
+> 
+> # Get indicator for whether a professor next year.
+> year.max <- reg.data %>% pull(year) %>% max(na.rm = TRUE)
+> year.min <- reg.data %>% pull(year) %>% min(na.rm = TRUE)
+> reg.data <- reg.data %>%
++     arrange(name, year, unitid) %>%
++     group_by(name) %>%
++     mutate(
++         notemployed_nextyear = ifelse(year == year.max, NA,
++             as.integer(is.na(dplyr::lead(salary_real, 1)))),
++         hired_lastyear = ifelse(year == year.min, NA,
++             as.integer(is.na(dplyr::lag(salary_real, 1)))),
++         promoted = ifelse(year %in% c(year.min, year.max), NA,
++             as.integer(dplyr::lag(ranked_position, 1) < ranked_position)),
++         demoted = ifelse(year %in% c(year.min, year.max), NA,
++             as.integer(dplyr::lag(ranked_position, 1) > ranked_position))) %>%
++     ungroup()
+> 
+> # How many individual professors in 2010 and 2021?
+> reg.data %>% filter(year == 2010) %>% count(unitid, name) %>% nrow() %>% print()
+[1] 16932
+> reg.data %>% filter(year == 2021) %>% count(unitid, name) %>% nrow() %>% print()
+[1] 15177
+> 
+> # Select non-missing values
+> reg.data <- reg.data %>%
++     mutate(extra_salary_real = ifelse(is.na(extra_salary_real), 0,
++         extra_salary_real)) %>%
++     # Only unis + years with measured state appropriations & shocks & Prof count
++     filter(!is.na(salary_real), salary_real > 0,
++         !is.na(enrollment_reported), enrollment_reported > 0,
++         #!is.na(nonauxrevenues_real),
++         !is.na(stateappropriations_real),
++         !is.na(appropriationshock_perEnroll_rolling))
+> 
+> # How many individual professors in 2010 and 2021,
+> # who were hired in 2011 and later.
+> reg.data %>% filter(year == 2011) %>% count(unitid, name) %>% nrow() %>% print()
+[1] 1778
+> reg.data %>% filter(year == 2021) %>% count(unitid, name) %>% nrow() %>% print()
+[1] 7935
+> 
+> # Factor out the unitid, name designations for FELM functionality
+> reg.data <- reg.data %>%
++     mutate(unitid = factor(unitid),
++         name = factor(name))
+> 
+> # Summary Table ----------------------------------------------------------------
+> 
+> # Generate the TeX summary table.
+> reg.data %>%
++     transmute(
++         lecturer = 100 * lecturer,
++         assistant = 100 * assistant,
++         full = 100 * full,
++         administrator = 100 * administrator,
++         lecturer_salary_real = ifelse(lecturer == 100, 1, NA) * salary_real,
++         assistant_salary_real = ifelse(assistant == 100, 1, NA) * salary_real,
++         full_salary_real = ifelse(full == 100, 1, NA) * salary_real,
++         admin_salary_real = ifelse(administrator == 100, 1, NA) * salary_real,
++         salary_real = salary_real,
++         lecturer_extra_salary_real = ifelse(lecturer == 100, 1, NA) * extra_salary_real,
++         assistant_extra_salary_real = ifelse(assistant == 100, 1, NA) * extra_salary_real,
++         full_extra_salary_real = ifelse(full == 100, 1, NA) * extra_salary_real,
++         admin_extra_salary_real = ifelse(administrator == 100, 1, NA) * extra_salary_real,
++         extra_salary_real = extra_salary_real) %>%
++     as.data.frame() %>%
++     stargazer(summary = TRUE,
++         summary.stat = c("mean", "sd", "median", "n"),
++         digits = 0,
++         digits.extra = 0,
++         covariate.labels = c(
++             "Lecturer, percent",
++             "Assistant professor, percent",
++             "Full professor, percent",
++             "Administrator professor, percent",
++             "Lecturer salary (2021 USD)",
++             "Assistant salary (2021 USD)",
++             "Full salary (2021 USD)",
++             "Administrator salary (2021 USD)",
++             "All salary (2021 USD)",
++             "Lecturer benefits (2021 USD)",
++             "Assistant benefits (2021 USD)",
++             "Full benefits (2021 USD)",
++             "Administrator benefits (2021 USD)",
++             "All benefits (2021 USD)"),
++         omit.table.layout = "n",
++         header = FALSE, float = FALSE, no.space = TRUE,
++         type = "text",
++         out = "../../text/tables/illinois-summary-rolling.tex")
+
+================================================================
+Statistic                          Mean   St. Dev. Median   N   
+----------------------------------------------------------------
+Lecturer, percent                   38       48      0    68,449
+Assistant professor, percent        32       47      0    68,449
+Full professor, percent             13       34      0    68,449
+Administrator professor, percent    17       37      0    68,449
+Lecturer salary (2021 USD)        27,931   25,783  18,729 25,820
+Assistant salary (2021 USD)       79,842   37,139  75,541 22,156
+Full salary (2021 USD)            108,252  57,567  97,527 9,001 
+Administrator salary (2021 USD)   111,256  62,519  99,012 11,472
+All salary (2021 USD)             69,261   54,443  65,954 68,449
+Lecturer benefits (2021 USD)       1,930   6,951     0    25,820
+Assistant benefits (2021 USD)      2,820   7,067     0    22,156
+Full benefits (2021 USD)           5,892   13,476    0    9,001 
+Administrator benefits (2021 USD)  3,188   19,671    0    11,472
+All benefits (2021 USD)            2,950   11,165    0    68,449
+----------------------------------------------------------------
+> 
+> 
+> # First stage Regressions -----------------------------------------------------
+> 
+> # Explain Revenues with a shock to (only) state appropriations.
+> firststage_approp.reg <- reg.data %>%
++     felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
++         log(appropriationshock_perEnroll_rolling) |
++         unitid + firstyear |
++         0 |
++         unitid + firstyear,
++         data = .)
+> # Get the F.Stat
+> firststage_approp.fstat <-
++     summary(firststage_approp.reg)$P.fstat["F"] %>%
++     as.numeric() %>%
++     round(digits.no)
+> 
+> # Without the FEs
+> # Explain State appropriations with a shock to (only) state appropriations.
+> firststage_approp_noFE.reg <- reg.data %>%
++     felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
++         log(appropriationshock_perEnroll_rolling) |
++         0 |
++         0 |
++         unitid + firstyear,
++         data = .)
+> # Get the F.Stat
+> firststage_approp_noFE.fstat <-
++     summary(firststage_approp_noFE.reg)$P.fstat["F"] %>%
++     as.numeric() %>%
++     round(digits.no)
+> 
+> # Explain Revenues with a shock to (only) state appropriations.
+> firststage_approp_tuit.reg <- reg.data %>%
++     felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
++         log(appropriationshock_perEnroll_rolling) +
++         log(tuitionrev_real / enrollment_reported) |
++         unitid + firstyear |
++         0 |
++         unitid + firstyear,
++         data = .)
+> # Get the F.Stat
+> firststage_approp_tuit.fstat <-
++     summary(firststage_approp_tuit.reg)$P.fstat["F"] %>%
++     as.numeric() %>%
++     round(digits.no)
+> 
+> # Without the FEs
+> # Explain State appropriations with a shock to (only) state appropriations.
+> firststage_approp_tuit_noFE.reg <- reg.data %>%
++     felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
++         log(appropriationshock_perEnroll_rolling) +
++         log(tuitionrev_real / enrollment_reported) |
++         0 |
++         0 |
++         unitid + firstyear,
++         data = .)
+> # Get the F.Stat
+> firststage_approp_tuit_noFE.fstat <-
++     summary(firststage_approp_tuit_noFE.reg)$P.fstat["F"] %>%
++     as.numeric() %>%
++     round(digits.no)
+> 
+> # Collate the results to a LaTeX table
+> stargazer(
++     firststage_approp_tuit.reg, firststage_approp_tuit_noFE.reg,
++     firststage_approp.reg, firststage_approp_noFE.reg,
++     dep.var.caption = "Dependent Variable: State Funding",
++     dep.var.labels.include = FALSE,
++     digits = digits.no,
++     digits.extra = digits.no,
++     model.names = FALSE,
++     omit = "factor|count|year",
++     intercept.bottom = TRUE,
++     covariate.labels = c("Appropriations Shock", "Tuition Revenue", "Constant"),
++     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq", "f"),
++     add.lines = list(
++         c("Fixed effects?", "Yes", "No", "Yes", "No"),
++         c("F stat.",
++             firststage_approp_tuit.fstat, firststage_approp_tuit_noFE.fstat,
++             firststage_approp.fstat, firststage_approp_noFE.fstat)),
++     star.cutoffs = NA,
++     header = FALSE, float = FALSE, no.space = TRUE,
++     omit.table.layout = "n", notes.append = FALSE,
++     type = "text",
++     out = "../../text/tables/firststage-illinois-rolling.tex")
+
+=========================================================
+                      Dependent Variable: State Funding  
+                     ------------------------------------
+                        (1)      (2)      (3)      (4)   
+---------------------------------------------------------
+Appropriations Shock   0.939    0.486    0.920    0.328  
+                      (0.024)  (0.084)  (0.024)  (0.066) 
+Tuition Revenue        0.711    0.766                    
+                      (0.223)  (0.280)                   
+Constant                        -1.906            6.484  
+                               (2.827)           (0.549) 
+---------------------------------------------------------
+Fixed effects?          Yes       No      Yes       No   
+F stat.               754.498   17.745  1470.24   24.842 
+Observations          68,449    68,449   68,449   68,449 
+R2                     0.911    0.416    0.906    0.257  
+=========================================================
+> 
+> 
+> # Faculty Salary Regressions ---------------------------------------------------
+> 
+> ## Non-full faculty salaries
+> lecturer.data <- reg.data %>%
++     filter(lecturer == 1)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_lecturer_salaries.reg <- lecturer.data %>%
++     felm(log(salary_real + extra_salary_real) ~ 1 |
++         unitid + firstyear |
++         (log(stateappropriations_real / enrollment_reported) ~
++             log(appropriationshock_perEnroll_rolling)) |
++         unitid + firstyear,
++         data = .)
+> 
+> ## Tenure-track faculty salaries
+> assistant.data <- reg.data %>%
++     filter(assistant == 1)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_assistant_salaries.reg <- assistant.data %>%
++     felm(log(salary_real + extra_salary_real) ~ 1 |
++         unitid + firstyear |
++         (log(stateappropriations_real / enrollment_reported) ~
++             log(appropriationshock_perEnroll_rolling)) |
++         unitid + firstyear,
++         data = .)
+> 
+> ## full faculty salaries
+> full.data <- reg.data %>%
++     filter(full == 1)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_full_salaries.reg <- full.data %>%
++     felm(log(salary_real + extra_salary_real) ~ 1 |
++         unitid + firstyear |
++         (log(stateappropriations_real / enrollment_reported) ~
++             log(appropriationshock_perEnroll_rolling)) |
++         unitid + firstyear,
++         data = .)
+> 
+> ## Administrator faculty salaries
+> administrator.data <- reg.data %>%
++     filter(administrator == 1)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_administrator_salaries.reg <- administrator.data %>%
++     felm(log(salary_real + extra_salary_real) ~ 1 |
++         unitid + firstyear |
++         (log(stateappropriations_real / enrollment_reported) ~
++             log(appropriationshock_perEnroll_rolling)) |
++         unitid + firstyear,
++         data = .)
+> 
+> ## All faculty Salaries
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_all_salaries.reg <- reg.data %>%
++     felm(log(salary_real + extra_salary_real) ~ 1 |
++         unitid + firstyear |
++         (log(stateappropriations_real / enrollment_reported) ~
++             log(appropriationshock_perEnroll_rolling)) |
++         unitid + firstyear,
++         data = .)
+> 
+> ## Collate the results to a LaTeX table
+> stargazer(
++     shiftshare_lecturer_salaries.reg,
++     shiftshare_assistant_salaries.reg,
++     shiftshare_full_salaries.reg,
++     shiftshare_administrator_salaries.reg,
++     shiftshare_all_salaries.reg,
++     dep.var.caption  = "Dependent Variable: Salaries by Professor Group",
++     dep.var.labels.include = FALSE,
++     column.labels = c("Lecturer", "Assistant", "Full", "Admin", "All"),
++     digits = digits.no,
++     digits.extra = digits.no,
++     model.names = FALSE,
++     omit = "factor|count|year",
++     intercept.bottom = TRUE,
++     order = c(2, 1, 3),
++     covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
++     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
++     star.cutoffs = NA,
++     header = FALSE, float = FALSE, no.space = TRUE,
++     omit.table.layout = "n", notes.append = FALSE,
++     type = "text",
++     out = "../../text/tables/facultysalaries-shock-illinois-rolling.tex")
+
+=================================================================
+                Dependent Variable: Salaries by Professor Group  
+              ---------------------------------------------------
+               Lecturer  Assistant    Full      Admin      All   
+                 (1)        (2)        (3)       (4)       (5)   
+-----------------------------------------------------------------
+State Funding   0.009      -0.072    -0.044    -0.013    -0.011  
+               (0.094)    (0.040)    (0.038)   (0.049)   (0.086) 
+-----------------------------------------------------------------
+Observations    25,820     22,156     9,001    11,472    68,449  
+R2              0.217      0.051      0.074     0.143     0.161  
+=================================================================
+> 
+> 
+> # Faculty Salary Regressions among first-years ---------------------------------
+> 
+> # Repeat analysis among the sample of new-hires, in their first year
+> newhire.data <- reg.data %>%
++     filter(firstyear == year, year > 2010)
+> 
+> ## Non-full faculty salaries
+> lecturer.data <- newhire.data %>%
++     filter(lecturer == 1)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_lecturer_salaries.reg <- lecturer.data %>%
++     felm(log(salary_real + extra_salary_real) ~ 1 |
++         unitid + firstyear |
++         (log(stateappropriations_real / enrollment_reported) ~
++             log(appropriationshock_perEnroll_rolling)) |
++         unitid + firstyear,
++         data = .)
+> 
+> ## Tenure-track faculty salaries
+> assistant.data <- newhire.data %>%
++     filter(assistant == 1)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_assistant_salaries.reg <- assistant.data %>%
++     felm(log(salary_real + extra_salary_real) ~ 1 |
++         unitid + firstyear |
++         (log(stateappropriations_real / enrollment_reported) ~
++             log(appropriationshock_perEnroll_rolling)) |
++         unitid + firstyear,
++         data = .)
+> 
+> ## full faculty salaries
+> full.data <- newhire.data %>%
++     filter(full == 1)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_full_salaries.reg <- full.data %>%
++     felm(log(salary_real + extra_salary_real) ~ 1 |
++         unitid + firstyear |
++         (log(stateappropriations_real / enrollment_reported) ~
++             log(appropriationshock_perEnroll_rolling)) |
++         unitid + firstyear,
++         data = .)
+> 
+> ## Administrator faculty salaries
+> administrator.data <- newhire.data %>%
++     filter(administrator == 1)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_administrator_salaries.reg <- administrator.data %>%
++     felm(log(salary_real + extra_salary_real) ~ 1 |
++         unitid + firstyear |
++         (log(stateappropriations_real / enrollment_reported) ~
++             log(appropriationshock_perEnroll_rolling)) |
++         unitid + firstyear,
++         data = .)
+> 
+> ## All faculty Salaries
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_all_salaries.reg <- newhire.data %>%
++     felm(log(salary_real + extra_salary_real) ~ 1 |
++         unitid + firstyear |
++         (log(stateappropriations_real / enrollment_reported) ~
++             log(appropriationshock_perEnroll_rolling)) |
++         unitid + firstyear,
++         data = .)
+> 
+> ## Collate the results to a LaTeX table
+> stargazer(
++     shiftshare_lecturer_salaries.reg,
++     shiftshare_assistant_salaries.reg,
++     shiftshare_full_salaries.reg,
++     shiftshare_administrator_salaries.reg,
++     shiftshare_all_salaries.reg,
++     dep.var.caption  = "Dependent Variable: Salaries by Professor Group",
++     dep.var.labels.include = FALSE,
++     column.labels = c("Lecturer", "Assistant", "Full", "Admin", "All"),
++     digits = digits.no,
++     digits.extra = digits.no,
++     model.names = FALSE,
++     omit = "factor|count|year",
++     intercept.bottom = TRUE,
++     order = c(2, 1, 3),
++     covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
++     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
++     star.cutoffs = NA,
++     header = FALSE, float = FALSE, no.space = TRUE,
++     omit.table.layout = "n", notes.append = FALSE,
++     type = "text",
++     out = "../../text/tables/newhiresalaries-shock-illinois-rolling.tex")
+
+=================================================================
+                Dependent Variable: Salaries by Professor Group  
+              ---------------------------------------------------
+               Lecturer  Assistant    Full      Admin      All   
+                 (1)        (2)        (3)       (4)       (5)   
+-----------------------------------------------------------------
+State Funding   0.384      -0.256    -0.378    -0.130     0.238  
+               (0.158)    (0.212)    (0.313)   (0.331)   (0.196) 
+-----------------------------------------------------------------
+Observations    8,786      5,090      1,248     3,153    18,277  
+R2              0.303      0.075      0.100     0.250     0.223  
+=================================================================
+> 
+> 
+> # Faculty Promotion rates among new Faculty ------------------------------------
+> 
+> # Generate indicator for whether the individual is ever observed as the position
+> reg.data <- reg.data %>%
++     mutate(associate = as.integer(position %in% c("Associate Professor"))) %>%
++     group_by(name, unitid) %>%
++     mutate(
++         ever_lecturer  = max(lecturer,  na.rm = TRUE),
++         ever_assistant = max(assistant, na.rm = TRUE),
++         ever_associate = max(associate, na.rm = TRUE)) %>%
++     ungroup()
+> 
+> ## Non-full faculty promotion
+> lecturer.data <- reg.data %>%
++     filter(ever_lecturer == 1, lecturer + assistant > 0)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_lecturer_promotion.reg <- lecturer.data %>%
++     felm(promoted ~ 1 |
++         unitid + firstyear |
++         (log(stateappropriations_real / enrollment_reported) ~
++             log(appropriationshock_perEnroll_rolling)) |
++         unitid + firstyear,
++         data = .)
+> 
+> print("How many lecturers ever go from lecturer to AP?")
+[1] "How many lecturers ever go from lecturer to AP?"
+> lecturer.data %>%
++     filter(ever_assistant == 1) %>%
++     distinct(name, .keep_all = TRUE) %>%
++     nrow() %>%
++     print()
+[1] 826
+> print("How many lecturers are there in total?")
+[1] "How many lecturers are there in total?"
+> lecturer.data %>% distinct(name, .keep_all = TRUE) %>% nrow() %>% print()
+[1] 9376
+> 
+> ## Tenure-track faculty promotion
+> assistant.data <- reg.data %>%
++     filter(ever_assistant == 1, assistant + associate > 0)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_assistant_promotion.reg <- assistant.data %>%
++     felm(promoted ~ 1 |
++         unitid + firstyear |
++         (log(stateappropriations_real / enrollment_reported) ~
++             log(appropriationshock_perEnroll_rolling)) |
++         unitid + firstyear,
++         data = .)
+> 
+> ## full faculty promotion
+> associate.data <- reg.data %>%
++     filter(ever_associate == 1, full > 0)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_full_promotion.reg <- associate.data %>%
++     felm(promoted ~ 1 |
++         unitid + firstyear |
++         (log(stateappropriations_real / enrollment_reported) ~
++             log(appropriationshock_perEnroll_rolling)) |
++         unitid + firstyear,
++         data = .)
+> 
+> ## All faculty promotion
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_all_promotion.reg <- reg.data %>%
++     felm(promoted ~ 1 |
++         unitid + firstyear |
++         (log(stateappropriations_real / enrollment_reported) ~
++             log(appropriationshock_perEnroll_rolling)) |
++         unitid + firstyear,
++         data = .)
+> 
+> ## Collate the results to a LaTeX table
+> stargazer(
++     shiftshare_lecturer_promotion.reg,
++     shiftshare_assistant_promotion.reg,
++     shiftshare_full_promotion.reg,
++     shiftshare_all_promotion.reg,
++     dep.var.caption  = "Dependent Variable: Promotion Rate by Professor Group",
++     dep.var.labels.include = FALSE,
++     column.labels = c("Lecturer", "Assistant", "Associate", "All"),
++     digits = digits.no,
++     digits.extra = digits.no,
++     model.names = FALSE,
++     omit = "factor|count|year",
++     intercept.bottom = TRUE,
++     order = c(2, 1, 3),
++     covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
++     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
++     star.cutoffs = NA,
++     header = FALSE, float = FALSE, no.space = TRUE,
++     omit.table.layout = "n", notes.append = FALSE,
++     type = "text",
++     out = "../../text/tables/promotion-shock-illinois-rolling.tex")
+
+======================================================================
+               Dependent Variable: Promotion Rate by Professor Group  
+              --------------------------------------------------------
+                 Lecturer      Assistant      Associate       All     
+                   (1)            (2)            (3)          (4)     
+----------------------------------------------------------------------
+State Funding     0.014          0.035          0.029        0.014    
+                 (0.007)        (0.019)        (0.062)      (0.009)   
+----------------------------------------------------------------------
+Observations      16,346         17,094         4,377        42,396   
+R2                0.007          0.024          0.029        0.009    
+======================================================================
+> 
+> 
+> # Faculty exit-rate Regressions ------------------------------------------------
+> 
+> ## Non-full faculty salaries
+> lecturer.data <- reg.data %>%
++     filter(lecturer == 1)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_lecturer_exit.reg <- lecturer.data %>%
++     felm(notemployed_nextyear ~ 1 |
++         unitid + firstyear |
++         (log(stateappropriations_real / enrollment_reported) ~
++             log(appropriationshock_perEnroll_rolling)) |
++         unitid + firstyear,
++         data = .)
+> 
+> ## Tenure-track faculty salaries
+> assistant.data <- reg.data %>%
++     filter(assistant == 1)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_assistant_exit.reg <- assistant.data %>%
++     felm(notemployed_nextyear ~ 1 |
++         unitid + firstyear |
++         (log(stateappropriations_real / enrollment_reported) ~
++             log(appropriationshock_perEnroll_rolling)) |
++         unitid + firstyear,
++         data = .)
+> 
+> ## full faculty salaries
+> full.data <- reg.data %>%
++     filter(full == 1)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_full_exit.reg <- full.data %>%
++     felm(notemployed_nextyear ~ 1 |
++         unitid + firstyear |
++         (log(stateappropriations_real / enrollment_reported) ~
++             log(appropriationshock_perEnroll_rolling)) |
++         unitid + firstyear,
++         data = .)
+> 
+> ## Administrator faculty salaries
+> administrator.data <- reg.data %>%
++     filter(administrator == 1)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_administrator_exit.reg <- administrator.data %>%
++     felm(notemployed_nextyear ~ 1 |
++         unitid + firstyear |
++         (log(stateappropriations_real / enrollment_reported) ~
++             log(appropriationshock_perEnroll_rolling)) |
++         unitid + firstyear,
++         data = .)
+> 
+> ## All faculty Salaries
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_all_exit.reg <- reg.data %>%
++     felm(notemployed_nextyear ~ 1 |
++         unitid + firstyear |
++         (log(stateappropriations_real / enrollment_reported) ~
++             log(appropriationshock_perEnroll_rolling)) |
++         unitid + firstyear,
++         data = .)
+> 
+> ## Collate the results to a LaTeX table
+> stargazer(
++     shiftshare_lecturer_exit.reg,
++     shiftshare_assistant_exit.reg,
++     shiftshare_full_exit.reg,
++     shiftshare_administrator_exit.reg,
++     shiftshare_all_exit.reg,
++     dep.var.caption  = "Dependent Variable: Exit rate by Professor Group",
++     dep.var.labels.include = FALSE,
++     column.labels = c("Lecturer", "Assistant", "Full", "Admin", "All"),
++     digits = digits.no,
++     digits.extra = digits.no,
++     model.names = FALSE,
++     omit = "factor|count|year",
++     intercept.bottom = TRUE,
++     order = c(2, 1, 3),
++     covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
++     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
++     star.cutoffs = NA,
++     header = FALSE, float = FALSE, no.space = TRUE,
++     omit.table.layout = "n", notes.append = FALSE,
++     type = "text",
++     out = "../../text/tables/facultyleaving-shock-illinois-rolling.tex")
+
+==================================================================
+                Dependent Variable: Exit rate by Professor Group  
+              ----------------------------------------------------
+               Lecturer   Assistant    Full      Admin      All   
+                  (1)        (2)        (3)       (4)       (5)   
+------------------------------------------------------------------
+State Funding   -0.007      0.002     -0.004    -0.003    -0.006  
+                (0.024)    (0.006)    (0.008)   (0.020)   (0.015) 
+------------------------------------------------------------------
+Observations    23,376      19,757     7,190    10,191    60,514  
+R2               0.013      0.006      0.014     0.068     0.016  
+==================================================================
+> 
+> 
+> # Local Projections for staying-power of effects -------------------------------
+> # install.packages("lpirfs")
+> # https://cran.r-project.org/web/packages/lpirfs/lpirfs.pdf
+> quit("no")
+> proc.time()
+   user  system elapsed 
+ 32.600   0.307  32.905 
