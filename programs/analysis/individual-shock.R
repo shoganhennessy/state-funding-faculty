@@ -1,5 +1,6 @@
 #!/usr/bin/R
 ## Senan Hogan-Hennessy, 3 August 2022
+print(c(Sys.time(), Sys.Date()))
 ## IV for Prof's outcomes, using Illinois data.
 library(tidyverse) ## functions for data manipulation and visualization
 library(lfe)
@@ -15,7 +16,7 @@ digits.no <- 3
 
 # Size for figures
 fig.width <- 10
-fig.height <- fig.width * 0.75
+fig.height <- fig.width * 0.85
 
 
 # Load data --------------------------------------------------------------------
@@ -254,7 +255,7 @@ firststage_approp_tuit_noFE.fstat <-
 stargazer(
     firststage_approp_tuit.reg, firststage_approp_tuit_noFE.reg,
     firststage_approp.reg, firststage_approp_noFE.reg,
-    dep.var.caption = "Dependent Variable: Non-institutional Revenues",
+    dep.var.caption = "Dependent Variable: State Funding",
     dep.var.labels.include = FALSE,
     digits = digits.no,
     digits.extra = digits.no,
@@ -351,13 +352,82 @@ stargazer(
     omit = "factor|count|year",
     intercept.bottom = TRUE,
     order = c(2, 1, 3),
-    covariate.labels = c("Non-inst. Revenues", "Tuition Revenue", "Constant"),
+    covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
     star.cutoffs = NA,
     header = FALSE, float = FALSE, no.space = TRUE,
     omit.table.layout = "n", notes.append = FALSE,
     type = "text",
     out = "../../text/tables/facultysalaries-shock-illinois.tex")
+
+# Investigate count + pay for new professors, by position, in each year Illinois
+faculty_yearly.data <- reg.data %>%
+    mutate(
+        position = ifelse(lecturer == 1, "lecturer",
+            ifelse(assistant == 1, "assistant",
+                ifelse(full == 1, "full",
+                    ifelse(administrator == 1, "administrator", NA))))) %>%
+    # Get the uni-yearly count (enrollment is at the uni leevel, so is averaged)
+    group_by(year, position, unitid) %>%
+    summarise(prof_count = n(),
+        enrollment_reported = mean(enrollment_reported, na.rm = TRUE),
+        totalsalary_real =
+            mean(salary_real + extra_salary_real, na.rm = TRUE)) %>%
+    ungroup() %>%
+    # Collapse to the year-position level
+    group_by(year, position) %>%
+    summarise(totalsalary_real = weighted.mean(totalsalary_real,
+            weights = prof_count, na.rm = TRUE),
+        prof_count = sum(prof_count, na.rm = TRUE),
+        enrollment_reported = sum(enrollment_reported, na.rm = TRUE)) %>%
+    ungroup() %>%
+    mutate(prof_perstudent = prof_count / enrollment_reported)
+
+# Plot the number of new professors, by position, in each year Illinois
+faculty_count.plot <- faculty_yearly.data %>%
+    ggplot(aes(x = year, y = prof_perstudent, colour = position)) +
+    geom_point() +
+    geom_line() +
+    # Adjust the names and axis
+    scale_x_continuous(name = "Year",
+        breaks = seq(2010, 2021, by = 2)) +
+    scale_y_continuous(name = "",
+        limits = c(0, 0.035),
+        breaks = seq(0, 0.035, by = 0.005),
+        labels = scales::comma) +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5),
+        legend.position = "top") +
+    scale_colour_discrete(name = "",
+        breaks = c("lecturer", "assistant", "full", "administrator"),
+        labels = c("Lecturer", "Assistant", "Full", "Administrator"))
+# Save this plot
+ggsave("../../text/figures/faculty-count-illinois.png",
+    plot = faculty_count.plot,
+    units = "cm", width = fig.width, height = fig.height)
+
+# Plot the salaries for new professors, by position, in each year Illinois
+faculty_salary.plot <- faculty_yearly.data %>%
+    ggplot(aes(x = year, y = totalsalary_real, colour = position)) +
+    geom_point() +
+    geom_line() +
+    # Adjust the names and axis
+    scale_x_continuous(name = "Year",
+        breaks = seq(2010, 2021, by = 2)) +
+    scale_y_continuous(name = "",
+        limits = c(0, 130000),
+        breaks = seq(0, 130000, by = 20000),
+        labels = scales::comma) +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5),
+        legend.position = "top") +
+    scale_colour_discrete(name = "",
+        breaks = c("lecturer", "assistant", "full", "administrator"),
+        labels = c("Lecturer", "Assistant", "Full", "Administrator"))
+# Save this plot
+ggsave("../../text/figures/faculty-salary-illinois.png",
+    plot = faculty_salary.plot,
+    units = "cm", width = fig.width, height = fig.height)
 
 
 # Faculty Salary Regressions among first-years ---------------------------------
@@ -440,15 +510,13 @@ stargazer(
     omit = "factor|count|year",
     intercept.bottom = TRUE,
     order = c(2, 1, 3),
-    covariate.labels = c("Non-inst. Revenues", "Tuition Revenue", "Constant"),
+    covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
     star.cutoffs = NA,
     header = FALSE, float = FALSE, no.space = TRUE,
     omit.table.layout = "n", notes.append = FALSE,
     type = "text",
     out = "../../text/tables/newhiresalaries-shock-illinois.tex")
-quit("no")
-
 
 # Investigate count + pay for new professors, by position, in each year Illinois
 newhire_yearly.data <- newhire.data %>%
@@ -581,7 +649,7 @@ stargazer(
     omit = "factor|count|year",
     intercept.bottom = TRUE,
     order = c(2, 1, 3),
-    covariate.labels = c("Non-inst. Revenues", "Tuition Revenue", "Constant"),
+    covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
     star.cutoffs = NA,
     header = FALSE, float = FALSE, no.space = TRUE,
@@ -666,7 +734,7 @@ stargazer(
     omit = "factor|count|year",
     intercept.bottom = TRUE,
     order = c(2, 1, 3),
-    covariate.labels = c("Non-inst. Revenues", "Tuition Revenue", "Constant"),
+    covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
     star.cutoffs = NA,
     header = FALSE, float = FALSE, no.space = TRUE,

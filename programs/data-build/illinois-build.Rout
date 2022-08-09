@@ -1,0 +1,78 @@
+
+R version 4.2.1 (2022-06-23) -- "Funny-Looking Kid"
+Copyright (C) 2022 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> #!/usr/bin/R
+> ## Senan Hogan-Hennessy, 12 April 2022
+> ## Put raw Illinois data to readable format.
+> # functions for data manipulation and visualisation
+> library(tidyverse)
+── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+✔ ggplot2 3.3.5     ✔ purrr   0.3.4
+✔ tibble  3.1.6     ✔ dplyr   1.0.9
+✔ tidyr   1.2.0     ✔ stringr 1.4.0
+✔ readr   2.1.2     ✔ forcats 0.5.1
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+> # Fuzzy matching
+> library(fuzzyjoin)
+> set.seed(47)
+> 
+> 
+> ################################################################################
+> ## Load raw data
+> 
+> # Load the first year
+> illinois.data <-
++     readxl::read_xls("../../data/states/illinois/2010_Salaries.xls") %>%
++     mutate(year = 2010)
+> 
+> # Add the next years
+> for (extrayear in c(2011:2021)) {
++     print(extrayear)
++     # Read next year of data
++     extra.data <- paste0("../../data/states/illinois/", as.character(extrayear),
++             "_Salaries.xls") %>%
++         readxl::read_xls() %>%
++         mutate(year = extrayear)
++     # Append relevant data
++     illinois.data <- illinois.data %>%
++         bind_rows(extra.data)
++     # Save memory (thanks to R having no auto GC)
++     rm(extra.data)
++     gc()
++ }
+[1] 2011
+[1] 2012
+[1] 2013
+[1] 2014
+[1] 2015
+[1] 2016
+[1] 2017
+[1] 2018
+[1] 2019
+[1] 2020
+[1] 2021
+> 
+> # CPI-U from FREDS (since Urban provided cpi has missing years)
+> # Yearly average, seasonally adjusted, base year 1982-1984=100
+> # https://fred.stlouisfed.org/series/CPIAUCSL
+> cpiu.data <- read_csv("../../data/urban-ipeds/raw-data/freds-cpiu.csv")
+Error: '../../data/urban-ipeds/raw-data/freds-cpiu.csv' does not exist in current working directory ('/home/shh/Dropbox/finances-faculty-composition/programs/data-build').
+Execution halted

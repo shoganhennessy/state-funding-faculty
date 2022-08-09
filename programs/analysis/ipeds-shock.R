@@ -1,6 +1,7 @@
 #!/usr/bin/R
 ## Senan Hogan-Hennessy, 3 August June 2022
 ## IV for Prof's salaries, using IPEDS data.
+print(c(Sys.time(), Sys.Date()))
 library(tidyverse) # Functions for data manipulation and visualization
 library(lfe) # Functions for fast linear models with IV + FEs
 library(plm) # Functions for panel data
@@ -16,7 +17,7 @@ digits.no <- 3
 
 # Size for figures
 fig.width <- 10
-fig.height <- fig.width * 0.75
+fig.height <- fig.width * 0.85
 
 
 # Load data sources ------------------------------------------------------------
@@ -128,8 +129,8 @@ mean_funding_fte.data <- reg.data %>%
     summarise(
         totalrevenues_real =
             mean(totalrevenues_real / enrollment_reported, na.rm = TRUE),
-        nonauxrevenues_real =
-            mean(nonauxrevenues_real / enrollment_reported, na.rm = TRUE),
+        #nonauxrevenues_real =
+        #    mean(nonauxrevenues_real / enrollment_reported, na.rm = TRUE),
         stateappropriations_real =
             mean(stateappropriations_real / enrollment_reported, na.rm = TRUE),
         tuitionrev_real =
@@ -153,7 +154,7 @@ mean_funding_fte.graph <- mean_funding_fte.data %>%
     scale_colour_discrete(name = "",
         breaks = c("totalrevenues_real", "nonauxrevenues_real",
         "stateappropriations_real", "tuitionrev_real"),
-        labels = c("Total", "Non-inst.", "State", "Tution"))
+        labels = c("Total", "Non-aux.", "State", "Tuition"))
 # Save this plot
 ggsave("../../text/figures/mean-funding-fte.png",
     plot = mean_funding_fte.graph,
@@ -165,8 +166,8 @@ mean_funding.data <- reg.data %>%
     summarise(
         totalrevenues_real =
             mean(totalrevenues_real, na.rm = TRUE) / (10^6),
-        nonauxrevenues_real =
-            mean(nonauxrevenues_real, na.rm = TRUE) / (10^6),
+        #nonauxrevenues_real =
+        #    mean(nonauxrevenues_real, na.rm = TRUE) / (10^6),
         stateappropriations_real =
             mean(stateappropriations_real, na.rm = TRUE) / (10^6),
         tuitionrev_real =
@@ -190,23 +191,31 @@ mean_funding.graph <- mean_funding.data %>%
     scale_colour_discrete(name = "",
         breaks = c("totalrevenues_real", "nonauxrevenues_real",
         "stateappropriations_real", "tuitionrev_real"),
-        labels = c("Total", "Non-inst.", "State", "Tution"))
+        labels = c("Total", "Non-inst.", "State", "Tuition"))
 # Save this plot
 ggsave("../../text/figures/mean-funding-total.png",
     plot = mean_funding.graph,
     units = "cm", width = fig.width, height = fig.height)
 
 # SHow figures fo 1990 and 2020, mean and total
-print("total rev")
-mean_funding.data %>% filter(year == 1990) %>% pull(totalrevenues_real)
-mean_funding.data %>% filter(year == 2020) %>% pull(totalrevenues_real)
-mean_funding_fte.data %>% filter(year == 1990) %>% pull(totalrevenues_real)
-mean_funding_fte.data %>% filter(year == 2020) %>% pull(totalrevenues_real)
-print("state approp")
-mean_funding.data %>% filter(year == 1990) %>% pull(stateappropriations_real)
-mean_funding.data %>% filter(year == 2020) %>% pull(stateappropriations_real)
-mean_funding_fte.data %>% filter(year == 1990) %>% pull(stateappropriations_real)
-mean_funding_fte.data %>% filter(year == 2020) %>% pull(stateappropriations_real)
+print("total rev:")
+print(c("Mean total rev per uni, 1990",
+    mean_funding.data %>% filter(year == 1990) %>% pull(totalrevenues_real)))
+print(c("Mean total rev per uni, 2020",
+    mean_funding.data %>% filter(year == 2020) %>% pull(totalrevenues_real)))
+print(c("Mean total rev per student, 1990",
+    mean_funding_fte.data %>% filter(year == 1990) %>% pull(totalrevenues_real)))
+print(c("Mean total rev per student, 2020",
+    mean_funding_fte.data %>% filter(year == 2020) %>% pull(totalrevenues_real)))
+print("state approp:")
+print(c("Mean state rev per uni, 1990",
+    mean_funding.data %>% filter(year == 1990) %>% pull(stateappropriations_real)))
+print(c("Mean state rev per uni, 2020",
+    mean_funding.data %>% filter(year == 2020) %>% pull(stateappropriations_real)))
+print(c("Mean state rev per student, 1990",
+    mean_funding_fte.data %>% filter(year == 1990) %>% pull(stateappropriations_real)))
+print(c("Mean state rev per student, 2020",
+    mean_funding_fte.data %>% filter(year == 2020) %>% pull(stateappropriations_real)))
 print("enrollment in 1990 as a percent of that in 2020 among PUs")
 enrollment_yearly.data <- reg.data %>%
     group_by(year) %>%
@@ -225,8 +234,8 @@ illinois_funding_fte.data <- reg.data %>%
     summarise(
         totalrevenues_real =
             mean(totalrevenues_real / enrollment_reported, na.rm = TRUE),
-        nonauxrevenues_real =
-            mean(nonauxrevenues_real / enrollment_reported, na.rm = TRUE),
+        #nonauxrevenues_real =
+        #    mean(nonauxrevenues_real / enrollment_reported, na.rm = TRUE),
         stateappropriations_real =
             mean(stateappropriations_real / enrollment_reported, na.rm = TRUE),
         tuitionrev_real =
@@ -250,7 +259,7 @@ illinois_funding_fte.graph <- illinois_funding_fte.data %>%
     scale_colour_discrete(name = "",
         breaks = c("totalrevenues_real", "nonauxrevenues_real",
         "stateappropriations_real", "tuitionrev_real"),
-        labels = c("Total", "Non-inst.", "State", "Tution"))
+        labels = c("Total", "Non-inst.", "State", "Tuition"))
 # Save this plot
 ggsave("../../text/figures/illinois-funding-fte.png",
     plot = illinois_funding_fte.graph,
@@ -263,8 +272,8 @@ illinois_funding.data <- reg.data %>%
     summarise(
         totalrevenues_real =
             mean(totalrevenues_real, na.rm = TRUE) / (10^6),
-        nonauxrevenues_real =
-            mean(nonauxrevenues_real, na.rm = TRUE) / (10^6),
+        #nonauxrevenues_real =
+        #    mean(nonauxrevenues_real, na.rm = TRUE) / (10^6),
         stateappropriations_real =
             mean(stateappropriations_real, na.rm = TRUE) / (10^6),
         tuitionrev_real =
@@ -288,7 +297,7 @@ illinois_funding.graph <- illinois_funding.data %>%
     scale_colour_discrete(name = "",
         breaks = c("totalrevenues_real", "nonauxrevenues_real",
         "stateappropriations_real", "tuitionrev_real"),
-        labels = c("Total", "Non-inst.", "State", "Tution"))
+        labels = c("Total", "Non-inst.", "State", "Tuition"))
 # Save this plot
 ggsave("../../text/figures/illinois-funding-total.png",
     plot = illinois_funding.graph,
@@ -362,7 +371,7 @@ firststage_approp_tuit_noFE.fstat <-
 stargazer(
     firststage_approp_tuit.reg, firststage_approp_tuit_noFE.reg,
     firststage_approp.reg, firststage_approp_noFE.reg,
-    dep.var.caption = "Dependent Variable: Non-institutional Revenues",
+    dep.var.caption = "Dependent Variable: State Funding",
     dep.var.labels.include = FALSE,
     digits = digits.no,
     digits.extra = digits.no,
@@ -487,7 +496,7 @@ stargazer(
     omit = "factor|count|year",
     intercept.bottom = TRUE,
     order = c(2, 1, 3),
-    covariate.labels = c("Non-inst. Revenues", "Tuition Revenue", "Constant"),
+    covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
     star.cutoffs = NA,
     header = FALSE, float = FALSE, no.space = TRUE,
@@ -602,7 +611,7 @@ stargazer(
     omit = "factor|count|year",
     intercept.bottom = TRUE,
     order = c(2, 1, 3),
-    covariate.labels = c("Non-inst. Revenues", "Tuition Revenue", "Constant"),
+    covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
     star.cutoffs = NA,
     header = FALSE, float = FALSE, no.space = TRUE,
@@ -719,7 +728,7 @@ stargazer(
     omit = "factor|count|year",
     intercept.bottom = TRUE,
     order = c(2, 1, 3),
-    covariate.labels = c("Non-inst. Revenues", "Tuition Revenue", "Constant"),
+    covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
     star.cutoffs = NA,
     header = FALSE, float = FALSE, no.space = TRUE,
@@ -731,7 +740,6 @@ stargazer(
 # Local Projections for staying-power of effects -------------------------------
 # install.packages("lpirfs")
 # https://cran.r-project.org/web/packages/lpirfs/lpirfs.pdf
-quit("no")
 library(plm)
 library(lpirfs)
 time.horizon <- 10
@@ -742,7 +750,7 @@ lp.data <- reg.data %>%
         year = year,
         all_prof_count = log(all_prof_count / enrollment_reported),
         all_profmeansalary_real = log(all_profmeansalary_real),
-        nonauxrevenues_real = log(stateappropriations_real / enrollment_reported),
+        stateappropriations_real = log(stateappropriations_real / enrollment_reported),
         appropriationshock_perEnroll_real =
             log(appropriationshock_perEnroll_real),
         tuitionrev_real = log(tuitionrev_real / enrollment_reported))
@@ -751,7 +759,7 @@ lp.data <- reg.data %>%
 firststage.lpreg <-
     lp_lin_panel(data_set = lp.data,
         # Outcome variable
-        endog_data = "nonauxrevenues_real",
+        endog_data = "stateappropriations_real",
         # Predictor variable
         shock = "appropriationshock_perEnroll_real",
         # Contemporaneous control
@@ -776,7 +784,7 @@ all_count.lpreg <-
         # Outcome variable
         endog_data = "all_prof_count",
         # Predictor variable
-        shock = "nonauxrevenues_real",
+        shock = "stateappropriations_real",
         # Contemporaneous control
         #c_exog_data = "tuitionrev_real",
         # Option to use IV for predictor endogeneity
@@ -800,7 +808,7 @@ all_salaries.lpreg <-
         # Outcome variable
         endog_data = "all_profmeansalary_real",
         # Predictor variable
-        shock = "nonauxrevenues_real",
+        shock = "stateappropriations_real",
         # Contemporaneous control
         #c_exog_data = "tuitionrev_real",
         # Option to use IV for predictor endogeneity

@@ -1,5 +1,6 @@
 #!/usr/bin/R
 ## Senan Hogan-Hennessy, 3 August 2022
+print(c(Sys.time(), Sys.Date()))
 ## IV for Prof's outcomes, using Illinois data.
 ## Using a rolling-share variant of the instrument.
 library(tidyverse) ## functions for data manipulation and visualization
@@ -16,7 +17,7 @@ digits.no <- 3
 
 # Size for figures
 fig.width <- 10
-fig.height <- fig.width * 0.75
+fig.height <- fig.width * 0.85
 
 
 # Load data --------------------------------------------------------------------
@@ -284,7 +285,7 @@ firststage_approp_tuit_noFE.fstat <-
 stargazer(
     firststage_approp_tuit.reg, firststage_approp_tuit_noFE.reg,
     firststage_approp.reg, firststage_approp_noFE.reg,
-    dep.var.caption = "Dependent Variable: Non-institutional Revenues",
+    dep.var.caption = "Dependent Variable: State Funding",
     dep.var.labels.include = FALSE,
     digits = digits.no,
     digits.extra = digits.no,
@@ -381,7 +382,7 @@ stargazer(
     omit = "factor|count|year",
     intercept.bottom = TRUE,
     order = c(2, 1, 3),
-    covariate.labels = c("Non-inst. Revenues", "Tuition Revenue", "Constant"),
+    covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
     star.cutoffs = NA,
     header = FALSE, float = FALSE, no.space = TRUE,
@@ -470,7 +471,7 @@ stargazer(
     omit = "factor|count|year",
     intercept.bottom = TRUE,
     order = c(2, 1, 3),
-    covariate.labels = c("Non-inst. Revenues", "Tuition Revenue", "Constant"),
+    covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
     star.cutoffs = NA,
     header = FALSE, float = FALSE, no.space = TRUE,
@@ -561,7 +562,7 @@ stargazer(
     omit = "factor|count|year",
     intercept.bottom = TRUE,
     order = c(2, 1, 3),
-    covariate.labels = c("Non-inst. Revenues", "Tuition Revenue", "Constant"),
+    covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
     star.cutoffs = NA,
     header = FALSE, float = FALSE, no.space = TRUE,
@@ -646,7 +647,7 @@ stargazer(
     omit = "factor|count|year",
     intercept.bottom = TRUE,
     order = c(2, 1, 3),
-    covariate.labels = c("Non-inst. Revenues", "Tuition Revenue", "Constant"),
+    covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
     star.cutoffs = NA,
     header = FALSE, float = FALSE, no.space = TRUE,
@@ -658,6 +659,7 @@ stargazer(
 # Local Projections for staying-power of effects -------------------------------
 # install.packages("lpirfs")
 # https://cran.r-project.org/web/packages/lpirfs/lpirfs.pdf
+quit("no")
 library(plm)
 library(lpirfs)
 time.horizon <- 5

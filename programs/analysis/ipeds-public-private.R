@@ -1,6 +1,7 @@
 #!/usr/bin/R
 ## Senan Hogan-Hennessy, 10 June 2022
 ## Investigate differences between public and private uni prof composition.
+print(c(Sys.time(), Sys.Date()))
 set.seed(47)
 # Functions for data manipulation and visualisation
 library(tidyverse)
@@ -114,21 +115,21 @@ ggsave("../../text/figures/enrollment-mean.png",
 
 # Compare to IPEDS provided table
 # https://nces.ed.gov/ipeds/search/ViewTable?tableId=10102&returnUrl=%2Fipeds%2Fsearch
-ipeds.data %>%
-    group_by(year, public, fouryear) %>%
-    summarise(
-        all_profmeansalary_real = weighted.mean(all_profmeansalary_real,
-            weights = all_prof_count, na.rm = TRUE),
-        full_profmeansalary_real = weighted.mean(full_profmeansalary_real,
-            weights = lecturer_prof_count, na.rm = TRUE),
-        assistant_profmeansalary_real = weighted.mean(assistant_profmeansalary_real,
-            weights = assistant_prof_count, na.rm = TRUE),
-        lecturer_profmeansalary_real = weighted.mean(lecturer_profmeansalary_real,
-            weights = full_prof_count, na.rm = TRUE),
-        full_prof_count = sum(full_prof_count, na.rm = TRUE),
-        all_prof_count =  sum(all_prof_count, na.rm = TRUE)) %>%
-    filter(year %in% 2018:2019) %>%
-    View()
+#ipeds.data %>%
+#    group_by(year, public, fouryear) %>%
+#    summarise(
+#        all_profmeansalary_real = weighted.mean(all_profmeansalary_real,
+#            weights = all_prof_count, na.rm = TRUE),
+#        full_profmeansalary_real = weighted.mean(full_profmeansalary_real,
+#            weights = lecturer_prof_count, na.rm = TRUE),
+#        assistant_profmeansalary_real = weighted.mean(assistant_profmeansalary_real,
+#            weights = assistant_prof_count, na.rm = TRUE),
+#        lecturer_profmeansalary_real = weighted.mean(lecturer_profmeansalary_real,
+#            weights = full_prof_count, na.rm = TRUE),
+#        full_prof_count = sum(full_prof_count, na.rm = TRUE),
+#        all_prof_count =  sum(all_prof_count, na.rm = TRUE)) %>%
+#    filter(year %in% 2018:2019) %>%
+#    View()
 #! Massive under-count for private uni prof salaries, as compared to here
 #! https://nces.ed.gov/ipeds/search/ViewTable?tableId=25036&returnUrl=%2Fipeds%2Fsearch
 
@@ -164,8 +165,7 @@ ipeds.data %>%
     theme_bw()
 
 #! The salaries data show that public profs are paid more then private, which is not the case elsewhere
-#! There must be a problem with how these salary info are constructed, so I must change it until
-#! This makes sense.
+#! There must be a problem with how these salary info are constructed specifically for private unis, so do not use these as an outcome in the analysis.
 
 
 # Plot prof per student over time ----------------------------------------------
@@ -280,12 +280,3 @@ mean_funding.data <- ipeds.data %>%
             mean(stateappropriations_real / enrollment_reported, na.rm = TRUE),
         tuitionrev_perEnroll =
             mean(tuitionrev_real / enrollment_reported, na.rm = TRUE))
-
-# Show yearly figures
-mean_funding.data %>%
-    filter(year %in% c(1990, 2020)) %>%
-    print()
-
-mean_funding.data %>%
-    #filter(year %in% c(1990, 2020)) %>%
-    View()

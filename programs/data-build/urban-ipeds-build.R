@@ -1,6 +1,7 @@
 #!/usr/bin/R
 ## Senan Hogan-Hennessy, 21 December 2021
 ## Build IPEDS data with the Urban Inst's package
+print(c(Sys.time(), Sys.Date()))
 ## https://educationdata.urban.org/documentation/colleges.html
 ## https://urbaninstitute.github.io/education-data-package-r/
 library(tidyverse) ## functions for data manipulation and visualization
@@ -349,12 +350,3 @@ urban_ipeds.data %>%
 urban_ipeds.data %>%
     filter(fouryear == 1, public == 1, forprofit == 0) %>%
     write_csv("../../data/urban-ipeds/urban-clean-publicunis.csv")
-
-#! WHich years are covered?
-print("all years")
-urban_ipeds.data %>% pull(year) %>% table()
-print("variables")
-urban_ipeds.data %>% filter(!is.na(enrollment_fte)) %>% pull(year) %>% max(na.rm = TRUE)
-urban_ipeds.data %>% filter(!is.na(totalrevenues_real)) %>% pull(year) %>% max(na.rm = TRUE)
-urban_ipeds.data %>% filter(!is.na(nonauxspending_real)) %>% pull(year) %>% max(na.rm = TRUE)
-urban_ipeds.data %>% filter(!is.na(appropriationshock_perEnroll_real)) %>% pull(year) %>% table()

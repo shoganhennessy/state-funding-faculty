@@ -1,5 +1,6 @@
 #!/usr/bin/R
 ## Senan Hogan-Hennessy, 12 April 2022
+print(c(Sys.time(), Sys.Date()))
 ## Put raw Illinois data to readable format.
 # functions for data manipulation and visualisation
 library(tidyverse)
