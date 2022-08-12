@@ -2,10 +2,9 @@
 
 Senan Hogan-Hennessy, 17 August 2021
 
-The code in this replication package for the economics research paper "Stagnating Public University Finances and Faculty
-Composition", analysis using IPEDS and public Illinois data using R.
+The code in this replication package for the economics research paper "Stagnating State Support for Higher Education and Its Effect on Faculty Composition", analysis using IPEDS and public Illinois data using *R*.
 A master bash file calls all code to build analysis data from raw files, and then produce analysis files.
-The replicator should expect the code to run for less than 10 minutes, using at maximum 6GB of RAM.
+The replicator should expect the code to run for less than 10 minutes, using at maximum 4GB of RAM.
 
 ## Data
 
