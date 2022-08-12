@@ -2,3 +2,4 @@ data/*
 programs/analysis/old/*
 text/presentation/*
 text/readings/*
+.gitignore
