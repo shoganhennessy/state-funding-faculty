@@ -1,4 +1,4 @@
-# finances-faculty-composition
+# state-faculty-composition
 
 Senan Hogan-Hennessy, 17 August 2021
 
