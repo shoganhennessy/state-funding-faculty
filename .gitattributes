@@ -27,3 +27,8 @@ data/urban-ipeds/documentation/educationdata.pdf filter=lfs diff=lfs merge=lfs -
 data/urban-ipeds/documentation/get.sh filter=lfs diff=lfs merge=lfs -text
 data/urban-ipeds/documentation/index.html filter=lfs diff=lfs merge=lfs -text
 data/urban-ipeds/documentation/introducing-educationdata.html filter=lfs diff=lfs merge=lfs -text
+data/urban-ipeds/raw-data/colleges_ipeds_admissions-enrollment.csv filter=lfs diff=lfs merge=lfs -text
+data/urban-ipeds/raw-data/colleges_ipeds_ay_tuition_fees.csv filter=lfs diff=lfs merge=lfs -text
+data/urban-ipeds/raw-data/colleges_ipeds_enrollment-fte.csv filter=lfs diff=lfs merge=lfs -text
+data/urban-ipeds/raw-data/colleges_ipeds_institutional-characteristics.csv filter=lfs diff=lfs merge=lfs -text
+data/urban-ipeds/raw-data/colleges_ipeds_salaries_is.csv filter=lfs diff=lfs merge=lfs -text
