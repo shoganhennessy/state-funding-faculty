@@ -24,6 +24,6 @@ R CMD BATCH --no-save individual-shock-rolling.R
 cd ..
 
 # Compile paper, with outputs of progams as inputs for TeX files
-cd text
+cd ../text
 latexmk -pdf paper.tex
 latexmk -c

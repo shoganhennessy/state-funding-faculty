@@ -369,8 +369,8 @@ firststage_approp_tuit_noFE.fstat <-
 
 # Collate the results to a LaTeX table
 stargazer(
-    firststage_approp_tuit.reg, firststage_approp_tuit_noFE.reg,
     firststage_approp.reg, firststage_approp_noFE.reg,
+    firststage_approp_tuit.reg, firststage_approp_tuit_noFE.reg,
     dep.var.caption = "Dependent Variable: State Funding",
     dep.var.labels.include = FALSE,
     digits = digits.no,

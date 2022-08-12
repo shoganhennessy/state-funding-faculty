@@ -19,6 +19,8 @@ Type 'q()' to quit R.
 
 > #!/usr/bin/R
 > ## Senan Hogan-Hennessy, 3 August 2022
+> print(c(Sys.time(), Sys.Date()))
+[1] "2022-08-11 20:20:08 EDT" "2022-08-10 20:00:00 EDT"
 > ## IV for Prof's outcomes, using Illinois data.
 > library(tidyverse) ## functions for data manipulation and visualization
 ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
@@ -125,8 +127,8 @@ dbl (46): unitid, year, public, forprofit, fouryear, associatescollege, cpi2...
 > rm(illinois.data)
 > gc()
           used  (Mb) gc trigger  (Mb) max used  (Mb)
-Ncells 2137651 114.2    4345291 232.1  3254923 173.9
-Vcells 8143283  62.2   17860271 136.3 17860271 136.3
+Ncells 2138579 114.3    4344111 232.1  3256061 173.9
+Vcells 8145381  62.2   17862789 136.3 17862789 136.3
 > 
 > # How many individual professors in 2010 and 2021?
 > reg.data %>% filter(year == 2010) %>% count(unitid, name) %>% nrow() %>% print()
@@ -921,4 +923,4 @@ The following objects are masked from ‘package:dplyr’:
 > quit("no")
 > proc.time()
    user  system elapsed 
- 41.544   0.474  42.339 
+ 58.490   0.613  59.925 

@@ -20,8 +20,8 @@ Type 'q()' to quit R.
 > #!/usr/bin/R
 > ## Senan Hogan-Hennessy, 21 December 2021
 > ## Build IPEDS data with the Urban Inst's package
-> 
-> sink("../../run.log", append = TRUE)
+> print(c(Sys.time(), Sys.Date()))
+[1] "2022-08-11 20:18:34 EDT" "2022-08-10 20:00:00 EDT"
 > ## https://educationdata.urban.org/documentation/colleges.html
 > ## https://urbaninstitute.github.io/education-data-package-r/
 > library(tidyverse) ## functions for data manipulation and visualization
@@ -434,3 +434,6 @@ date (1): DATE
 +     filter(fouryear == 1, public == 1, forprofit == 0) %>%
 +     write_csv("../../data/urban-ipeds/urban-clean-publicunis.csv")
 > 
+> proc.time()
+   user  system elapsed 
+ 35.695   1.640  28.651 

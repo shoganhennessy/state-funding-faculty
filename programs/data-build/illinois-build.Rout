@@ -19,6 +19,8 @@ Type 'q()' to quit R.
 
 > #!/usr/bin/R
 > ## Senan Hogan-Hennessy, 12 April 2022
+> print(c(Sys.time(), Sys.Date()))
+[1] "2022-08-11 20:19:03 EDT" "2022-08-10 20:00:00 EDT"
 > ## Put raw Illinois data to readable format.
 > # functions for data manipulation and visualisation
 > library(tidyverse)

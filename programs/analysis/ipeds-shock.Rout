@@ -20,6 +20,8 @@ Type 'q()' to quit R.
 > #!/usr/bin/R
 > ## Senan Hogan-Hennessy, 3 August June 2022
 > ## IV for Prof's salaries, using IPEDS data.
+> print(c(Sys.time(), Sys.Date()))
+[1] "2022-08-11 20:19:29 EDT" "2022-08-10 20:00:00 EDT"
 > library(tidyverse) # Functions for data manipulation and visualization
 ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
 ✔ ggplot2 3.3.5     ✔ purrr   0.3.4
@@ -140,8 +142,8 @@ dbl (46): unitid, year, public, forprofit, fouryear, associatescollege, cpi2...
 > rm(ipeds.data)
 > gc()
           used  (Mb) gc trigger  (Mb) max used  (Mb)
-Ncells 2366714 126.4    4145060 221.4  4145060 221.4
-Vcells 4457461  34.1   10146329  77.5  6815915  52.1
+Ncells 2367625 126.5    4146300 221.5  4146300 221.5
+Vcells 4459525  34.1   10146329  77.5  6809366  52.0
 > 
 > 
 > # Summary Table ----------------------------------------------------------------
@@ -459,8 +461,8 @@ All mean salary (2021 USD)               81,570  25,055  80,582 17,759
 > 
 > # Collate the results to a LaTeX table
 > stargazer(
-+     firststage_approp_tuit.reg, firststage_approp_tuit_noFE.reg,
 +     firststage_approp.reg, firststage_approp_noFE.reg,
++     firststage_approp_tuit.reg, firststage_approp_tuit_noFE.reg,
 +     dep.var.caption = "Dependent Variable: State Funding",
 +     dep.var.labels.include = FALSE,
 +     digits = digits.no,
@@ -486,17 +488,17 @@ All mean salary (2021 USD)               81,570  25,055  80,582 17,759
                            ------------------------------------
                               (1)      (2)      (3)      (4)   
 ---------------------------------------------------------------
-Appropriations Shock         0.990    0.608    0.980    0.350  
-                            (0.075)  (0.059)  (0.078)  (0.084) 
-Tuition Revenue              0.063    0.558                    
-                            (0.055)  (0.059)                   
-Constant                              -0.982            6.011  
-                                     (0.751)           (0.688) 
+Appropriations Shock         0.980    0.350    0.990    0.608  
+                            (0.078)  (0.084)  (0.075)  (0.059) 
+Tuition Revenue                                0.063    0.558  
+                                              (0.055)  (0.059) 
+Constant                              6.011             -0.982 
+                                     (0.688)           (0.751) 
 ---------------------------------------------------------------
 Uni. + Year fixed effects?    Yes       No      Yes       No   
 F stat.                     92.461    88.72   156.791   17.487 
 Observations                18,504    18,504   18,504   18,504 
-R2                           0.801    0.222    0.801    0.064  
+R2                           0.801    0.064    0.801    0.222  
 ===============================================================
 > 
 > 
@@ -978,4 +980,4 @@ R2             0.670   0.668   0.809   0.809   0.826   0.825   0.403   0.403
 > 
 > proc.time()
    user  system elapsed 
- 30.047   0.349  30.004 
+ 38.607   0.499  38.995 
