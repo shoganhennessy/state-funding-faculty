@@ -23,3 +23,7 @@ data/states/illinois/2017_Salaries.xls filter=lfs diff=lfs merge=lfs -text
 data/states/illinois/2020_Salaries.xls filter=lfs diff=lfs merge=lfs -text
 data/states/illinois/illinois-postsecondary-investments.pdf filter=lfs diff=lfs merge=lfs -text
 data/states/illinois-professors.csv filter=lfs diff=lfs merge=lfs -text
+data/urban-ipeds/documentation/educationdata.pdf filter=lfs diff=lfs merge=lfs -text
+data/urban-ipeds/documentation/get.sh filter=lfs diff=lfs merge=lfs -text
+data/urban-ipeds/documentation/index.html filter=lfs diff=lfs merge=lfs -text
+data/urban-ipeds/documentation/introducing-educationdata.html filter=lfs diff=lfs merge=lfs -text
