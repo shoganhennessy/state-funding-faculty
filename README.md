@@ -1,6 +1,6 @@
 # state-faculty-composition
 
-Senan Hogan-Hennessy, 17 August 2021
+Senan Hogan-Hennessy, 18 August 2022
 
 The code in this replication package for the economics research paper "Stagnating State Support for Higher Education and Its Effect on Faculty Composition", analysis using IPEDS and public Illinois data using *R*.
 A master bash file calls all code to build analysis data from raw files, and then produce analysis files.
@@ -13,7 +13,7 @@ Folder "data/" contains multiple data sources:
 - "urban-ipeds/" contains all raw data files relating to the IPED Survey, collected by the Urban Institute.
 Various subfolders contain raw IPEDS files (downloaded from NCES), which supplement the Urban Institute compilation.
 
-- "states/illinois/" contains raw data on every public university instructor in the Illinois public university system 2010-2020, downloaded from IBHED.
+- "states/illinois/" contains raw data on every public university instructor in the Illinois public university system 2010-2021, downloaded from IBHED.
 
 ## Analysis
 
