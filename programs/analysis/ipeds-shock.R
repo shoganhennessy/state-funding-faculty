@@ -103,7 +103,7 @@ reg.data %>%
         digits = 0,
         digits.extra = 0,
         covariate.labels = c(
-            "Enrollment, full-time equivalent",
+            "Enrollment, institution reported",
             "State appropriations (millions 2021 USD)",
             "Total revenues (millions 2021 USD)",
             #"Non-instutional revenues (millions 2021 USD)",

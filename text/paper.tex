@@ -78,9 +78,7 @@
 % Author
 \author{Senan Hogan-Hennessy\thanks{
     Cornell University, Department of Economics.}
-    \thanks{I thank Professor Evan Riehl for guidance on this project, Michael Lovenheim, Ronald Ehrenberg, Douglas Miller, and Francine Blau for various comments on the project's direction,
-    as well as seminar participants at Cornell University (Autumn 202) for helpful
-    discussion.
+    \thanks{I thank Professor Evan Riehl for guidance on this project, Michael Lovenheim, Ronald Ehrenberg, Douglas Miller, and Francine Blau for various comments on the project's direction, as well as seminar participants at Cornell University (Autumn 2022) for helpful discussion.
     This project's Github repository, with materials and (publicly available) data for replication, is available at 
     \url{https://github.com/shoganhennessy/state-faculty-composition}.
     Any comments or suggestions may be sent to me at \href{mailto:seh325@cornell.edu}{\nolinkurl{seh325@cornell.edu}}, or raised as an issue on the Github project.}}
@@ -139,9 +137,9 @@ State appropriations for public universities are plausibly endogenous to many ou
 The shift-share instrument interacts reliance on state funding in a base period with the yearly total appropriations per student in the entire state, to exploit both changes in support for higher education and how much each university relies on that support.
 
 Findings show that negative changes in state funding affects faculty composition at public universities, away from tenured and tenure-track professors towards non-tenure track lecturer positions.
-A reduction of 10\% in state funding, via a shock to state appropriations, leads to a fall in 1.4\% in the number of assistant professors per student within a university, 1.2\% for full (tenured) professors, and an increas in 4.4\% the number of lecturers per student.
+A reduction of 10\% in state funding, via a shock to state appropriations, leads to a fall in 1.4\% in the number of assistant professors per student within a university, 1.2\% for full (tenured) professors, and an increase in 4.4\% the number of lecturers per student.
 Additionally, I use individual level data on professors at Illinois public universities over 2010-2021 to investigate whether the shocks to state funding affected incumbent professors at public universities.
-Incumbent professors were not meaningfully affected, in terms of total salary, promotion rate, or rate of leaving the Illinois public university system, yet lecturers' first year slary decreased by 3.8\% in response to a fall in state funding of 10\%.
+Incumbent professors were not meaningfully affected, in terms of total salary, promotion rate, or rate of leaving the Illinois public university system, yet lecturers' first year salary decreased by 3.8\% in response to a fall in state funding of 10\%.
 These findings imply that changes in faculty composition came about by changes in the composition of hiring new professors at the university level.
 
 \cite{NBERw23736} first study the effect of (changes in) public universities' finances on student outcomes by isolating changes in public universities' expenditures on student instruction, addressing endogeneity of expenditures decisions by instrumenting expenditures with state appropriation shocks and limits on tuition price.
@@ -154,7 +152,7 @@ In a similar vein, \cite{bound2007cohort} document variation in per student stat
 
 Faculty are a core component of this country's educational and research-innovation university system, yet their composition within universities, and its relationship with higher education finances has so far not been studied.
 \cite{brown2014endowment} presents the closest example by studying how university endowments react to negative financial shocks, exhibiting an association between negative endowment shocks and a fall in tenure-system faculty employed at private universities.
-\cite{abe2015implications} present a model for university administrator decision-making, and posit that a large component of variation in faculty salaries arises from university politics, and not only economic factors such as outside options.
+\cite{abe2015implications} present a model for decision-making by university administrators, and posit that a large component of variation in faculty salaries arises from university politics, and not only economic factors such as outside options.
 \cite{johnson2009jep,NBERc13879} both empirically document allocation of faculty between research and instruction, and \cite{hemelt2021math} document differences in instructional cost (per student) between departments, primarily thanks to department differences in class size and faculty salaries.
 \cite{turner2014impact} document how universities reacted to the Great Recession of 2008, a severe financial shock to state finances and support for higher education.
 
@@ -239,7 +237,7 @@ This publicly available data provides the basis to build a panel of Illinois pub
 The analysis sample represents 16,932 professors in the year 2010 and 15,352 in the year 2021, with summary statistics presented in \autoref{tab:illinois-summary}.
 Additionally, further analysis using the first year of a professor's employment focuses on the subset of professors with observed year of hiring between the years 2011 and 2021, representing 1,778 professors in 2011, and 9,099 in 2021.\footnote{
     Summary statistics for this group, which over-represents lecturers compared to assistant and full professors, can be seen in \autoref{tab:illinois-summary-rolling}.
-    The reasons for restricting to the sample with identified year of hire in the range 2011-2021 is explained in \autoref{sec:iv-model-indiv}.
+    The reasons for considering the sub-sample with identified year of hire in the range 2011-2021 are explained in \autoref{sec:iv-model-indiv}.
 }
 
 \begin{table}[h!]
@@ -253,7 +251,8 @@ Additionally, further analysis using the first year of a professor's employment 
 \subsection{Trends in Finances, Enrolment, and Faculty Composition}
 \label{sec:trends}
 A state government plans an annual budget a couple of years ahead of the fiscal year, and the legislature chooses to approve or reject a budget request put forth by the governor's office.\footnote{
-    \cite{NBERw23736} present a full discussion of the state appropriation decision-making process, drawing on administrative records originally analysed by \cite{parmley2009state}.}
+    \cite{NBERw23736} present a full discussion of the decision-making process for state appropriations, drawing on administrative records originally analysed by \cite{parmley2009state}.
+}
 US state governments, by majority, are legally obligated to run a balanced-budget, so that yearly variation in tax revenues (caused by changing economic conditions or otherwise) necessarily affect state expenditures.
 This process leads to yearly variation in state appropriations not seen in other revenues sources (such as federal government appropriations), since US states differ in their support for higher education, and are subject to fiscal constraints.
 State appropriations to higher education are a particularly attractive area of state spending to absorb such shocks to state finances \citep{delaney2011state}.\footnote{
@@ -380,7 +379,7 @@ State agencies, and higher education institutions, employed accounting technique
     K-12 schools were unaffected thanks to a separate budget agreement allowing non-higher education to operate as before.
 }
 While state institutions were able to stay open, there were drastic revenue and spending cuts in response to the budget impasse, as it continued through fiscal year 2017, and ended with a new budget restoring revenues to state agencies and universities for the 2018 fiscal year.
-This variation in public university revenues via the state appropriations channel, stemming entirely from political disagreements --- not from state decisions regarding higher education and its finances \citep{young2020squandered} ---  mean that Illinois public universities exhibit sizable changes in their state appropriations over 2010-2021, of similar order to those for the rest of the country over 1990-2021.
+This variation in public university revenues via the state appropriations channel, stemming entirely from political disagreements --- not from state decisions regarding higher education and its finances \citep{young2020squandered} --- mean that Illinois public universities exhibit sizable changes in their state appropriations over 2010-2021, of similar order to those for the rest of the country over 1990-2021.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -424,7 +423,7 @@ If a public university's primary obligation is to teach, and they must fulfil th
 \section{Empirical Framework}
 \label{sec:empirics}
 
-A professor is employed by a university, so it stands to reason that when public universities experience a secular fall in one of their revenue soruces revenue --- analogous to a demand shock in the private sector --- that the composition of their employees will be affected.
+A professor is employed by a university, so it stands to reason that when public universities experience a secular fall in one of their revenue sources revenue --- analogous to a demand shock in the private sector --- that the composition of their employees will be affected.
 
 Na\"ively we can analyse the relationship between professor-outcomes $Y_{i,t}$ at university $i$ in year $t$ as a result of state funding per student $X_{i,t}$.
 Outcomes include count of professors per student, and average salary, within each university-year.
@@ -496,10 +495,10 @@ In this case, we satisfy the second: universities' institutional-level decisions
     \end{flushleft}
 \end{table}
 
-\autoref{tab:firststage-reg} presents results of the first-stage regression, separately with and without a control for per student tuition revenue and year plus institution fixed effects.\footnote{
+\autoref{tab:firststage-reg} presents results of the first-stage regression, separately with and without a control for tuition revenue per student, plus institution and year fixed effects.\footnote{
     Representations for frequentist significance levels (i.e. 10, 5, 1\% etc.) are omitted here, and in all following tables.
 }
-We note columns (1) and (2) estimate that a shock to state appropriations per student in the state of 10\% is associated with around 9.8\% change in state funding per student at the university; the instrument is strong, and we note similarity in estimates with and without inclusion of fixed effects.
+We note columns (1) and (2) estimate that a shock to appropriations (per student in the entire state) of 10\% is associated with 9.8\% change in state funding per student at the university; the instrument is strong, and we note similarity in estimates with and without inclusion of fixed effects.
 Columns (3) and (4) include the tuition revenue control (explained in \autoref{foot:control}) to exhibit estimates with the inclusion of this possible collider or bad control.
 Column (3) shows similar estimates to columns (1), (2) thanks to inclusion of fixed effects, so that the fixed effects was effective in soaking variation in per-student tuition revenues at the institution-year level.
 Column (1) represents the estimates for \autoref{eqn:firststage} with fixed effects, omitting the tuition revenue control, and is the preferred form that I proceed with in the following.
@@ -577,7 +576,7 @@ Redefining the level of outcome requires adjustment to the empirical approach, l
 \autoref{eqn:rolling-instrument} defines a rolling-share variant of the instrument, $\tilde Z_{j,t}$, where the university's state appropriations share exposure is based in the year a professor joins the university --- and not the base period 1990--1993.
 $j$ indexes each professor in year $t$, $\tau(j)$ for the year the professor first joins their institution.\footnote{
     Identifying $\tau(j)$ is possible for $j$ by restricting to all professors hired 2011-2021 --- i.e. in the years after the start of the full panel.
-    It is not possible to discern the hiring year for professors who  were hired in the years preceding 2011, and so the entire sample is only possible to analyse using the base-share in years 1990-1993 formulation (e.g. \autoref{tab:facultysalaries-shock-illinois}, \ref{tab:promotion-shock-illinois}).
+    It is not possible to discern the hiring year for professors who  were hired in the years preceding 2011, and so the entire sample is only possible to analyse using the base-share in years 1990-1993 formulation (e.g., \autoref{tab:facultysalaries-shock-illinois}, \ref{tab:promotion-shock-illinois}).
 }
 \begin{align}
     \label{eqn:rolling-instrument}
@@ -591,7 +590,7 @@ This approach leverages an insight, made available by level of the data: that an
     The formulation in this section does not consider whether the professor joins the university, instead taking as given that the professor is employed at the university, and then projects the effect on the individual.
 }
 Exogeneity and relevance of the rolling-share instrument, $\tilde Z_{j,t}$, follows the same reasoning as that for the base-share instrument, $Z_{i,t}$, discussed in \autoref{sec:approp-shocks}.\footnote{
-    The base-share instrument is still used for some outcomes with the individual Illinois professors, where appropriate (\autoref{tab:facultysalaries-shock-illinois}, \ref{tab:promotion-shock-illinois}).
+    The base-share instrument is appropriate for some outcomes with the individual Illinois professors, where appropriate (\autoref{tab:facultysalaries-shock-illinois}, \ref{tab:promotion-shock-illinois}).
 }
 We satisfy the assumptions for exogeneity by noting that none of the Illinois public campuses take the majority of state appropriations, and that the instrument identification strategy relies on exogeneity in changes in state appropriations to individual professor-outcomes, following the year they joined the university.\footnote{
     Additionally, within-institution changes resulting from share reliance on state funding may be correlated with unobserved changes in the outcomes, so that \cite{NBERw27885} note the importance of controlling for the base share and state student population.
@@ -654,7 +653,7 @@ And yet, identifying the university revenues by the state appropriations shock i
 Between years 1990-1999 IPEDS provided count of professors by explicit tenure designation (opposed to named position as in \autoref{tab:facultycount-shock-reg}), and \autoref{tab:tenurecount-shock-reg-fte} presents results of the respective regressions by tenure status.
 Results are relatively similar, yet imprecise from the much smaller number of observations.
 
-Together these findings show that public universities increase their count of tenure-track and tenured professors per student in years where revenues are more plentiful, possibly by increasing hiring intensity or efforts to maintain incumbent professors.
+Together these findings show that public universities increase their count of tenure-track and tenured professors per student in years when revenues are more plentiful, possibly by increasing hiring intensity or efforts to maintain incumbent professors.
 Yet, when revenues are not so bountiful, count of tenure-track and tenured professors per student decreases.
 The mechanism that explains these changes in faculty composition are, however, not clear at this unit of analysis; individual data are needed to delve deeper.
 
@@ -664,7 +663,7 @@ The mechanism that explains these changes in faculty composition are, however, n
 I first examine whether a shock to the university's revenues affects the salaries of professors at the university.
 The first outcome is first-year salary for each professor by their position;
 \autoref{tab:newhiresalaries-shock-illinois-rolling} presents 2SLS estimates for the elasticity of total salaries with respect to university revenues, among the sample with a year of starting employment after 2010.
-New hires of assistant, full, or administrative position professors are not realted to revenues, via a shock to appropriations in their first-year of employment.
+New hires of assistant, full, or administrative position professors are not related to revenues, via a shock to appropriations in their first-year of employment.
 Yet, the starting salary of lecturers is 3.8\% higher given an increase in their hiring university's state funding of 10\%.
 
 \begin{table}[h!]
