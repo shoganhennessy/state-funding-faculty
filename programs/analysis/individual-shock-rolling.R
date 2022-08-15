@@ -659,7 +659,6 @@ stargazer(
 # Local Projections for staying-power of effects -------------------------------
 # install.packages("lpirfs")
 # https://cran.r-project.org/web/packages/lpirfs/lpirfs.pdf
-quit("no")
 library(plm)
 library(lpirfs)
 time.horizon <- 5

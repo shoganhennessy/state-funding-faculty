@@ -749,7 +749,6 @@ stargazer(
 library(plm)
 library(lpirfs)
 time.horizon <- 5
-quit("no")
 
 # Define data sample for the LP estimation
 lp.data <- reg.data %>%
