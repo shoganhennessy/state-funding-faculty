@@ -19,11 +19,11 @@ Type 'q()' to quit R.
 
 > #!/usr/bin/R
 > ## Senan Hogan-Hennessy, 3 August 2022
-> print(c(Sys.time(), Sys.Date()))
-[1] "2022-08-11 20:21:08 EDT" "2022-08-10 20:00:00 EDT"
 > ## IV for Prof's outcomes, using Illinois data.
 > ## Using a rolling-share variant of the instrument.
-> library(tidyverse) ## functions for data manipulation and visualization
+> print(c(Sys.time(), Sys.Date()))
+[1] "2022-08-31 17:01:37 EDT" "2022-08-30 20:00:00 EDT"
+> library(tidyverse) # Functions for data manipulation and visualization
 ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
 ✔ ggplot2 3.3.5     ✔ purrr   0.3.4
 ✔ tibble  3.1.6     ✔ dplyr   1.0.9
@@ -32,7 +32,7 @@ Type 'q()' to quit R.
 ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
-> library(lfe)
+> library(lfe) # Functions for fast linear models with IV + FEs
 Loading required package: Matrix
 
 Attaching package: ‘Matrix’
@@ -41,9 +41,34 @@ The following objects are masked from ‘package:tidyr’:
 
     expand, pack, unpack
 
+> library(plm) # Functions for panel data
+
+Attaching package: ‘plm’
+
+The following object is masked from ‘package:lfe’:
+
+    sargan
+
+The following objects are masked from ‘package:dplyr’:
+
+    between, lag, lead
+
+> library(car) # Function for F stat regarding IV models
+Loading required package: carData
+
+Attaching package: ‘car’
+
+The following object is masked from ‘package:dplyr’:
+
+    recode
+
+The following object is masked from ‘package:purrr’:
+
+    some
+
 > # My custom flavour of Stargazer TeX tables:
 > # devtools::install_github("shoganhennessy/stargazer")
-> library(stargazer) ## TeX tables
+> library(stargazer) # TeX tables
 
 Please cite as: 
 
@@ -153,8 +178,8 @@ dbl (46): unitid, year, public, forprofit, fouryear, associatescollege, cpi2...
 > rm(illinois.data)
 > gc()
           used  (Mb) gc trigger  (Mb) max used  (Mb)
-Ncells 2139908 114.3    4344112 232.1  3311329 176.9
-Vcells 8577655  65.5   21515346 164.2 21502697 164.1
+Ncells 2431669 129.9    4146352 221.5  4146352 221.5
+Vcells 9057407  69.2   25106619 191.6 25029159 191.0
 > 
 > # How many individual professors in 2010 and 2021?
 > reg.data %>% filter(year == 2010) %>% count(unitid, name) %>% nrow() %>% print()
@@ -310,36 +335,43 @@ All benefits (2021 USD)            2,950   11,165    0    68,449
 > # Explain Revenues with a shock to (only) state appropriations.
 > firststage_approp.reg <- reg.data %>%
 +     felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
-+         log(appropriationshock_perEnroll_rolling) |
++         I(-log(appropriationshock_perEnroll_rolling)) |
 +         unitid + firstyear |
 +         0 |
 +         unitid + firstyear,
 +         data = .)
 > # Get the F.Stat
 > firststage_approp.fstat <-
-+     summary(firststage_approp.reg)$P.fstat["F"] %>%
++     linearHypothesis(firststage_approp.reg, test = "F",
++         c("I(-log(appropriationshock_perEnroll_rolling))=0"))["F"] %>%
++     unlist() %>%
++     nth(2) %>%
 +     as.numeric() %>%
 +     round(digits.no)
+> 
 > 
 > # Without the FEs
 > # Explain State appropriations with a shock to (only) state appropriations.
 > firststage_approp_noFE.reg <- reg.data %>%
 +     felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
-+         log(appropriationshock_perEnroll_rolling) |
++         I(-log(appropriationshock_perEnroll_rolling)) |
 +         0 |
 +         0 |
 +         unitid + firstyear,
 +         data = .)
 > # Get the F.Stat
 > firststage_approp_noFE.fstat <-
-+     summary(firststage_approp_noFE.reg)$P.fstat["F"] %>%
++     linearHypothesis(firststage_approp_noFE.reg, test = "F",
++         c("I(-log(appropriationshock_perEnroll_rolling))=0"))["F"] %>%
++     unlist() %>%
++     nth(2) %>%
 +     as.numeric() %>%
 +     round(digits.no)
 > 
 > # Explain Revenues with a shock to (only) state appropriations.
 > firststage_approp_tuit.reg <- reg.data %>%
 +     felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
-+         log(appropriationshock_perEnroll_rolling) +
++         I(-log(appropriationshock_perEnroll_rolling)) +
 +         log(tuitionrev_real / enrollment_reported) |
 +         unitid + firstyear |
 +         0 |
@@ -347,7 +379,10 @@ All benefits (2021 USD)            2,950   11,165    0    68,449
 +         data = .)
 > # Get the F.Stat
 > firststage_approp_tuit.fstat <-
-+     summary(firststage_approp_tuit.reg)$P.fstat["F"] %>%
++     linearHypothesis(firststage_approp_tuit.reg, test = "F",
++         c("I(-log(appropriationshock_perEnroll_rolling))=0"))["F"] %>%
++     unlist() %>%
++     nth(2) %>%
 +     as.numeric() %>%
 +     round(digits.no)
 > 
@@ -355,7 +390,7 @@ All benefits (2021 USD)            2,950   11,165    0    68,449
 > # Explain State appropriations with a shock to (only) state appropriations.
 > firststage_approp_tuit_noFE.reg <- reg.data %>%
 +     felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
-+         log(appropriationshock_perEnroll_rolling) +
++         I(-log(appropriationshock_perEnroll_rolling)) +
 +         log(tuitionrev_real / enrollment_reported) |
 +         0 |
 +         0 |
@@ -363,7 +398,10 @@ All benefits (2021 USD)            2,950   11,165    0    68,449
 +         data = .)
 > # Get the F.Stat
 > firststage_approp_tuit_noFE.fstat <-
-+     summary(firststage_approp_tuit_noFE.reg)$P.fstat["F"] %>%
++     linearHypothesis(firststage_approp_tuit_noFE.reg, test = "F",
++         c("I(-log(appropriationshock_perEnroll_rolling))=0"))["F"] %>%
++     unlist() %>%
++     nth(2) %>%
 +     as.numeric() %>%
 +     round(digits.no)
 > 
@@ -396,7 +434,7 @@ All benefits (2021 USD)            2,950   11,165    0    68,449
                      ------------------------------------
                         (1)      (2)      (3)      (4)   
 ---------------------------------------------------------
-Appropriations Shock   0.939    0.486    0.920    0.328  
+Appropriations Shock  -0.939    -0.486   -0.920   -0.328 
                       (0.024)  (0.084)  (0.024)  (0.066) 
 Tuition Revenue        0.711    0.766                    
                       (0.223)  (0.280)                   
@@ -404,7 +442,7 @@ Constant                        -1.906            6.484
                                (2.827)           (0.549) 
 ---------------------------------------------------------
 Fixed effects?          Yes       No      Yes       No   
-F stat.               754.498   17.745  1470.24   24.842 
+F stat.              1508.997   33.586  1470.24   24.842 
 Observations          68,449    68,449   68,449   68,449 
 R2                     0.911    0.416    0.906    0.257  
 =========================================================
@@ -420,7 +458,7 @@ R2                     0.911    0.416    0.906    0.257
 +     felm(log(salary_real + extra_salary_real) ~ 1 |
 +         unitid + firstyear |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_rolling)) |
++             I(-log(appropriationshock_perEnroll_rolling))) |
 +         unitid + firstyear,
 +         data = .)
 > 
@@ -432,7 +470,7 @@ R2                     0.911    0.416    0.906    0.257
 +     felm(log(salary_real + extra_salary_real) ~ 1 |
 +         unitid + firstyear |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_rolling)) |
++             I(-log(appropriationshock_perEnroll_rolling))) |
 +         unitid + firstyear,
 +         data = .)
 > 
@@ -444,7 +482,7 @@ R2                     0.911    0.416    0.906    0.257
 +     felm(log(salary_real + extra_salary_real) ~ 1 |
 +         unitid + firstyear |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_rolling)) |
++             I(-log(appropriationshock_perEnroll_rolling))) |
 +         unitid + firstyear,
 +         data = .)
 > 
@@ -456,7 +494,7 @@ R2                     0.911    0.416    0.906    0.257
 +     felm(log(salary_real + extra_salary_real) ~ 1 |
 +         unitid + firstyear |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_rolling)) |
++             I(-log(appropriationshock_perEnroll_rolling))) |
 +         unitid + firstyear,
 +         data = .)
 > 
@@ -466,7 +504,7 @@ R2                     0.911    0.416    0.906    0.257
 +     felm(log(salary_real + extra_salary_real) ~ 1 |
 +         unitid + firstyear |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_rolling)) |
++             I(-log(appropriationshock_perEnroll_rolling))) |
 +         unitid + firstyear,
 +         data = .)
 > 
@@ -522,7 +560,7 @@ R2              0.217      0.051      0.074     0.143     0.161
 +     felm(log(salary_real + extra_salary_real) ~ 1 |
 +         unitid + firstyear |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_rolling)) |
++             I(-log(appropriationshock_perEnroll_rolling))) |
 +         unitid + firstyear,
 +         data = .)
 > 
@@ -534,7 +572,7 @@ R2              0.217      0.051      0.074     0.143     0.161
 +     felm(log(salary_real + extra_salary_real) ~ 1 |
 +         unitid + firstyear |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_rolling)) |
++             I(-log(appropriationshock_perEnroll_rolling))) |
 +         unitid + firstyear,
 +         data = .)
 > 
@@ -546,7 +584,7 @@ R2              0.217      0.051      0.074     0.143     0.161
 +     felm(log(salary_real + extra_salary_real) ~ 1 |
 +         unitid + firstyear |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_rolling)) |
++             I(-log(appropriationshock_perEnroll_rolling))) |
 +         unitid + firstyear,
 +         data = .)
 > 
@@ -558,7 +596,7 @@ R2              0.217      0.051      0.074     0.143     0.161
 +     felm(log(salary_real + extra_salary_real) ~ 1 |
 +         unitid + firstyear |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_rolling)) |
++             I(-log(appropriationshock_perEnroll_rolling))) |
 +         unitid + firstyear,
 +         data = .)
 > 
@@ -568,7 +606,7 @@ R2              0.217      0.051      0.074     0.143     0.161
 +     felm(log(salary_real + extra_salary_real) ~ 1 |
 +         unitid + firstyear |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_rolling)) |
++             I(-log(appropriationshock_perEnroll_rolling))) |
 +         unitid + firstyear,
 +         data = .)
 > 
@@ -630,7 +668,7 @@ R2              0.303      0.075      0.100     0.250     0.223
 +     felm(promoted ~ 1 |
 +         unitid + firstyear |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_rolling)) |
++             I(-log(appropriationshock_perEnroll_rolling))) |
 +         unitid + firstyear,
 +         data = .)
 > 
@@ -655,7 +693,7 @@ R2              0.303      0.075      0.100     0.250     0.223
 +     felm(promoted ~ 1 |
 +         unitid + firstyear |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_rolling)) |
++             I(-log(appropriationshock_perEnroll_rolling))) |
 +         unitid + firstyear,
 +         data = .)
 > 
@@ -667,7 +705,7 @@ R2              0.303      0.075      0.100     0.250     0.223
 +     felm(promoted ~ 1 |
 +         unitid + firstyear |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_rolling)) |
++             I(-log(appropriationshock_perEnroll_rolling))) |
 +         unitid + firstyear,
 +         data = .)
 > 
@@ -677,7 +715,7 @@ R2              0.303      0.075      0.100     0.250     0.223
 +     felm(promoted ~ 1 |
 +         unitid + firstyear |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_rolling)) |
++             I(-log(appropriationshock_perEnroll_rolling))) |
 +         unitid + firstyear,
 +         data = .)
 > 
@@ -728,7 +766,7 @@ R2                0.007          0.024          0.029        0.009
 +     felm(notemployed_nextyear ~ 1 |
 +         unitid + firstyear |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_rolling)) |
++             I(-log(appropriationshock_perEnroll_rolling))) |
 +         unitid + firstyear,
 +         data = .)
 > 
@@ -740,7 +778,7 @@ R2                0.007          0.024          0.029        0.009
 +     felm(notemployed_nextyear ~ 1 |
 +         unitid + firstyear |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_rolling)) |
++             I(-log(appropriationshock_perEnroll_rolling))) |
 +         unitid + firstyear,
 +         data = .)
 > 
@@ -752,7 +790,7 @@ R2                0.007          0.024          0.029        0.009
 +     felm(notemployed_nextyear ~ 1 |
 +         unitid + firstyear |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_rolling)) |
++             I(-log(appropriationshock_perEnroll_rolling))) |
 +         unitid + firstyear,
 +         data = .)
 > 
@@ -764,7 +802,7 @@ R2                0.007          0.024          0.029        0.009
 +     felm(notemployed_nextyear ~ 1 |
 +         unitid + firstyear |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_rolling)) |
++             I(-log(appropriationshock_perEnroll_rolling))) |
 +         unitid + firstyear,
 +         data = .)
 > 
@@ -774,7 +812,7 @@ R2                0.007          0.024          0.029        0.009
 +     felm(notemployed_nextyear ~ 1 |
 +         unitid + firstyear |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_rolling)) |
++             I(-log(appropriationshock_perEnroll_rolling))) |
 +         unitid + firstyear,
 +         data = .)
 > 
@@ -819,7 +857,93 @@ R2               0.013      0.006      0.014     0.068     0.016
 > # Local Projections for staying-power of effects -------------------------------
 > # install.packages("lpirfs")
 > # https://cran.r-project.org/web/packages/lpirfs/lpirfs.pdf
-> quit("no")
+> library(plm)
+> library(lpirfs)
+> time.horizon <- 5
+> 
+> # Define data sample for the LP estimation
+> lp.data <- reg.data %>%
++     transmute(
++         name_unitid = paste(name, unitid),
++         year = year,
++         unitid = unitid,
++         firstyear = firstyear,
++         salary_real = log(salary_real + extra_salary_real),
++         promoted = promoted,
++         nonauxrevenues_real =
++             log(stateappropriations_real / enrollment_reported),
++         appropriationshock_perEnroll_real =
++             log(appropriationshock_perEnroll_real),
++         tuitionrev_real = log(tuitionrev_real / enrollment_reported))
+> 
+> # Run the LP method for the first-stage regression.
+> firststage.lpreg <-
++     lp_lin_panel(data_set = lp.data,
++         # Outcome variable
++         endog_data = "nonauxrevenues_real",
++         # Predictor variable
++         shock = "appropriationshock_perEnroll_real",
++         # Contemporaneous control, plus FE for unitid * firstyear
++         c_exog_data = c("tuitionrev_real", "unitid", "firstyear"),
++         # Option to use IV for predictor endogeneity (not used here)
++         iv_reg = FALSE,
++         # Add clustered SEs in the panel
++         panel_model = "pooling",
++         robust_cov = "vcovHC",
++         robust_cluster = c("group", "time"),
++         confint = 1.96,
++         hor = time.horizon)
+> # Save this plot
+> ggsave("../../text/figures/firststage-illinois-lp-rolling.png",
++     plot = plot(firststage.lpreg),
++     units = "cm", width = fig.width, height = fig.height)
+> 
+> # Run the LP estimation for salaries among all profs.
+> all_salaries.lpreg <-
++     lp_lin_panel(data_set = lp.data,
++         # Outcome variable
++         endog_data = "salary_real",
++         # Predictor variable
++         shock = "nonauxrevenues_real",
++         # Contemporaneous control, plus FE for unitid + firstyear
++         c_exog_data = c("tuitionrev_real", "unitid", "firstyear"),
++         # Option to use IV for predictor endogeneity
++         iv_reg = TRUE,
++         instrum = "appropriationshock_perEnroll_real",
++         # Add clustered SEs in the panel
++         panel_model = "pooling",
++         robust_cov = "vcovHC",
++         robust_cluster = c("group", "time"),
++         confint = 1.96,
++         hor = time.horizon)
+> # Save this plot
+> ggsave("../../text/figures/salaries-illinois-lp-rolling.png",
++     plot = plot(all_salaries.lpreg),
++     units = "cm", width = fig.width, height = fig.height)
+> 
+> # Run the LP estimation for promotion rate among all profs.
+> all_promoted.lpreg <-
++     lp_lin_panel(data_set = lp.data,
++         # Outcome variable
++         endog_data = "promoted",
++         # Predictor variable
++         shock = "nonauxrevenues_real",
++         # Contemporaneous control, plus FE for unitid + firstyear
++         c_exog_data = c("tuitionrev_real", "unitid", "firstyear"),
++         # Option to use IV for predictor endogeneity
++         iv_reg = TRUE,
++         instrum = "appropriationshock_perEnroll_real",
++         # Add clustered SEs in the panel
++         panel_model = "pooling",
++         robust_cov = "vcovHC",
++         robust_cluster = c("group", "time"),
++         confint = 1.96,
++         hor = time.horizon)
+> # Save this plot
+> ggsave("../../text/figures/promoted-illinois-lp-rolling.png",
++     plot = plot(all_promoted.lpreg),
++     units = "cm", width = fig.width, height = fig.height)
+> 
 > proc.time()
    user  system elapsed 
- 45.143   0.445  45.954 
+107.668   0.735 108.362 

@@ -21,7 +21,7 @@ Type 'q()' to quit R.
 > ## Senan Hogan-Hennessy, 3 August June 2022
 > ## IV for Prof's salaries, using IPEDS data.
 > print(c(Sys.time(), Sys.Date()))
-[1] "2022-08-11 20:19:29 EDT" "2022-08-10 20:00:00 EDT"
+[1] "2022-08-31 16:59:12 EDT" "2022-08-30 20:00:00 EDT"
 > library(tidyverse) # Functions for data manipulation and visualization
 ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
 ✔ ggplot2 3.3.5     ✔ purrr   0.3.4
@@ -51,6 +51,19 @@ The following object is masked from ‘package:lfe’:
 The following objects are masked from ‘package:dplyr’:
 
     between, lag, lead
+
+> library(car) # Function for F stat regarding IV models
+Loading required package: carData
+
+Attaching package: ‘car’
+
+The following object is masked from ‘package:dplyr’:
+
+    recode
+
+The following object is masked from ‘package:purrr’:
+
+    some
 
 > # My custom flavour of Stargazer TeX tables:
 > # devtools::install_github("shoganhennessy/stargazer")
@@ -142,8 +155,8 @@ dbl (46): unitid, year, public, forprofit, fouryear, associatescollege, cpi2...
 > rm(ipeds.data)
 > gc()
           used  (Mb) gc trigger  (Mb) max used  (Mb)
-Ncells 2367625 126.5    4146300 221.5  4146300 221.5
-Vcells 4459525  34.1   10146329  77.5  6809366  52.0
+Ncells 2378284 127.1    4146352 221.5  4146352 221.5
+Vcells 4473417  34.2   10146329  77.5  6927954  52.9
 > 
 > 
 > # Summary Table ----------------------------------------------------------------
@@ -167,7 +180,7 @@ Vcells 4459525  34.1   10146329  77.5  6809366  52.0
 +         digits = 0,
 +         digits.extra = 0,
 +         covariate.labels = c(
-+             "Enrollment, full-time equivalent",
++             "Enrollment, institution reported",
 +             "State appropriations (millions 2021 USD)",
 +             "Total revenues (millions 2021 USD)",
 +             #"Non-instutional revenues (millions 2021 USD)",
@@ -187,7 +200,7 @@ Vcells 4459525  34.1   10146329  77.5  6809366  52.0
 ======================================================================
 Statistic                                 Mean  St. Dev. Median   N   
 ----------------------------------------------------------------------
-Enrollment, full-time equivalent         11,511  10,821  7,723  18,504
+Enrollment, institution reported         11,511  10,821  7,723  18,504
 State appropriations (millions 2021 USD)   99     125      52   18,504
 Total revenues (millions 2021 USD)        425     793     158   18,504
 Lecturers count                            60      74      34   17,329
@@ -396,20 +409,22 @@ All mean salary (2021 USD)               81,570  25,055  80,582 17,759
 +     units = "cm", width = fig.width, height = fig.height)
 > 
 > 
-> 
 > # First stage Regressions ------------------------------------------------------
 > 
 > # Explain Revenues with a shock to (only) state appropriations.
 > firststage_approp.reg <- reg.data %>%
 +     felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
-+         log(appropriationshock_perEnroll_real) |
++         I(-log(appropriationshock_perEnroll_real)) |
 +         unitid + year |
 +         0 |
 +         state + year,
 +         data = .)
 > # Get the F.Stat
 > firststage_approp.fstat <-
-+     summary(firststage_approp.reg)$P.fstat["F"] %>%
++     linearHypothesis(firststage_approp.reg, test = "F",
++         c("I(-log(appropriationshock_perEnroll_real))"))["F"] %>%
++     unlist() %>%
++     nth(2) %>%
 +     as.numeric() %>%
 +     round(digits.no)
 > 
@@ -417,21 +432,24 @@ All mean salary (2021 USD)               81,570  25,055  80,582 17,759
 > # Explain State appropriations with a shock to (only) state appropriations.
 > firststage_approp_noFE.reg <- reg.data %>%
 +     felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
-+         log(appropriationshock_perEnroll_real) |
++         I(-log(appropriationshock_perEnroll_real)) |
 +         0 |
 +         0 |
 +         state + year,
 +         data = .)
 > # Get the F.Stat
 > firststage_approp_noFE.fstat <-
-+     summary(firststage_approp_noFE.reg)$P.fstat["F"] %>%
++     linearHypothesis(firststage_approp_noFE.reg, test = "F",
++         c("I(-log(appropriationshock_perEnroll_real))=0"))["F"] %>%
++     unlist() %>%
++     nth(2) %>%
 +     as.numeric() %>%
 +     round(digits.no)
 > 
 > # Explain Revenues with a shock to (only) state appropriations.
 > firststage_approp_tuit.reg <- reg.data %>%
 +     felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
-+         log(appropriationshock_perEnroll_real) +
++         I(-log(appropriationshock_perEnroll_real)) +
 +         log(tuitionrev_real / enrollment_reported) |
 +         unitid + year |
 +         0 |
@@ -439,7 +457,10 @@ All mean salary (2021 USD)               81,570  25,055  80,582 17,759
 +         data = .)
 > # Get the F.Stat
 > firststage_approp_tuit.fstat <-
-+     summary(firststage_approp_tuit.reg)$P.fstat["F"] %>%
++     linearHypothesis(firststage_approp_tuit.reg, test = "F",
++         c("I(-log(appropriationshock_perEnroll_real))=0"))["F"] %>%
++     unlist() %>%
++     nth(2) %>%
 +     as.numeric() %>%
 +     round(digits.no)
 > 
@@ -447,7 +468,7 @@ All mean salary (2021 USD)               81,570  25,055  80,582 17,759
 > # Explain State appropriations with a shock to (only) state appropriations.
 > firststage_approp_tuit_noFE.reg <- reg.data %>%
 +     felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
-+         log(appropriationshock_perEnroll_real) +
++         I(-log(appropriationshock_perEnroll_real)) +
 +         log(tuitionrev_real / enrollment_reported) |
 +         0 |
 +         0 |
@@ -455,7 +476,10 @@ All mean salary (2021 USD)               81,570  25,055  80,582 17,759
 +         data = .)
 > # Get the F.Stat
 > firststage_approp_tuit_noFE.fstat <-
-+     summary(firststage_approp_tuit_noFE.reg)$P.fstat["F"] %>%
++     linearHypothesis(firststage_approp_tuit_noFE.reg, test = "F",
++         c("I(-log(appropriationshock_perEnroll_real))=0"))["F"] %>%
++     unlist() %>%
++     nth(2) %>%
 +     as.numeric() %>%
 +     round(digits.no)
 > 
@@ -488,7 +512,7 @@ All mean salary (2021 USD)               81,570  25,055  80,582 17,759
                            ------------------------------------
                               (1)      (2)      (3)      (4)   
 ---------------------------------------------------------------
-Appropriations Shock         0.980    0.350    0.990    0.608  
+Appropriations Shock        -0.980    -0.350   -0.990   -0.608 
                             (0.078)  (0.084)  (0.075)  (0.059) 
 Tuition Revenue                                0.063    0.558  
                                               (0.055)  (0.059) 
@@ -496,7 +520,7 @@ Constant                              6.011             -0.982
                                      (0.688)           (0.751) 
 ---------------------------------------------------------------
 Uni. + Year fixed effects?    Yes       No      Yes       No   
-F stat.                     92.461    88.72   156.791   17.487 
+F stat.                     175.636   104.65  156.791   17.487 
 Observations                18,504    18,504   18,504   18,504 
 R2                           0.801    0.064    0.801    0.222  
 ===============================================================
@@ -522,7 +546,7 @@ R2                           0.801    0.064    0.801    0.222
 +     felm(log(lecturer_prof_count / enrollment_reported) ~ 1 |
 +         unitid + year |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_real)) |
++             I(-log(appropriationshock_perEnroll_real))) |
 +         state + year,
 +         data = .)
 > 
@@ -544,7 +568,7 @@ R2                           0.801    0.064    0.801    0.222
 +     felm(log(assistant_prof_count / enrollment_reported) ~ 1 |
 +         unitid + year |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_real)) |
++             I(-log(appropriationshock_perEnroll_real))) |
 +         state + year,
 +         data = .)
 > 
@@ -567,7 +591,7 @@ R2                           0.801    0.064    0.801    0.222
 +     felm(log(full_prof_count / enrollment_reported) ~ 1 |
 +         unitid + year |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_real)) |
++             I(-log(appropriationshock_perEnroll_real))) |
 +         state + year,
 +         data = .)
 > 
@@ -587,7 +611,7 @@ R2                           0.801    0.064    0.801    0.222
 +     felm(log(all_prof_count / enrollment_reported) ~ 1 |
 +         unitid + year |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_real)) |
++             I(-log(appropriationshock_perEnroll_real))) |
 +         state + year,
 +         data = .)
 > 
@@ -648,7 +672,7 @@ R2             0.671   0.657   0.709   0.708   0.783   0.783   0.812   0.812
 +     felm(log(nontenured_tenure_count / enrollment_reported) ~ 1 |
 +         unitid + year |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_real)) |
++             I(-log(appropriationshock_perEnroll_real))) |
 +         state + year,
 +         data = .)
 > 
@@ -670,7 +694,7 @@ R2             0.671   0.657   0.709   0.708   0.783   0.783   0.812   0.812
 +     felm(log(tenuretrack_tenure_count / enrollment_reported) ~ 1 |
 +         unitid + year |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_real)) |
++             I(-log(appropriationshock_perEnroll_real))) |
 +         state + year,
 +         data = .)
 > 
@@ -692,7 +716,7 @@ R2             0.671   0.657   0.709   0.708   0.783   0.783   0.812   0.812
 +     felm(log(tenured_tenure_count / enrollment_reported) ~ 1 |
 +         unitid + year |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_real)) |
++             I(-log(appropriationshock_perEnroll_real))) |
 +         state + year,
 +         data = .)
 > 
@@ -716,7 +740,7 @@ R2             0.671   0.657   0.709   0.708   0.783   0.783   0.812   0.812
 +     felm(log(all_tenure_count / enrollment_reported) ~ 1 |
 +         unitid + year |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_real)) |
++             I(-log(appropriationshock_perEnroll_real))) |
 +         state + year,
 +         data = .)
 > 
@@ -779,7 +803,7 @@ R2             0.849   0.588    0.777  -0.413   0.898   0.872   0.932   0.426
 +     felm(log(lecturer_profmeansalary_real) ~ 1 |
 +         unitid + year |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_real)) |
++             I(-log(appropriationshock_perEnroll_real))) |
 +         state + year,
 +         data = .)
 > 
@@ -802,7 +826,7 @@ R2             0.849   0.588    0.777  -0.413   0.898   0.872   0.932   0.426
 +     felm(log(assistant_profmeansalary_real) ~ 1 |
 +         unitid + year |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_real)) |
++             I(-log(appropriationshock_perEnroll_real))) |
 +         state + year,
 +         data = .)
 > 
@@ -825,7 +849,7 @@ R2             0.849   0.588    0.777  -0.413   0.898   0.872   0.932   0.426
 +     felm(log(full_profmeansalary_real) ~ 1 |
 +         unitid + year |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_real)) |
++             I(-log(appropriationshock_perEnroll_real))) |
 +         state + year,
 +         data = .)
 > 
@@ -847,7 +871,7 @@ R2             0.849   0.588    0.777  -0.413   0.898   0.872   0.932   0.426
 +     felm(log(all_profmeansalary_real) ~ 1 |
 +         unitid + year |
 +         (log(stateappropriations_real / enrollment_reported) ~
-+             log(appropriationshock_perEnroll_real)) |
++             I(-log(appropriationshock_perEnroll_real))) |
 +         state + year,
 +         data = .)
 > 
@@ -904,7 +928,7 @@ R2             0.670   0.668   0.809   0.809   0.826   0.825   0.403   0.403
 +         all_profmeansalary_real = log(all_profmeansalary_real),
 +         stateappropriations_real = log(stateappropriations_real / enrollment_reported),
 +         appropriationshock_perEnroll_real =
-+             log(appropriationshock_perEnroll_real),
++             I(-log(appropriationshock_perEnroll_real)),
 +         tuitionrev_real = log(tuitionrev_real / enrollment_reported))
 > 
 > # Run the LP method for the first-stage regression.
@@ -980,4 +1004,4 @@ R2             0.670   0.668   0.809   0.809   0.826   0.825   0.403   0.403
 > 
 > proc.time()
    user  system elapsed 
- 38.607   0.499  38.995 
+ 28.319   0.292  28.093 

@@ -1,12 +1,15 @@
 #!/usr/bin/R
 ## Senan Hogan-Hennessy, 3 August 2022
-print(c(Sys.time(), Sys.Date()))
 ## IV for Prof's outcomes, using Illinois data.
-library(tidyverse) ## functions for data manipulation and visualization
-library(lfe)
+## Using a base-share version of the instrument.
+print(c(Sys.time(), Sys.Date()))
+library(tidyverse) # Functions for data manipulation and visualization
+library(lfe) # Functions for fast linear models with IV + FEs
+library(plm) # Functions for panel data
+library(car) # Function for F stat regarding IV models
 # My custom flavour of Stargazer TeX tables:
 # devtools::install_github("shoganhennessy/stargazer")
-library(stargazer) ## TeX tables
+library(stargazer) # TeX tables
 set.seed(47)
 # This file follows an adjusted Deming Walters (2017, p.10) approach to
 # appropriations shock instrument.
@@ -130,7 +133,6 @@ reg.data <- reg.data %>%
     # Only unis + years with measured state appropriations & shocks & Prof count
     filter(!is.na(salary_real), salary_real > 0,
         !is.na(enrollment_reported), enrollment_reported > 0,
-        !is.na(nonauxrevenues_real),
         !is.na(stateappropriations_real),
         !is.na(appropriationshock_perEnroll_real))
 
@@ -165,7 +167,7 @@ reg.data %>%
         extra_salary_real = extra_salary_real) %>%
     as.data.frame() %>%
     stargazer(summary = TRUE,
-        summary.stat = c("mean", "sd", "median", "n"),
+        summary.stat = c("mean", "sd", "n"),
         digits = 0,
         digits.extra = 0,
         covariate.labels = c(
@@ -194,14 +196,17 @@ reg.data %>%
 # Explain Revenues with a shock to (only) state appropriations.
 firststage_approp.reg <- reg.data %>%
     felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
-        log(appropriationshock_perEnroll_real) |
+        I(-log(appropriationshock_perEnroll_real)) |
         unitid + firstyear |
         0 |
         unitid + year,
         data = .)
 # Get the F.Stat
 firststage_approp.fstat <-
-    summary(firststage_approp.reg)$P.fstat["F"] %>%
+    linearHypothesis(firststage_approp.reg, test = "F",
+        c("I(-log(appropriationshock_perEnroll_real))=0"))["F"] %>%
+    unlist() %>%
+    nth(2) %>%
     as.numeric() %>%
     round(digits.no)
 
@@ -209,21 +214,24 @@ firststage_approp.fstat <-
 # Explain State appropriations with a shock to (only) state appropriations.
 firststage_approp_noFE.reg <- reg.data %>%
     felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
-        log(appropriationshock_perEnroll_real) |
+        I(-log(appropriationshock_perEnroll_real)) |
         0 |
         0 |
         unitid + year,
         data = .)
 # Get the F.Stat
 firststage_approp_noFE.fstat <-
-    summary(firststage_approp_noFE.reg)$P.fstat["F"] %>%
+    linearHypothesis(firststage_approp_noFE.reg, test = "F",
+        c("I(-log(appropriationshock_perEnroll_real))=0"))["F"] %>%
+    unlist() %>%
+    nth(2) %>%
     as.numeric() %>%
     round(digits.no)
 
 # Explain Revenues with a shock to (only) state appropriations.
 firststage_approp_tuit.reg <- reg.data %>%
     felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
-        log(appropriationshock_perEnroll_real) +
+        I(-log(appropriationshock_perEnroll_real)) +
         log(tuitionrev_real / enrollment_reported) |
         unitid + firstyear |
         0 |
@@ -231,7 +239,10 @@ firststage_approp_tuit.reg <- reg.data %>%
         data = .)
 # Get the F.Stat
 firststage_approp_tuit.fstat <-
-    summary(firststage_approp_tuit.reg)$P.fstat["F"] %>%
+    linearHypothesis(firststage_approp_tuit.reg, test = "F",
+        c("I(-log(appropriationshock_perEnroll_real))=0"))["F"] %>%
+    unlist() %>%
+    nth(2) %>%
     as.numeric() %>%
     round(digits.no)
 
@@ -239,7 +250,7 @@ firststage_approp_tuit.fstat <-
 # Explain State appropriations with a shock to (only) state appropriations.
 firststage_approp_tuit_noFE.reg <- reg.data %>%
     felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
-        log(appropriationshock_perEnroll_real) +
+        I(-log(appropriationshock_perEnroll_real)) +
         log(tuitionrev_real / enrollment_reported) |
         0 |
         0 |
@@ -247,7 +258,10 @@ firststage_approp_tuit_noFE.reg <- reg.data %>%
         data = .)
 # Get the F.Stat
 firststage_approp_tuit_noFE.fstat <-
-    summary(firststage_approp_tuit_noFE.reg)$P.fstat["F"] %>%
+    linearHypothesis(firststage_approp_tuit_noFE.reg, test = "F",
+        c("I(-log(appropriationshock_perEnroll_real))=0"))["F"] %>%
+    unlist() %>%
+    nth(2) %>%
     as.numeric() %>%
     round(digits.no)
 
@@ -286,7 +300,7 @@ shiftshare_lecturer_salaries.reg <- lecturer.data %>%
     felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid + firstyear |
         (log(stateappropriations_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_real)) |
+            I(-log(appropriationshock_perEnroll_real))) |
         unitid + year,
         data = .)
 
@@ -298,7 +312,7 @@ shiftshare_assistant_salaries.reg <- assistant.data %>%
     felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid + firstyear |
         (log(stateappropriations_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_real)) |
+            I(-log(appropriationshock_perEnroll_real))) |
         unitid + year,
         data = .)
 
@@ -310,7 +324,7 @@ shiftshare_full_salaries.reg <- full.data %>%
     felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid + firstyear |
         (log(stateappropriations_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_real)) |
+            I(-log(appropriationshock_perEnroll_real))) |
         unitid + year,
         data = .)
 
@@ -322,7 +336,7 @@ shiftshare_administrator_salaries.reg <- administrator.data %>%
     felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid + firstyear |
         (log(stateappropriations_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_real)) |
+            I(-log(appropriationshock_perEnroll_real))) |
         unitid + year,
         data = .)
 
@@ -332,7 +346,7 @@ shiftshare_all_salaries.reg <- reg.data %>%
     felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid + firstyear |
         (log(stateappropriations_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_real)) |
+            I(-log(appropriationshock_perEnroll_real))) |
         unitid + year,
         data = .)
 
@@ -444,7 +458,7 @@ shiftshare_lecturer_salaries.reg <- lecturer.data %>%
     felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid |
         (log(stateappropriations_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_real)) |
+            I(-log(appropriationshock_perEnroll_real))) |
         unitid + year,
         data = .)
 
@@ -456,7 +470,7 @@ shiftshare_assistant_salaries.reg <- assistant.data %>%
     felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid |
         (log(stateappropriations_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_real)) |
+            I(-log(appropriationshock_perEnroll_real))) |
         unitid + year,
         data = .)
 
@@ -468,7 +482,7 @@ shiftshare_full_salaries.reg <- full.data %>%
     felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid |
         (log(stateappropriations_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_real)) |
+            I(-log(appropriationshock_perEnroll_real))) |
         unitid + year,
         data = .)
 
@@ -480,7 +494,7 @@ shiftshare_administrator_salaries.reg <- administrator.data %>%
     felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid |
         (log(stateappropriations_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_real)) |
+            I(-log(appropriationshock_perEnroll_real))) |
         unitid + year,
         data = .)
 
@@ -490,7 +504,7 @@ shiftshare_all_salaries.reg <- newhire.data %>%
     felm(log(salary_real + extra_salary_real) ~ 1 |
         unitid |
         (log(stateappropriations_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_real)) |
+            I(-log(appropriationshock_perEnroll_real))) |
         unitid + year,
         data = .)
 
@@ -596,7 +610,7 @@ shiftshare_lecturer_promotion.reg <- lecturer.data %>%
     felm(promoted ~ 1 |
         unitid + firstyear |
         (log(stateappropriations_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_real)) |
+            I(-log(appropriationshock_perEnroll_real))) |
         unitid + year,
         data = .)
 
@@ -608,7 +622,7 @@ shiftshare_assistant_promotion.reg <- assistant.data %>%
     felm(promoted ~ 1 |
         unitid + firstyear |
         (log(stateappropriations_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_real)) |
+            I(-log(appropriationshock_perEnroll_real))) |
         unitid + year,
         data = .)
 
@@ -620,7 +634,7 @@ shiftshare_full_promotion.reg <- associate.data %>%
     felm(promoted ~ 1 |
         unitid + firstyear |
         (log(stateappropriations_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_real)) |
+            I(-log(appropriationshock_perEnroll_real))) |
         unitid + year,
         data = .)
 
@@ -630,7 +644,7 @@ shiftshare_all_promotion.reg <- reg.data %>%
     felm(promoted ~ 1 |
         unitid + firstyear |
         (log(stateappropriations_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_real)) |
+            I(-log(appropriationshock_perEnroll_real))) |
         unitid + year,
         data = .)
 
@@ -668,7 +682,7 @@ shiftshare_lecturer_exit.reg <- lecturer.data %>%
     felm(notemployed_nextyear ~ 1 |
         unitid + firstyear |
         (log(stateappropriations_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_real)) |
+            I(-log(appropriationshock_perEnroll_real))) |
         unitid + year,
         data = .)
 
@@ -680,7 +694,7 @@ shiftshare_assistant_exit.reg <- assistant.data %>%
     felm(notemployed_nextyear ~ 1 |
         unitid + firstyear |
         (log(stateappropriations_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_real)) |
+            I(-log(appropriationshock_perEnroll_real))) |
         unitid + year,
         data = .)
 
@@ -692,7 +706,7 @@ shiftshare_full_exit.reg <- full.data %>%
     felm(notemployed_nextyear ~ 1 |
         unitid + firstyear |
         (log(stateappropriations_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_real)) |
+            I(-log(appropriationshock_perEnroll_real))) |
         unitid + year,
         data = .)
 
@@ -704,7 +718,7 @@ shiftshare_administrator_exit.reg <- administrator.data %>%
     felm(notemployed_nextyear ~ 1 |
         unitid + firstyear |
         (log(stateappropriations_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_real)) |
+            I(-log(appropriationshock_perEnroll_real))) |
         unitid + year,
         data = .)
 
@@ -714,7 +728,7 @@ shiftshare_all_exit.reg <- reg.data %>%
     felm(notemployed_nextyear ~ 1 |
         unitid + firstyear |
         (log(stateappropriations_real / enrollment_reported) ~
-            log(appropriationshock_perEnroll_real)) |
+            I(-log(appropriationshock_perEnroll_real))) |
         unitid + year,
         data = .)
 
@@ -757,23 +771,26 @@ lp.data <- reg.data %>%
         year = year,
         unitid = unitid,
         firstyear = firstyear,
+        instid = factor(unitid),
+        academicyear = factor(year),
         salary_real = log(salary_real + extra_salary_real),
         promoted = promoted,
-        nonauxrevenues_real =
+        stateappropriations_real =
             log(stateappropriations_real / enrollment_reported),
         appropriationshock_perEnroll_real =
-            log(appropriationshock_perEnroll_real),
-        tuitionrev_real = log(tuitionrev_real / enrollment_reported))
+            - log(appropriationshock_perEnroll_real),
+        tuitionrev_real = log(tuitionrev_real / enrollment_reported)) %>%
+    pdata.frame(index = c("unitid", "year"), drop.index = FALSE)
 
 # Run the LP method for the first-stage regression.
 firststage.lpreg <-
     lp_lin_panel(data_set = lp.data,
         # Outcome variable
-        endog_data = "nonauxrevenues_real",
+        endog_data = "stateappropriations_real",
         # Predictor variable
         shock = "appropriationshock_perEnroll_real",
-        # Contemporaneous control, plus FE for unitid * year
-        c_exog_data = c("tuitionrev_real", "unitid", "year"),
+        # Contemporaneous control, FE for unitid * year
+        c_exog_data = c("instid", "academicyear"),
         # Option to use IV for predictor endogeneity (not used here)
         iv_reg = FALSE,
         # Add clustered SEs in the panel
@@ -793,9 +810,9 @@ all_salaries.lpreg <-
         # Outcome variable
         endog_data = "salary_real",
         # Predictor variable
-        shock = "nonauxrevenues_real",
+        shock = "stateappropriations_real",
         # Contemporaneous control, plus FE for unitid + year
-        c_exog_data = c("tuitionrev_real", "unitid", "year"),
+        c_exog_data = c("instid", "academicyear"),
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_real",
@@ -816,9 +833,9 @@ all_promoted.lpreg <-
         # Outcome variable
         endog_data = "promoted",
         # Predictor variable
-        shock = "nonauxrevenues_real",
-        # Contemporaneous control, plus FE for unitid + year
-        c_exog_data = c("tuitionrev_real", "unitid", "year"),
+        shock = "stateappropriations_real",
+        # Contemporaneous control, FE for unitid + year
+        c_exog_data = c("instid", "academicyear"),
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_real",

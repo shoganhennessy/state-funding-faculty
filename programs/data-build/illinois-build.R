@@ -36,7 +36,7 @@ for (extrayear in c(2011:2021)) {
 # CPI-U from FREDS (since Urban provided cpi has missing years)
 # Yearly average, seasonally adjusted, base year 1982-1984=100
 # https://fred.stlouisfed.org/series/CPIAUCSL
-cpiu.data <- read_csv("../../data/urban-ipeds/raw-data/freds-cpiu.csv")
+cpiu.data <- read_csv("../../data/inflation-indices/freds-cpiu.csv")
 # Clean CPI data, and put in terms of base year 2021
 base.year <- 2021
 base.index <- cpiu.data %>%

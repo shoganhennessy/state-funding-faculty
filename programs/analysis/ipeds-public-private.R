@@ -184,35 +184,35 @@ prof_perfte.data <- ipeds.data %>%
             sum(enrollment_reported, na.rm = TRUE)) %>%
     ungroup()
 
-
-# Draw the graph for all Professors per student
-full_fte_perprof.plot <- prof_perfte.data %>%
-    ggplot(aes(x = year, y = full_fte_perprof, colour = factor(public))) +
+# Draw the graph for lecturers Professors per student
+lecturer_fte_perprof.plot <- prof_perfte.data %>%
+    ggplot(aes(x = year, y = 1 / lecturer_fte_perprof, colour = factor(public))) +
     geom_point() +
     geom_line() +
     scale_x_continuous(name = "Year",
         breaks = seq(1985, 2020, by = 5)) +
     scale_y_continuous(name = "",
-        limits = c(0.015, 0.03),
-        breaks = seq(0, 0.05, by = 0.005),
+        #limits = c(0, 350),
+        breaks = seq(0, 350, by = 25),
         labels = scales::comma) +
     theme_bw() +
     theme(plot.title = element_text(hjust = 0.5),
         legend.position = "top") +
     scale_colour_discrete(name = "", labels = c("Private", "Public"))
-ggsave("../../text/figures/full-fte-perprof.png",
-    plot = full_fte_perprof.plot,
+ggsave("../../text/figures/lecturer-fte-perprof.png",
+    plot = lecturer_fte_perprof.plot,
     units = "cm", width = fig.width, height = fig.height)
+
 # Draw the graph for TT Professors per student
 assistant_fte_perprof.plot <- prof_perfte.data %>%
-    ggplot(aes(x = year, y = assistant_fte_perprof, colour = factor(public))) +
+    ggplot(aes(x = year, y = 1 / assistant_fte_perprof, colour = factor(public))) +
     geom_point() +
     geom_line() +
     scale_x_continuous(name = "Year",
         breaks = seq(1985, 2020, by = 5)) +
     scale_y_continuous(name = "",
-        limits = c(0.005, 0.015),
-        breaks = seq(0, 0.05, by = 0.0025),
+        #limits = c(0, 350),
+        breaks = seq(0, 350, by = 5),
         labels = scales::comma) +
     theme_bw() +
     theme(plot.title = element_text(hjust = 0.5),
@@ -221,35 +221,36 @@ assistant_fte_perprof.plot <- prof_perfte.data %>%
 ggsave("../../text/figures/assistant-fte-perprof.png",
     plot = assistant_fte_perprof.plot,
     units = "cm", width = fig.width, height = fig.height)
-# Draw the graph for lecturers Professors per student
-lecturer_fte_perprof.plot <- prof_perfte.data %>%
-    ggplot(aes(x = year, y = lecturer_fte_perprof, colour = factor(public))) +
+
+# Draw the graph for tenured Professors per student
+full_fte_perprof.plot <- prof_perfte.data %>%
+    ggplot(aes(x = year, y = 1 / full_fte_perprof, colour = factor(public))) +
     geom_point() +
     geom_line() +
     scale_x_continuous(name = "Year",
         breaks = seq(1985, 2020, by = 5)) +
     scale_y_continuous(name = "",
-        limits = c(0.003, 0.007),
-        breaks = seq(0, 0.007, by = 0.001),
+        limits = c(30, 55),
+        breaks = seq(0, 350, by = 5),
         labels = scales::comma) +
     theme_bw() +
     theme(plot.title = element_text(hjust = 0.5),
         legend.position = "top") +
     scale_colour_discrete(name = "", labels = c("Private", "Public"))
-lecturer_fte_perprof.plot
-ggsave("../../text/figures/lecturer-fte-perprof.png",
-    plot = lecturer_fte_perprof.plot,
+ggsave("../../text/figures/full-fte-perprof.png",
+    plot = full_fte_perprof.plot,
     units = "cm", width = fig.width, height = fig.height)
+
 # Draw the graph for all Professors per student
 all_fte_perprof.plot <- prof_perfte.data %>%
-    ggplot(aes(x = year, y = all_fte_perprof, colour = factor(public))) +
+    ggplot(aes(x = year, y = 1 / all_fte_perprof, colour = factor(public))) +
     geom_point() +
     geom_line() +
     scale_x_continuous(name = "Year",
         breaks = seq(1985, 2020, by = 5)) +
     scale_y_continuous(name = "",
-        limits = c(0.03, 0.05),
-        breaks = seq(0, 0.05, by = 0.005),
+        limits = c(20, 30),
+        breaks = seq(0, 35, by = 2),
         labels = scales::comma) +
     theme_bw() +
     theme(plot.title = element_text(hjust = 0.5),

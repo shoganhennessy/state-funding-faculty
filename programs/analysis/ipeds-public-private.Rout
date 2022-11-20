@@ -21,7 +21,7 @@ Type 'q()' to quit R.
 > ## Senan Hogan-Hennessy, 10 June 2022
 > ## Investigate differences between public and private uni prof composition.
 > print(c(Sys.time(), Sys.Date()))
-[1] "2022-08-11 20:19:12 EDT" "2022-08-10 20:00:00 EDT"
+[1] "2022-08-31 16:59:00 EDT" "2022-08-30 20:00:00 EDT"
 > set.seed(47)
 > # Functions for data manipulation and visualisation
 > library(tidyverse)
@@ -108,7 +108,7 @@ dbl (46): unitid, year, public, forprofit, fouryear, associatescollege, cpi2...
 +         all_profoutlays_real)
 > gc()
           used  (Mb) gc trigger  (Mb) max used  (Mb)
-Ncells 2373644 126.8    4277050 228.5  4277050 228.5
+Ncells 2373644 126.8    4276940 228.5  4276940 228.5
 Vcells 5893933  45.0   23415964 178.7 28363976 216.4
 > 
 > # Public vs private enrollment comparison --------------------------------------
@@ -341,4 +341,4 @@ Warning messages:
 > 
 > proc.time()
    user  system elapsed 
- 18.233   0.513  16.666 
+ 11.744   0.462  11.382 

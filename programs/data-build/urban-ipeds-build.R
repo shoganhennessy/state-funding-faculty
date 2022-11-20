@@ -1,7 +1,7 @@
 #!/usr/bin/R
 ## Senan Hogan-Hennessy, 21 December 2021
 ## Build IPEDS data with the Urban Inst's package
-print(c(Sys.time(), Sys.Date()))
+print(Sys.time())
 ## https://educationdata.urban.org/documentation/colleges.html
 ## https://urbaninstitute.github.io/education-data-package-r/
 library(tidyverse) ## functions for data manipulation and visualization
@@ -79,16 +79,16 @@ finance.data <- finance.data %>%
         tuitionrev_real = replace(rev_tuition_fees_gross,
             rev_tuition_fees_gross <= 0, NA) / cpi2021,
         # Expenditures on instruction
-        instructionspending_total = replace(exp_instruc_total,
+        instructionspending_total_real = replace(exp_instruc_total,
             exp_instruc_total <= 0, NA) / cpi2021,
         # Salary Expenditures on instruction
-        instructionspending_salaries = replace(exp_instruc_salaries,
+        instructionspending_salaries_real = replace(exp_instruc_salaries,
             exp_instruc_salaries <= 0, NA) / cpi2021,
         # Expenditures on research
-        researchspending_total = replace(exp_research_total,
+        researchspending_total_real = replace(exp_research_total,
             exp_research_total <= 0, NA) / cpi2021,
         # Salary Expenditures on research
-        researchspending_salaries = replace(exp_research_salaries,
+        researchspending_salaries_real = replace(exp_research_salaries,
             exp_research_salaries <= 0, NA) / cpi2021,
         # All revenues (including tuition + appropriations)
         totalrevenues_real = replace(rev_total_current,
@@ -302,6 +302,10 @@ urban_ipeds.data <- urban_ipeds.data %>%
         totalrevenues_real,
         nonauxrevenues_real,
         nonauxspending_real,
+        instructionspending_total_real,
+        instructionspending_salaries_real,
+        researchspending_total_real,
+        researchspending_salaries_real,
         fedappropriations_real,
         stateappropriations_real,
         localappropriations_real,
