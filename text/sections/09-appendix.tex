@@ -1,0 +1,172 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Appendix section
+% Set-up the section.
+\newpage
+\appendix
+\setcounter{table}{0}
+\renewcommand{\thetable}{A\arabic{table}}
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{A\arabic{figure}}
+
+% Start appendix
+\section{Appendix}
+\label{appendix}
+This project used data which are fully public, and computational tools which are fully open-source.
+As such, all code and data involved in this project are available at this project's Github repository, available at \url{https://github.com/shoganhennessy/state-faculty-composition}.
+They may be used for replication, or as the basis for further work, as needed.
+Any comments or suggestions may be sent to me at \href{mailto:seh325@cornell.edu}{\nolinkurl{seh325@cornell.edu}}, or raised as an issue on the Github project.
+
+A number of statistical packages, for the $R$ language \citep{R2022}, made the empirical analysis for this paper possible.
+\begin{itemize}
+    \item \textit{Tidyverse} \citep{tidyverse} collected tools for data analysis in the R language.
+    \item \textit{LFE} \citep{lfe} implemented linear fixed effect models, with instruments, crucial for the empirical estimation in \autoref{sec:empirics}.
+    \item \textit{Stargazer} \citep{stargazer} provided a method to efficiently convert empirical results into presentable output in \LaTeX.
+    \item \textit{Lpirfs} \citep{lpirfs2019} implemented estimation of the \cite{jorda2005} local projections methods, with instrumental variables, crucial to the local projections estimates presented in this project.
+\end{itemize}
+
+
+\subsection{First Stage Estimates, Individual Outcomes}
+\label{appendix:part1}
+
+\begin{table}[h!]
+    \singlespacing
+    \centering
+    \caption{IBHED Summary Statistics, Entire Professor Panel 2010--2021.}
+    \makebox[\textwidth][c]{\input{tables/illinois-summary-rolling.tex}}
+    \label{tab:illinois-summary-rolling}
+    \begin{flushleft}
+        \footnotesize
+        \textbf{Note}: This table presents the summary statistics for professors with an observed year of first-year at their university.
+    \end{flushleft}
+\end{table}
+
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{First Stage Estimates, for Total University Revenues at the Individual-Level.}
+    \makebox[\textwidth][c]{\input{tables/firststage-illinois-rolling.tex}}
+    \label{tab:firststage-illinois}
+    \begin{flushleft}
+        \footnotesize
+        \textbf{Note}: Standard errors are clustered at the university-year level.
+    \end{flushleft}
+\end{table}
+
+
+\begin{figure}[h!]
+    \centering
+    \singlespacing
+    \caption{Local Projection Estimates for First-Stage \autoref{eqn:secondstage1_indiv}.}
+    \includegraphics[width=0.6\textwidth]{figures/firststage-illinois-lp-rolling.png}
+    \label{fig:firststage-illinois-lp}
+\end{figure}
+
+
+\subsection{Additional Results, University-Level}
+
+\autoref{tab:facultysalaries-shock-reg} presents OLS and IV estimates where the outcome is (log) mean salary for professors employed at the university, separated by position.
+Similarly, \autoref{fig:all-salaries-lp} shows the staying-power via projection methods.
+The outcome, mean salary is crude.
+
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{OLS and 2SLS Estimates for University Faculty-Tenure Composition.}
+    \makebox[\textwidth][c]{\input{tables/tenurecount-shock-reg-fte.tex}}
+    \begin{flushleft}
+        \footnotesize
+        \textbf{Note}: Standard errors are clustered at the university-year level.
+    \end{flushleft}
+    \label{tab:tenurecount-shock-reg-fte}
+\end{table}
+
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{OLS and 2SLS Estimates for University Faculty Salaries.}
+    \makebox[\textwidth][c]{\input{tables/facultysalaries-shock-reg-fte.tex}}
+    \begin{flushleft}
+        \footnotesize
+        \textbf{Note}: Standard errors are clustered at the state-year level.
+    \end{flushleft}
+    \label{tab:facultysalaries-shock-reg}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \singlespacing
+    \caption{Local Projection Estimates for Professor Salary, Mean within Each University.}
+    \includegraphics[width=0.6\textwidth]{figures/all-salaries-lp.png}
+    \label{fig:all-salaries-lp}
+\end{figure}
+
+
+\subsection{Additional Results, Individual-Professor Level}
+
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{2SLS Estimates for Faculty Salaries at Illinois Universities.}
+    \makebox[\textwidth][c]{\input{tables/facultysalaries-shock-illinois.tex}}
+    \begin{flushleft}
+        \footnotesize
+        \textbf{Note}: Standard errors are clustered at the institution-year level.
+    \end{flushleft}
+    \label{tab:facultysalaries-shock-illinois}
+\end{table}
+
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{2SLS Estimates for Faculty Promotion Rate at Illinois Universities, using Rolling Instrument.}
+    \makebox[\textwidth][c]{\input{tables/promotion-shock-illinois-rolling.tex}}
+    \begin{flushleft}
+        \footnotesize
+        \textbf{Note}: Standard errors are clustered at the institution and first year of employment level.
+    \end{flushleft}
+    \label{tab:promotion-shock-illinois-rolling}
+\end{table}
+
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{2SLS Estimates for Faculty Promotion Rate at Illinois Universities, using Base-Year Instrument.}
+    \makebox[\textwidth][c]{\input{tables/promotion-shock-illinois.tex}}
+    \begin{flushleft}
+        \footnotesize
+        \textbf{Note}: Standard errors are clustered at the institution and first year of employment level.
+    \end{flushleft}
+    \label{tab:promotion-shock-illinois}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \singlespacing
+    \caption{Local Projection Estimates for Promotion Rate at Illinois Universities.}
+    \includegraphics[width=0.6\textwidth]{figures/promoted-illinois-lp-rolling.png}
+    \label{fig:promoted-illinois-lp}
+\end{figure}
+
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{2SLS Estimates for Faculty Exit Rate at Illinois Universities, using Rolling Instrument.}
+    \makebox[\textwidth][c]{\input{tables/facultyleaving-shock-illinois-rolling.tex}}
+    \begin{flushleft}
+        \footnotesize
+        \textbf{Note}: Standard errors are clustered at the institution and first year of employment level.
+    \end{flushleft}
+    \label{tab:facultyleaving-shock-illinois-rolling}
+\end{table}
+
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{2SLS Estimates for Faculty Exit Rate at Illinois Universities, using Base-Year Instrument.}
+    \makebox[\textwidth][c]{\input{tables/facultyleaving-shock-illinois.tex}}
+    \begin{flushleft}
+        \footnotesize
+        \textbf{Note}: Standard errors are clustered at the institution and first year of employment level.
+    \end{flushleft}
+    \label{tab:facultyleaving-shock-illinois}
+\end{table}
