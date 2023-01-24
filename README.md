@@ -14,7 +14,7 @@ Folder "data/" contains multiple data sources:
 Various subfolders contain raw IPEDS files (downloaded from NCES), which supplement the Urban Institute compilation.
 
 - "states/illinois/" contains raw data on every public university instructor in the Illinois public university system 2010-2021, downloaded from IBHED.
-These data are anonymised as part of this analysis analysis, and the anonymised version hosted here.
+These data are anonymised as part of this analysis, and only the anonymised version is hosted here.
 See https://salarysearch.ibhe.org/ for publically available raw data.
 
 ## Analysis
