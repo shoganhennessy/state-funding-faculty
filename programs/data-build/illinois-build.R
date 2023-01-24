@@ -138,4 +138,13 @@ clean_illinois.data <- illinois.key %>%
 ################################################################################
 ## Save the constructed data file of Illinois data + IPEDS key connecter.
 clean_illinois.data %>%
-    write_csv("../../data/states/illinois-professors.csv")
+    write_csv("../../data/states/illinois-professors-realnames.csv")
+
+
+################################################################################
+## Save the constructed Illinois data with fake names, anonymised.
+clean_illinois.data %>%
+    group_by(name, unitid) %>%
+    mutate(nameid = name %>% paste(unitid) %>% factor() %>% as.numeric()) %>%
+    select(-name) %>%
+    write_csv("../../data/states/illinois-professors-anonymised.csv")
