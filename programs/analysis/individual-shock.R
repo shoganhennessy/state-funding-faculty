@@ -25,7 +25,8 @@ fig.height <- fig.width * 0.85
 # Load data --------------------------------------------------------------------
 
 # Data on Illinois Professors
-illinois.data <- read_csv("../../data/states/illinois-professors.csv")
+illinois.data <-
+    read_csv("../../data/states/illinois-professors-anonymised.csv")
 
 # Data from IPEDS, with relevant variables
 ipeds.data <- read_csv("../../data/urban-ipeds/urban-clean-publicunis.csv") %>%

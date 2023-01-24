@@ -143,8 +143,13 @@ clean_illinois.data %>%
 
 ################################################################################
 ## Save the constructed Illinois data with fake names, anonymised.
+
+# Shuffle the row order of the names, and replace with a string ID
 clean_illinois.data %>%
-    group_by(name, unitid) %>%
-    mutate(nameid = name %>% paste(unitid) %>% factor() %>% as.numeric()) %>%
-    select(-name) %>%
+    # SHuflle rows randomly
+    sample_frac(1L) %>%
+    # Anonymise names sequentially
+    mutate(name = name %>%
+        paste(unitid) %>% factor() %>% as.numeric() %>% as.character()) %>%
+    arrange(name, year) %>%
     write_csv("../../data/states/illinois-professors-anonymised.csv")
