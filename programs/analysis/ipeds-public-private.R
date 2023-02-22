@@ -17,6 +17,7 @@ fig.height <- fig.width * 0.75
 
 
 # Load data sources ------------------------------------------------------------
+
 # Load IPEDS data on all universities
 ipeds.data <- read_csv("../../data/urban-ipeds/urban-clean-allunis.csv")
 

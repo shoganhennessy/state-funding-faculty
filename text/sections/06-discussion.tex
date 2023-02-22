@@ -6,6 +6,36 @@ The results show that the recent stagnation in state funding for higher educatio
 At the same time, there are little discernible effects on individual professors hired in the years 2011-2021 at Illinois public universities, except for the salaries of first year lecturers.
 The rate that faculty leave their university, and their rate of promotion between positions, are unaffected by the university revenues, so this leaves one primary channel to explain changes in faculty composition: hiring.
 
+\subsection{Faculty Hiring at all US Universities}
+
+Write here about the faculty hiring network data, as provided by \cite{wapman2022quantifying}.
+
+Give a visualisation of the correlation between state funding per student (OLS) and faculty hiring.
+Also show the figure of faculty hiring in public vs private: did private unis hire more (in total and per student) over this time period?
+
+Cite Jackson (2021), effects of spending shock.
+
+IV model, where faculty hiring (per student) is the outcome, are presented in \autoref{tab:hiring-shock-reg}.\footnote{
+    Give extra details on this specification.
+}
+
+\begin{table}[h!]
+    \singlespacing
+    \centering
+    \caption{OLS and 2SLS Estimates for University Faculty Hiring, Total for 2011--2020.}
+    \makebox[\textwidth][c]{\input{tables/hiring-shock-reg-fte.tex}}
+    \begin{flushleft}
+        \footnotesize
+        \textbf{Note}: Standard errors are clustered at the state level.
+    \end{flushleft}
+    \label{tab:hiring-shock-reg}
+\end{table}
+
+Note that yearly variation is not observed here, so that only aggregate level, for 180 universities, can be considered.
+Leave it to further research to delve deeper into the role that hiring plays as the primary causal mediator for the effect of state funding shocks on faculty composition.
+
+\subsection{Faculty Hiring at Illinois Public Universities}
+
 \cite{turner2014impact} documents the wide-spread practice of hiring freezes at universities in response to budget shocks around the 2008 recession.
 Throughout the last decade, multiple such measures were taken by Illinois public universities in response to their deteriorating finances \citep{furlough2010}.
 The University of Illinois\footnote{
@@ -35,7 +65,7 @@ The University of Western Illinois adopted very similar measures in response to 
     \label{fig:newhire-illinois}
 \end{figure}
 
-These examples show that Illinois public universities were effected by the negative shock to state funding for higher education, and instituted policy changes aimed at affecting faculty outcomes investigated in \autoref{sec:results}.
+These examples show that Illinois public universities were affected by the negative shock to state funding for higher education, and instituted policy changes aimed at affecting faculty outcomes investigated in \autoref{sec:results}.
 Yet the only measurable effect was on count of professor per student (implied via slower hiring), and first-year lecturer salaries.
 To investigate these trends for the entire state, \autoref{fig:newhire-illinois} shows the count of professors hired in the years 2011-2021, and their mean salary, by position.
 In particular, no position had sustained rises in hiring while enrolment within the university was rising (so that new hires per student necessarily fell), and hiring of new administrators jumped once the Illinois budget crisis ended in 2017.

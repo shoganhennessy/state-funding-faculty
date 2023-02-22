@@ -39,7 +39,7 @@ $Z_{i,t}$ is the instrument for (log) state appropriations for institution $i$ i
     \cite{NBERw23736} use the single year 1990 as the base year, though I use the four years to ameliorate missing values in the single year of 1990.
     Results are similar in either specification.
 }
-$Z_{i,t}$ is contructed as negative to reflect the fact that the long term trend in, and most of the short-run shocks to, state funding for higher education has been negative.
+$Z_{i,t}$ is constructed as negative to reflect the fact that the long term trend in, and most of the short-run shocks to, state funding for higher education has been negative.
 State funding has been been falling, so that the instrument describes shocks to university revenues, mostly in a negative direction.
 
 \cite{NBERw27885} notes the tendency for public universities to respond to state funding cuts by increasing reliance on tuition, where \cite{NBERw23736} specifically instruments for tuition revenues with collected information on legislative tuition price controls.\footnote{
@@ -58,7 +58,7 @@ The first-stage is then as follows, including institution and year fixed effects
 \end{equation}
 We note the conditions for exogeneity in the instrument (following the discussion presented by \citealt{NBERw27885}).
 The instrument is exogenous if state policy decisions for funding of public universities are uncorrelated with unobserved institutional changes of any specific college or university in the state \citep{borusyak2022quasi}.
-This assumption is plausible given that the majority of states have multiple (i.e. more than five) public universities, without any single university campus receiving the majority of state funding within any single state.
+This assumption is plausible given that the majority of states have multiple (i.e., more than five) public universities, without any single university campus receiving the majority of state funding within any single state.
 Secondly, addressing endogeneity in university revenues by the shift-share identification strategy requires exogeneity in either the base-line share or shift component of the instrument.
 In this case, we satisfy the second: universities' institutional-level decisions are not correlated with contemporaneous or upcoming shocks to state appropriations.\footnote{
     It would be plausible to consider the case that universities make institutional-level decisions in a consistently different manner to those 
@@ -83,7 +83,7 @@ In this case, we satisfy the second: universities' institutional-level decisions
 We note columns (1) and (2) estimate that a shock to appropriations (per student in the entire state) of 10\% is associated with 9.8\% change in state funding per student at the university; the instrument is strong, and we note similarity in estimates with and without inclusion of fixed effects.
 Columns (3) and (4) include the tuition revenue control (explained in \autoref{foot:control}) to exhibit estimates with the inclusion of this possible collider or bad control.
 Column (3) shows similar estimates to columns (1), (2) thanks to inclusion of fixed effects, so that the fixed effects was effective in soaking variation in per-student tuition revenues at the institution-year level.
-Column (1) represents the estimates for \autoref{eqn:firststage} with fixed effects, omitting the tuition revenue control, and is the preferred form that I proceed with in the following.
+Column (1) represents the estimates for \autoref{eqn:firststage} with fixed effects, omitting the tuition revenue control, and is the preferred form that I proceed with.
 
 \begin{figure}[h!]
     \centering
@@ -93,7 +93,7 @@ Column (1) represents the estimates for \autoref{eqn:firststage} with fixed effe
     \label{fig:firststage-lp}
 \end{figure}
 
-\autoref{fig:firststage-lp} presents local projection estimates for the staying-power of the state appropriation shock to university revenues, with each year showing the years following effect of a shock to state reveunes in year zero.
+\autoref{fig:firststage-lp} presents local projection estimates for the staying-power of the state appropriation shock to university revenues, with each year showing the years following effect of a shock to state revenues in year zero.
 We see a decaying, yet real and positive, effect of the shock on revenues for the next 10 years, illustrating that the state appropriation shock is a strong, if fading, instrument for state funding per student and justifying its use in local projection IV estimation.
 
 These results, together with the case for exogeneity, show the appropriations shock instrument strongly predicts university revenues in the first-stage estimation.
@@ -102,9 +102,9 @@ These results, together with the case for exogeneity, show the appropriations sh
 \subsection{Instrumental Variables Model, University-Level}
 \label{sec:iv-model-uni}
 
-The primary empirical model combines the instrumental variable for state appropriation shocks with the empirical model for the effects of state funding at the university-level --- i.e. parameter $\beta$ in the following.\footnote{
+The primary empirical model combines the instrumental variable for state appropriation shocks with the empirical model for the effects of state funding at the university-level --- i.e., parameter $\beta$ in the following.\footnote{
     It is important to note the treatment effect isolated here; the instrumental variables approach identifies the local average treatment effects (LATE) specific to the instrument.
-    So we interpret this treatment effect as a university's response in employment count and average salaries to state funding changes, changes specific to state appropriation shocks, among the complier group --- i.e. universities with any exposure to shocks, assuming no universities increase employment or salaries in response to negative revenue shocks.
+    So we interpret this treatment effect as a university's response in employment count and average salaries to state funding changes, changes specific to state appropriation shocks, among the complier group --- i.e., universities with any exposure to shocks, assuming no universities increase employment or salaries in response to negative revenue shocks.
     \cite{mogstad2021causal} provide a full discussion of the LATE with instruments and multiple monotonicity conditions.
 }
 \begin{eqnarray}

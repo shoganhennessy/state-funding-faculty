@@ -9,6 +9,8 @@ cd data-build
 R CMD BATCH --no-save urban-ipeds-build.R
 # Build individual-level analysis data-set from raw data on Illinois Profs
 R CMD BATCH --no-save illinois-build.R
+# Build uni-level analysis data-set from open-sorce data on hiring networks.
+R CMD BATCH --no-save hiring-build.R
 cd ..
 
 # Statistical analysis code
@@ -21,6 +23,8 @@ R CMD BATCH --no-save ipeds-shock.R
 R CMD BATCH --no-save individual-shock.R
 # Analysis and regressions at the individual-level, with rolling shock IV.
 R CMD BATCH --no-save individual-shock-rolling.R
+# Analysis and regressions for rate of faculty hiring.
+R CMD BATCH --no-save hiring-shock.R
 cd ..
 
 # Compile paper, with outputs of progams as inputs for TeX files
