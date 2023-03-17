@@ -4,25 +4,21 @@
 \label{sec:data}
 
 \subsection{Data Description}
-The data used in this analysis come from two primary sources: \citet[IPEDS]{ipeds} regarding institutional information on finances and enrolment, and \citet[IBHED]{ibhed} for data on every professor in the Illinois public university system.
+The data used in this analysis come from two primary sources: \citet[IPEDS]{ipeds} regarding institutional information including finances and enrolment, and \citet[IBHED]{ibhed} for data on every professor in the Illinois public university system.
 
 IPEDS is a survey of higher educational institutions in the US, and legally requires institutions to participate in order to receive Federal Title IV student aid.\footnote{
     This statement means that IPEDS does not necessarily cover the universe of US higher education institutions, yet in practice every public university and not for-profit four-year institution is represented.
 }
 Data are consistent between the years 1990 and 2021,\footnote{
     The years 1987-1989 are represented in these data in an incompletion fashion, so I focus on the years 1990 onwards.
-    Year refers to the calendar year of the spring term --- i.e. 1987 refers to the academic year that ran August 1986 to July 1987.
+    Year refers to the calendar year of the spring term --- i.e., 1987 refers to the academic year that ran August 1986 to July 1987.
 }
-and provide information on the total revenues a university received from every source (including state governments), enrolment number, plus faculty count and total expenditures on salaries.\footnote{
-    I combine the Urban Institute's 2018 compilation of IPEDS data for the years 1990-2017, and manually combine with raw NCES data regarding the year 2018-2021 for all relevant variables.
-    Figures for enrolment, faculty counts and salaries come from the raw NCES version of IPEDS for all years to address inconsistencies in the Urban Institute's data formulation for these variables.
+and provide information on the total revenues a university received from every source (including state governments), enrolment, plus faculty count and total expenditures on salaries.\footnote{
+    I combine the Urban Institute's 2018 compilation of IPEDS data for the years 1990--2017, and manually combine raw NCES data on 2018-2021 for all relevant variables.
+    Figures for enrolment, faculty counts and salaries come from the raw NCES version of IPEDS for all years, addressing inconsistencies in the Urban Institute's data formulation for these variables.
 }
 I restrict analysis to public, four-year, degree-granting institutions, as these institutions adhere to a standardised concept of faculty profile, where tenure and title of appointment (lecturer, assistant professor, etc.) are relatively standardised.
-For-profit institutions employ and enrol a negligible share of professors and students respectively, while students at two-year institutions by majority intend to eventually enrol at a four-year institution \citep{mountjoy2022},\footnote{
-    Furthermore, \cite{mountjoy2022} documents the effects of expanding two-year higher education access in the US separately for students who would have and those who would not have otherwise have attended college.
-    The high rate of eventual enrolment at four-year institutions among two-year students explains the negative impact of increased access to two-year institutions on students who are diverted away from four-year institutions.
-}
-so that these institutions are not considered.
+For-profit institutions employ and enrol a negligible share of professors and students respectively, while students at two-year institutions by majority intend to eventually enrol at a four-year institution \citep{mountjoy2022}, so that these institutions are not considered.
 
 IPEDS reports the count of professors employed by position, as well as total salary expenditures by position.
 This gives a resulting panel data-set, where each row represents a university-year, and includes columns for university finances, plus total count and average salary\footnote{
@@ -66,20 +62,23 @@ Additionally, further analysis using the first year of a professor's employment 
 
 \subsection{Trends in Finances, Enrolment, and Faculty Composition}
 \label{sec:trends}
+
+The institutional environment for how states appropriate funding allows for wide variation in state funding for higher education, both between states and across years in each state.
 A state government plans an annual budget a couple of years ahead of the fiscal year, and the legislature chooses to approve or reject a budget request put forth by the governor's office.\footnote{
     \cite{NBERw23736} present a full discussion of the decision-making process for state appropriations, drawing on administrative records originally analysed by \cite{parmley2009state}.
 }
 US state governments, by majority, are legally obligated to run a balanced-budget, so that yearly variation in tax revenues (caused by changing economic conditions or otherwise) necessarily affect state expenditures.
 This process leads to yearly variation in state appropriations not seen in other revenues sources (such as federal government appropriations), since US states differ in their support for higher education, and are subject to fiscal constraints.
-State appropriations to higher education are a particularly attractive area of state spending to absorb such shocks to state finances \citep{delaney2011state}.\footnote{
-    \cite{delaney2011state} fully describes the financial environment of state expenditures, and what makes spending on higher education an attractive area for state governments to expand funding during years of higher tax revenues, and retract funding in leaner years.
-    An analysis of state expenditures for the years 1980-2004 (overlapping with the sample for this analysis) provides solid evidence for these trends.
+State appropriations to higher education are a particularly attractive area of state spending to absorb negative shocks to state finances \citep{delaney2011state}.\footnote{
+    \cite{delaney2011state} fully describe the financial environment of state expenditures, and what makes spending on higher education an attractive area for state governments to expand funding during years of higher tax revenues, and retract funding in leaner years.
+    An analysis of state expenditures for the years 1980-2004 (overlapping with the sample for this analysis) provides solid evidence for these trends, and \autoref{fig:funding} observes these same trends.
 }
 Additionally, there is yearly variation in the number of higher education students in each state \citep{turner2014impact}, so that per-student state appropriations vary on multiple dimensions.
 
-\autoref{fig:funding} exhibits the trends for the mean public university for the years 1990-2021.
+Public university revenues on average stagnated across there years 1990--2021.
+\autoref{fig:funding} show the trends in revenues for the mean public university for the years 1990--2021.
 We see a rise in total revenues received by public universities (from all sources), and a notable increase in mean tuition revenues from \$48 million per year-university to \$150 million per year-university.
-At the same time, total state appropriations stagnated at around \$100 million per year-university for 1990-2008, falling around 2008 and have not recovered ever since.
+At the same time, total state appropriations stagnated at around \$100 million per year-university for 1990--2008, falling around 2008 and have not recovered ever since.
 While public universities experienced a stagnation in state support, private universities were not exposed to the same constraints, receiving \$37,000 per student in 1990 and \$49,000 in 2021, experiencing no corresponding decline in any specific component.
 
 \begin{figure}[h!]
@@ -156,17 +155,17 @@ This means that revenues per student have stagnated across all measures (seen in
     \label{fig:fte-perprof}
 \end{figure}
 
-\autoref{fig:fte-perprof} documents the divergence in faculty composition (per student) between the average private and public university 1990-2021.
-Private universities start with  a higher baseline of around 4.5 professors per 100 students, and exhibited yearly variation of less than 0.5 professor per hundred students over the thirty years.
-Public universities start with 3.9 professors per hundred students, and this number falls to around 3.5 primarily in the 2008-2011 time period.
+There are large differences in the average number of professors per student between the private and public sector.
+\autoref{fig:fte-perprof} shows that private universities start with  a higher baseline of around 4.5 professors per 100 students, and exhibited yearly variation of less than 0.5 professor per hundred students over the thirty years.
+Public universities start with 3.9 professors per hundred students, and this number falls to around 3., with the largest fall in the 2008-2011 time period.
 We see a similar difference in baseline, and fall for the years 2008-2011 for assistant professors.
 Private and public universities have similar numbers of associated and full professors before the year 2000, yet this number has fallen by over 20\% in the next 20 years only for public universities: in 2021 the mean public university has 6 fewer full professors per hundred students than the mean private university.
-Over the same time period, we see the rise in use of non-tenure track instructor positions (referred to as lecturers from here on), who were employed at similar rates in both sectors in 1990 yet have been utilised by public universities at a higher rate since.
+Over the same time period, we see the rise in use of non-tenure track instructor positions (referred to as lecturers from here on), who were employed at similar rates in both sectors in 1990, yet have been utilised by public universities at a higher rate since.
 
 \subsection{Trends in Illinois}
 \label{sec:trends-illinois}
 
-The state of Illinois experienced the same stagnation in state support for higher education that the rest of the nation has experienced 1990-2021.
+The rate that Illinois funds higher education has stagnated to a similar extent as the average for the entire country.
 \autoref{fig:illinois-funding} shows the trends for revenues among the seven Illinois public university campuses, including the falling share of state appropriations and substitution towards tuition revenue.
 
 \begin{figure}[h!]
@@ -188,11 +187,10 @@ The state of Illinois experienced the same stagnation in state support for highe
     \label{fig:illinois-funding}
 \end{figure}
 
-The decade of 2010-2021 has also seen yearly variation in its revenues, particularly around 2016.
+The decade of 2010--2021 has also seen yearly variation in its revenues, particularly around 2016.
 In the calendar year 2015 partisan disagreements between the democratic legislature and republican governor led to the 2016 fiscal year starting with no state budget.
 State agencies, and higher education institutions, employed accounting techniques to continue operating without any resources provided by the state government.\footnote{
-    Fiscal year 2016 refers to June 205 to June 2016, as is the same for the academic year definition in this analysis. 
-    K-12 schools were unaffected thanks to a separate budget agreement allowing non-higher education to operate as before.
+    Fiscal year 2016 refers to June 205 to June 2016, so is the same as the academic year definition.
 }
-While state institutions were able to stay open, there were drastic revenue and spending cuts in response to the budget impasse, as it continued through fiscal year 2017, and ended with a new budget restoring revenues to state agencies and universities for the 2018 fiscal year.
-This variation in public university revenues via the state appropriations channel, stemming entirely from political disagreements --- not from state decisions regarding higher education and its finances \citep{young2020squandered} --- mean that Illinois public universities exhibit sizable changes in their state appropriations over 2010-2021, of similar order to those for the rest of the country over 1990-2021.
+While public universities were able to stay open, there were drastic revenue and spending cuts in response to the budget impasse, as it continued through fiscal year 2017, and ended with a new budget restoring funding to state institutions for 2018.
+This variation in public university revenues via the state appropriations channel, stemming entirely from political disagreements --- not from state decisions regarding higher education and its finances \citep{young2020squandered} --- mean that Illinois public universities exhibit sizable changes in their state appropriations over 2010-2021, of similar order to those for the rest of the country over 1990--2021.
