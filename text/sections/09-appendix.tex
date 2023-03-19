@@ -25,10 +25,21 @@ A number of statistical packages, for the $R$ language \citep{R2022}, made the e
 \end{itemize}
 
 
+\subsection{First Stage Local Projection Estimates}
+
+\begin{figure}[H]
+    \centering
+    \singlespacing
+    \caption{Local Projection Estimates for First-Stage \autoref{eqn:firststage}.}
+    \includegraphics[width=0.6\textwidth]{figures/firststage-lp.png}
+    \label{fig:firststage-lp}
+\end{figure}
+
+
 \subsection{First Stage Estimates, Individual Outcomes}
 \label{appendix:part1}
 
-\begin{table}[h!]
+\begin{table}[H]
     \singlespacing
     \centering
     \caption{IBHED Summary Statistics, Entire Professor Panel 2010--2021.}
@@ -53,7 +64,7 @@ A number of statistical packages, for the $R$ language \citep{R2022}, made the e
 \end{table}
 
 
-\begin{figure}[h!]
+\begin{figure}[H]
     \centering
     \singlespacing
     \caption{Local Projection Estimates for First-Stage \autoref{eqn:secondstage1_indiv}.}
@@ -99,6 +110,25 @@ The outcome, mean salary is crude.
     \includegraphics[width=0.6\textwidth]{figures/all-salaries-lp.png}
     \label{fig:all-salaries-lp}
 \end{figure}
+
+\subsection{Additional Results, Faculty Hiring}
+\label{sec:appendix-hiring}
+
+These results were collects by using the open-source network data by \cite{wapman2022quantifying}, summing the count of hires a university made for 2011--2021 across the network structure of the data, and integrating a sum of all revenue related measures from IPEDS data.
+
+\begin{table}[h!]
+    \singlespacing
+    \centering
+    \caption{OLS and 2SLS Estimates for University Faculty Hiring, Total for 2011--2020.}
+    \makebox[\textwidth][c]{\input{tables/hiring-shock-reg-fte.tex}}
+    \begin{flushleft}
+        \footnotesize
+        \textbf{Note}: Standard errors are clustered at the state level.
+    \end{flushleft}
+    \label{tab:hiring-shock-reg}
+\end{table}
+
+Note that yearly variation is not observed here, so that only the aggregate level, for 180 universities, can be considered.
 
 
 \subsection{Additional Results, Individual-Professor Level}

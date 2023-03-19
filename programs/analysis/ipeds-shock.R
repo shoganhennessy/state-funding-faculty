@@ -128,6 +128,49 @@ reg.data %>%
         type = "text",
         out = "../../text/tables/ipeds-summary-fte.tex")
 
+# Summary Statistics for the Quantiles of the shift-share instrument.
+quantile.count <- 5
+reg.data %>%
+    mutate(instrument_quantile = round((quantile.count - 1) *
+        ecdf(appropriationshock_perEnroll_real)(
+            appropriationshock_perEnroll_real))) %>%
+    group_by(instrument_quantile) %>%
+    summarise(
+        `State Funding Shock, USD per student` = round(mean(appropriationshock_perEnroll_real, an.rm = TRUE)),
+        `State Funding, per student`           = round(mean(stateappropriations_real / enrollment_reported, na.rm = TRUE)),
+        `Total Full-time Enrolment`            = round(mean(enrollment_reported, na.rme = TRUE)),
+        `State Funding, USD millions`          = round(mean(stateappropriations_real / 10^6, na.rme = TRUE)),
+        `Total Revenues, USD millions`         = round(mean(totalrevenues_real / 10^6, na.rme = TRUE)),
+        `Total Revenues, USD per student`      = round(mean(totalrevenues_real / enrollment_reported, na.rm = TRUE)),
+        `Lecturer Count`                       = round(mean(lecturer_prof_count, na.rm = TRUE)),
+        `Assistant Professor Count`            = round(mean(assistant_prof_count, na.rm = TRUE)),
+        `Full Professor Count`                 = round(mean(full_prof_count, na.rm = TRUE)),
+        `Total Professor Count`                = round(mean(all_prof_count, na.rm = TRUE)),
+        `Lecturers, per student`               = mean(lecturer_prof_count / enrollment_reported, na.rm = TRUE),
+        `Assistant Professors, per student`    = mean(assistant_prof_count / enrollment_reported, na.rm = TRUE),
+        `Full Professors, per student`         = mean(full_prof_count / enrollment_reported, na.rm = TRUE),
+        `Total Professors, per student`        = mean(all_prof_count / enrollment_reported, na.rm = TRUE)
+            ) %>%
+    ungroup() %>%
+    pivot_longer(!instrument_quantile,
+        names_to = "variable", values_to = "value") %>%
+    pivot_wider(names_from = "instrument_quantile",
+        values_from = "value") %>%
+    transmute(`Instrument Quantile:` = variable,
+        `1st` = `0`,
+        `2nd` = `1`,
+        `3rd` = `2`,
+        `4th` = `3`,
+        `5th` = `4`) %>%
+    as.data.frame() %>%
+    stargazer(summary = FALSE,
+        rownames = FALSE,
+        digits = 3,
+        omit.table.layout = "n",
+        header = FALSE, float = FALSE, no.space = TRUE,
+        type = "text",
+        out = "../../text/tables/summary-quantiles.tex")
+
 
 # Plot funding sources over time -----------------------------------------------
 

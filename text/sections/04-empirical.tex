@@ -22,7 +22,7 @@ Instead, the state government and university administration undertake a complex 
 Importantly for this analysis, revenues received from an institution's state government provide opportunity to address this endogeneity.
 
 
-\subsection{State Appropriation Shocks}
+\subsection{State Funding Shocks}
 \label{sec:approp-shocks}
 
 This analysis uses a shift-share instrument to address endogeneity concerns for the amount of funding a state gives to each of its public universities.
@@ -34,7 +34,7 @@ This analysis uses a shift-share instrument to address endogeneity concerns for 
     \sum_{\tau = 0}^{3} \frac 14
     \left( \frac{\text{State Funding}_{i,1990 + \tau}}{\text{Total Revenues}_{i,1990 + \tau}} \right) \right]
 \end{align}
-The system exploits the fact that institutions who rely on state appropriations more will be affected by state appropriation shocks.
+The system exploits the fact that institutions who rely on state funding more will be affected by state appropriation shocks.
 $Z_{i,t}$ is the instrument for (log) state appropriations for institution $i$ in year $t$, interacting the average funding for universities in state $s(i)$ with reliance on state funding relative to total revenues, averaged across the base years 1990--1993.\footnote{
     1990--1993 are defined as data for public university finance data are most comparable (i.e. without many missing values) beginning in 1990.
     \cite{NBERw23736} use the single year 1990 as the base year, though I use the four years to ameliorate missing values in the single year of 1990.
@@ -48,9 +48,24 @@ State funding has been falling, so that the instrument describes shocks to unive
     On the other hand, rises in tuition revenues (per student) may arise as result of tuition hikes thanks declining state support, which would mean controlling for tuition would constitute a bad control.
     Nonetheless, estimates including tuition revenues (per student) as a control in the second stage of the IV estimates produces results of very similar magnitude and direction, and so are omitted.
 }
-This analysis focuses on one important source of revenues for public universities: state appropriations.
+The instrument approach relies on the conditional independence assumption, that the instrument is independently assigned to the universities.
+While this assumption is fundamentally untestable, we see that univeresities are by-in-large smaller (in terms of enrolment, total revenues, and professor count) at the top of the state funding shock distribution.
+Though on a per student basis, there is little difference across the distribution (except in the outcomes under consideration).
+Yearly and individual fixed effects are included in regressions throughout to implicitly condition on mean differences between universities, and strengthen the claim of conditional independence of the instrument.
 
-The first-stage is then as follows, including institution and year fixed effects.
+\begin{table}[h!]
+    \singlespacing
+    %\centering
+    \caption{Mean Characteristics for Public Universities, by State Funding Shock Instrument.}
+    \makebox[\textwidth][c]{\input{tables/summary-quantiles.tex}}
+    \label{tab:summary-quantiles}
+    \footnotesize
+    \textbf{Note}:
+    The column labelled ``1st'' refers to the mean for all university-year observations in the first quintile (bottom 20\%) of the funding shock (per student) distribution, and so on.
+\end{table}
+
+The state funding shock is an instrument for the amount of state funding for each university in each year.  
+The first-stage is then as follows, including institution and year fixed effects, where $X_{i,t}$ represents the amount of state funding divided by the number of full-time students attending the university.
 \begin{equation}
     \label{eqn:firststage}
     X_{i,t} = \eta_i + \zeta_t + \delta Z_{i,t} + \epsilon_{i,t}
@@ -63,7 +78,7 @@ In this case, we satisfy the second: universities' institutional-level decisions
     It would be plausible to consider the case that universities make institutional-level decisions in a consistently different manner to those 
     with differing reliance on state appropriations in 1990, so that exogeneity by the base-line share is not plausible here.
 }
-Lastly, the IV model assumes that state funding shocks affect faculty outcomes only via affecting university finances.
+Lastly, the shift-share approach assumes that state funding shocks affect faculty outcomes only via affecting university finances.
 
 \begin{table}[h!]
     \singlespacing
@@ -85,17 +100,8 @@ We note columns (1) and (2) estimate that a shock to appropriations (per student
 Columns (3) and (4) include the tuition revenue control (explained in \autoref{foot:control}) to exhibit estimates with the inclusion of this possible collider or bad control.
 Column (3) shows similar estimates to columns (1), (2) thanks to inclusion of fixed effects, so that the fixed effects was effective in soaking variation in per-student tuition revenues at the institution-year level.
 Column (1) represents the estimates for \autoref{eqn:firststage} with fixed effects, omitting the tuition revenue control, and is the preferred form that I proceed with.
-
-\begin{figure}[h!]
-    \centering
-    \singlespacing
-    \caption{Local Projection Estimates for First-Stage \autoref{eqn:firststage}.}
-    \includegraphics[width=0.6\textwidth]{figures/firststage-lp.png}
-    \label{fig:firststage-lp}
-\end{figure}
-
-\autoref{fig:firststage-lp} presents local projection estimates for the staying-power of the state appropriation shock to university revenues, with each year showing the years following effect of a shock to state revenues in year zero.
-We see a decaying, yet real and positive, effect of the shock on revenues for the next 10 years, illustrating that the state appropriation shock is a strong, if fading, instrument for state funding per student and justifying its use in local projection IV estimation.
+Lastly, the state funding shock affects university revenues for multiple years after the initial shock (seee \autoref{fig:firststage-lp}).
+We see a decaying, yet real and positive, effect of the shock on revenues for the next 10 years, illustrating that the state appropriation shock is a strong, if fading, instrument for state funding per student and justifying its use in later local projections models.
 
 These results, together with the case for exogeneity, show the appropriations shock instrument strongly predicts university revenues in the first-stage estimation.
 
@@ -115,7 +121,11 @@ The primary empirical model combines the instrumental variable for state appropr
     Y_{i,t} &=& \alpha_i + \gamma_t + \beta \widehat X_{i,t} + \varepsilon_{i,t}
 \end{eqnarray}
 I estimate the system by two stage least squares, including institution and year fixed effects, and investigate outcomes at the university-level to analyse effects on the university as a result of changes in revenues.
-Additionally, I estimate the model via local projections \citep{jorda2005,miller2022} to investigate whether the effects of revenues on faculty composition linger for multiple years after the original appropriation shock.
+Additionally, I estimate the model via local projections \citep{jorda2005,miller2022} to investigate whether the effects of revenues on faculty composition linger for multiple years after the original appropriation shock.\footnote{
+    The local projections method is an empirical method to estimate dynamic treatment effects when the treatment of interest is not binary, so that time-series confounding (i.e., treatment in time $t$ is correlated with treatment in time $t-1$) is present even for instrumental variable models.
+    Inference for this model is similar to that for an event study design, so I present estimates in graphical form following that example (\autoref
+    {fig:count-lp}).
+}
 Regarding outcomes, I focus on the composition of the professors employed at the university by analysing (log) count per student of, and average salaries paid to, professors employed by the university.
 
 %\begin{figure}[H]

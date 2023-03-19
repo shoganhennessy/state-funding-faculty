@@ -31,3 +31,4 @@ cd ..
 cd ../text
 latexmk -pdf paper.tex
 latexmk -c
+cp paper.pdf ../state-faculty-composition-2023.pdf
