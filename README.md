@@ -32,7 +32,3 @@ Folder "programs/" contains multiple analysis, all using the *R* language, to an
 ## Text
 
 Folder "text/" contains all files regarding the final report, and write-up, of the empirical analysis.
-
-## March 2023 Revision to-do List:
-
-1. Re-do the discussion section with the hiring data from networks paper.
