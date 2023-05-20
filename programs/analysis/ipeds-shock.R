@@ -17,7 +17,7 @@ set.seed(47)
 digits.no <- 3
 
 # Size for figures
-fig.width <- 10
+fig.width <- 9
 fig.height <- fig.width * 0.85
 
 
@@ -100,29 +100,21 @@ reg.data %>%
         lecturer_prof_count = lecturer_prof_count,
         assistant_prof_count = assistant_prof_count,
         full_prof_count = full_prof_count,
-        all_prof_count = all_prof_count,
-        lecturer_profmeansalary_real = lecturer_profmeansalary_real,
-        assistant_profmeansalary_real = assistant_profmeansalary_real,
-        full_profmeansalary_real = full_profmeansalary_real,
-        all_profmeansalary_real = all_profmeansalary_real) %>%
+        all_prof_count = all_prof_count) %>%
     as.data.frame() %>%
     stargazer(summary = TRUE,
         summary.stat = c("mean", "sd", "n"),
         digits = 0,
         digits.extra = 0,
         covariate.labels = c(
-            "Enrollment, institution reported",
+            "Enrolment",
             "State appropriations (millions 2021 USD)",
             "Total revenues (millions 2021 USD)",
-            "Non-instutional revenues (millions 2021 USD)",
+            "Non-institutional revenues (millions 2021 USD)",
             "Lecturers count",
             "Assistant professors count",
             "Full professors count",
-            "All professors count",
-            "Lecturers mean salary (2021 USD)",
-            "Assistant mean salary (2021 USD)",
-            "Full mean salary (2021 USD)",
-            "All mean salary (2021 USD)"),
+            "All professors count"),
         omit.table.layout = "n",
         header = FALSE, float = FALSE, no.space = TRUE,
         type = "text",
@@ -190,23 +182,26 @@ mean_funding_fte.data <- reg.data %>%
 mean_funding_fte.graph <- mean_funding_fte.data %>%
     select(-totalrevenues_real) %>%
     pivot_longer(!year, names_to = "variable", values_to = "millions") %>%
-    ggplot(aes(x = year, y = millions, colour = variable)) +
+    ggplot(aes(x = year, y = millions / 10^3, colour = variable)) +
     geom_point() +
     geom_line() +
     # Adjust the names and axis
     scale_x_continuous(name = "Year",
         breaks = seq(1985, 2020, by = 5)) +
     scale_y_continuous(name = "",
-        limits = c(0, 21000),
-        breaks = seq(0, 50000, by = 2500),
+        limits = c(0, 21),
+        breaks = seq(0, 50, by = 2.5),
         labels = scales::comma) +
     theme_bw() +
-    theme(plot.title = element_text(hjust = 0.5),
-        legend.position = "top") +
+    ggtitle("Funding, $ thousands") +
+    theme(plot.title = element_text(size = rel(1)),
+        plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
+        legend.position = "bottom",
+        legend.margin = margin(t = -10)) +
     scale_colour_discrete(name = "",
         breaks = c("totalrevenues_real", "nonauxrevenues_real",
         "stateappropriations_real", "tuitionrev_real"),
-        labels = c("Total", "Non-aux.", "State", "Tuition"))
+        labels = c("Total", "Non-inst.", "State", "Tuition"))
 # Save this plot
 ggsave("../../text/figures/mean-funding-fte.png",
     plot = mean_funding_fte.graph,
@@ -239,12 +234,15 @@ mean_funding.graph <- mean_funding.data %>%
         breaks = seq(0, 500, by = 50),
         labels = scales::comma) +
     theme_bw() +
-    theme(plot.title = element_text(hjust = 0.5),
-        legend.position = "top") +
+    ggtitle("Funding, $ millions") +
+    theme(plot.title = element_text(size = rel(1)),
+        plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
+        legend.position = "bottom",
+        legend.margin = margin(t = -10)) +
     scale_colour_discrete(name = "",
         breaks = c("totalrevenues_real", "nonauxrevenues_real",
         "stateappropriations_real", "tuitionrev_real"),
-        labels = c("Total", "Total Non-inst.", "State", "Tuition"))
+        labels = c("Total", "Non-inst.", "State", "Tuition"))
 # Save this plot
 ggsave("../../text/figures/mean-funding-total.png",
     plot = mean_funding.graph,
@@ -309,7 +307,7 @@ illinois_funding_fte.graph <- illinois_funding_fte.data %>%
         labels = scales::comma) +
     theme_bw() +
     theme(plot.title = element_text(hjust = 0.5),
-        legend.position = "top") +
+        legend.position = "bottom") +
     scale_colour_discrete(name = "",
         breaks = c("totalrevenues_real", "nonauxrevenues_real",
         "stateappropriations_real", "tuitionrev_real"),
@@ -348,7 +346,7 @@ illinois_funding.graph <- illinois_funding.data %>%
         labels = scales::comma) +
     theme_bw() +
     theme(plot.title = element_text(hjust = 0.5),
-        legend.position = "top") +
+        legend.position = "bottom") +
     scale_colour_discrete(name = "",
         breaks = c("totalrevenues_real", "nonauxrevenues_real",
         "stateappropriations_real", "tuitionrev_real"),
