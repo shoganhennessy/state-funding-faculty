@@ -9,6 +9,7 @@ library(car) # Function for F stat regarding IV models
 # My custom flavour of Stargazer TeX tables:
 # devtools::install_github("shoganhennessy/stargazer")
 library(stargazer) # TeX tables
+library(xtable)
 set.seed(47)
 # This file follows an adjusted Deming Walters (2017, p.10) approach to
 # appropriations shock instrument.
@@ -128,12 +129,12 @@ reg.data %>%
             appropriationshock_perEnroll_real))) %>%
     group_by(instrument_quantile) %>%
     summarise(
-        `State Funding Shock, USD per student` = round(mean(appropriationshock_perEnroll_real, an.rm = TRUE)),
+        `State Funding Shock, \\$ per student` = round(mean(appropriationshock_perEnroll_real, an.rm = TRUE)),
         `State Funding, per student`           = round(mean(stateappropriations_real / enrollment_reported, na.rm = TRUE)),
         `Total Full-time Enrolment`            = round(mean(enrollment_reported, na.rme = TRUE)),
-        `State Funding, USD millions`          = round(mean(stateappropriations_real / 10^6, na.rme = TRUE)),
-        `Total Revenues, USD millions`         = round(mean(totalrevenues_real / 10^6, na.rme = TRUE)),
-        `Total Revenues, USD per student`      = round(mean(totalrevenues_real / enrollment_reported, na.rm = TRUE)),
+        `State Funding, \\$ millions`          = round(mean(stateappropriations_real / 10^6, na.rme = TRUE)),
+        `Total Revenues, \\$ millions`         = round(mean(totalrevenues_real / 10^6, na.rme = TRUE)),
+        `Total Revenues, \\$ per student`      = round(mean(totalrevenues_real / enrollment_reported, na.rm = TRUE)),
         `Lecturer Count`                       = round(mean(lecturer_prof_count, na.rm = TRUE)),
         `Assistant Professor Count`            = round(mean(assistant_prof_count, na.rm = TRUE)),
         `Full Professor Count`                 = round(mean(full_prof_count, na.rm = TRUE)),
@@ -154,14 +155,16 @@ reg.data %>%
         `3rd` = `2`,
         `4th` = `3`,
         `5th` = `4`) %>%
-    as.data.frame() %>%
-    stargazer(summary = FALSE,
-        rownames = FALSE,
-        digits = 3,
-        omit.table.layout = "n",
-        header = FALSE, float = FALSE, no.space = TRUE,
-        type = "text",
-        out = "../../text/tables/summary-quantiles.tex")
+    xtable(type = "latex",
+        align = "llccccc") %>%
+    print(
+        sanitize.colnames.function = identity,
+        sanitize.text.function = identity,
+        format.args = list(big.mark = ",", decimal.mark = "."),
+        floating = FALSE,
+        floating.environment = "tabular",
+        include.rownames = FALSE,
+        file = "../../text/tables/summary-quantiles.tex")
 
 
 # Plot funding sources over time -----------------------------------------------
@@ -295,19 +298,22 @@ illinois_funding_fte.data <- reg.data %>%
 illinois_funding_fte.graph <- illinois_funding_fte.data %>%
     select(-totalrevenues_real) %>%
     pivot_longer(!year, names_to = "variable", values_to = "millions") %>%
-    ggplot(aes(x = year, y = millions, colour = variable)) +
+    ggplot(aes(x = year, y = millions / 10^3, colour = variable)) +
     geom_point() +
     geom_line() +
     # Adjust the names and axis
     scale_x_continuous(name = "Year",
         breaks = seq(1985, 2020, by = 5)) +
     scale_y_continuous(name = "",
-        limits = c(0, 25000),
-        breaks = seq(0, 50000, by = 5000),
+        limits = c(0, 25),
+        breaks = seq(0, 50, by = 5),
         labels = scales::comma) +
     theme_bw() +
-    theme(plot.title = element_text(hjust = 0.5),
-        legend.position = "bottom") +
+    ggtitle("Funding, $ thousands") +
+    theme(plot.title = element_text(size = rel(1)),
+        plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
+        legend.position = "bottom",
+        legend.margin = margin(t = -10)) +
     scale_colour_discrete(name = "",
         breaks = c("totalrevenues_real", "nonauxrevenues_real",
         "stateappropriations_real", "tuitionrev_real"),
@@ -345,8 +351,11 @@ illinois_funding.graph <- illinois_funding.data %>%
         breaks = seq(0, 1000, by = 50),
         labels = scales::comma) +
     theme_bw() +
-    theme(plot.title = element_text(hjust = 0.5),
-        legend.position = "bottom") +
+    ggtitle("Funding, $ millions") +
+    theme(plot.title = element_text(size = rel(1)),
+        plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
+        legend.position = "bottom",
+        legend.margin = margin(t = -10)) +
     scale_colour_discrete(name = "",
         breaks = c("totalrevenues_real", "nonauxrevenues_real",
         "stateappropriations_real", "tuitionrev_real"),

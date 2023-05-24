@@ -12,8 +12,8 @@ library(plm)
 digits.no <- 3
 
 # Size for figures
-fig.width <- 10
-fig.height <- fig.width * 0.75
+fig.width <- 9
+fig.height <- fig.width * 0.85
 
 
 # Load data sources ------------------------------------------------------------
@@ -78,34 +78,42 @@ enrollment.data <- ipeds.data %>%
     ungroup()
 # Draw the graph for enrollment total
 enrollment_total.plot <- enrollment.data %>%
-    ggplot(aes(x = year, y = enrollment_total, colour = factor(public))) +
+    ggplot(aes(x = year, y = enrollment_total / 10^6, colour = factor(public))) +
     geom_point() +
     geom_line() +
     scale_x_continuous(name = "Year",
         breaks = seq(1985, 2020, by = 5)) +
     scale_y_continuous(name = "",
-        limits = c(0, 10^7),
+        limits = c(0, 10),
+        breaks = seq(0, 10, by = 2),
         labels = scales::comma) +
     theme_bw() +
-    theme(plot.title = element_text(hjust = 0.5),
-        legend.position = "top") +
+    ggtitle("Student Enrolment, millions") +
+    theme(plot.title = element_text(size = rel(1)),
+        plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
+        legend.position = "bottom",
+        legend.margin = margin(t = -10)) +
     scale_colour_discrete(name = "", labels = c("Private", "Public"))
 ggsave("../../text/figures/enrollment-total.png",
     plot = enrollment_total.plot,
     units = "cm", width = fig.width, height = fig.height)
 # Draw the graph for enrollment mean
 enrollment_mean.plot <- enrollment.data %>%
-    ggplot(aes(x = year, y = enrollment_mean, colour = factor(public))) +
+    ggplot(aes(x = year, y = enrollment_mean / 10^3, colour = factor(public))) +
     geom_point() +
     geom_line() +
     scale_x_continuous(name = "Year",
         breaks = seq(1985, 2020, by = 5)) +
     scale_y_continuous(name = "",
-        limits = c(0, 12500),
+        limits = c(0, 12.5),
+        breaks = seq(0, 13, by = 2),
         labels = scales::comma) +
     theme_bw() +
-    theme(plot.title = element_text(hjust = 0.5),
-        legend.position = "top") +
+    ggtitle("Student Enrolment, thousands") +
+    theme(plot.title = element_text(size = rel(1)),
+        plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
+        legend.position = "bottom",
+        legend.margin = margin(t = -10)) +
     scale_colour_discrete(name = "", labels = c("Private", "Public"))
 ggsave("../../text/figures/enrollment-mean.png",
     plot = enrollment_mean.plot,
@@ -193,12 +201,15 @@ lecturer_fte_perprof.plot <- prof_perfte.data %>%
     scale_x_continuous(name = "Year",
         breaks = seq(1985, 2020, by = 5)) +
     scale_y_continuous(name = "",
-        #limits = c(0, 350),
+        limits = c(20, 350),
         breaks = seq(0, 350, by = 25),
         labels = scales::comma) +
     theme_bw() +
-    theme(plot.title = element_text(hjust = 0.5),
-        legend.position = "top") +
+    ggtitle("Students per Lecturer") +
+    theme(plot.title = element_text(size = rel(1)),
+        plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
+        legend.position = "bottom",
+        legend.margin = margin(t = -10)) +
     scale_colour_discrete(name = "", labels = c("Private", "Public"))
 ggsave("../../text/figures/lecturer-fte-perprof.png",
     plot = lecturer_fte_perprof.plot,
@@ -212,12 +223,15 @@ assistant_fte_perprof.plot <- prof_perfte.data %>%
     scale_x_continuous(name = "Year",
         breaks = seq(1985, 2020, by = 5)) +
     scale_y_continuous(name = "",
-        #limits = c(0, 350),
-        breaks = seq(0, 350, by = 5),
+        limits = c(20, 120),
+        breaks = seq(0, 350, by = 10),
         labels = scales::comma) +
     theme_bw() +
-    theme(plot.title = element_text(hjust = 0.5),
-        legend.position = "top") +
+    ggtitle("Students per Assistant Professor") +
+    theme(plot.title = element_text(size = rel(1)),
+        plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
+        legend.position = "bottom",
+        legend.margin = margin(t = -10)) +
     scale_colour_discrete(name = "", labels = c("Private", "Public"))
 ggsave("../../text/figures/assistant-fte-perprof.png",
     plot = assistant_fte_perprof.plot,
@@ -231,12 +245,15 @@ full_fte_perprof.plot <- prof_perfte.data %>%
     scale_x_continuous(name = "Year",
         breaks = seq(1985, 2020, by = 5)) +
     scale_y_continuous(name = "",
-        limits = c(30, 55),
+        limits = c(20, 55),
         breaks = seq(0, 350, by = 5),
         labels = scales::comma) +
     theme_bw() +
-    theme(plot.title = element_text(hjust = 0.5),
-        legend.position = "top") +
+    ggtitle("Students per Full Professor") +
+    theme(plot.title = element_text(size = rel(1)),
+        plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
+        legend.position = "bottom",
+        legend.margin = margin(t = -10)) +
     scale_colour_discrete(name = "", labels = c("Private", "Public"))
 ggsave("../../text/figures/full-fte-perprof.png",
     plot = full_fte_perprof.plot,
@@ -254,8 +271,11 @@ all_fte_perprof.plot <- prof_perfte.data %>%
         breaks = seq(0, 35, by = 2),
         labels = scales::comma) +
     theme_bw() +
-    theme(plot.title = element_text(hjust = 0.5),
-        legend.position = "top") +
+    ggtitle("Students per Total Faculty") +
+    theme(plot.title = element_text(size = rel(1)),
+        plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
+        legend.position = "bottom",
+        legend.margin = margin(t = -10)) +
     scale_colour_discrete(name = "", labels = c("Private", "Public"))
 ggsave("../../text/figures/all-fte-perprof.png",
     plot = all_fte_perprof.plot,
