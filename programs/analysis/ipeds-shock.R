@@ -156,6 +156,7 @@ reg.data %>%
         `4th` = `3`,
         `5th` = `4`) %>%
     xtable(type = "latex",
+        digits = digits.no,
         align = "llccccc") %>%
     print(
         sanitize.colnames.function = identity,

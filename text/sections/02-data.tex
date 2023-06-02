@@ -15,7 +15,7 @@ Data are consistent between the years 1990 and 2021,\footnote{
 }
 and provide information on the total revenues a university received from every source (including state governments), enrolment, plus faculty count and total expenditures on salaries.\footnote{
     I combine the Urban Institute's 2018 compilation of IPEDS data for the years 1990--2017, and manually combine raw NCES data on 2018-2021 for all relevant variables.
-    Figures for enrolment, faculty counts and salaries come from the raw NCES version of IPEDS for all years, addressing inconsistencies in the Urban Institute's data formulation for these variables.
+    Figures for enrolment and faculty counts come from the raw NCES version of IPEDS for all years, addressing inconsistencies in the Urban Institute's data formulation for these variables.
 }
 I restrict analysis to public, four-year, degree-granting institutions, as these institutions adhere to a standardised concept of faculty profile, where tenure and title of appointment (lecturer, assistant professor, etc.) are relatively standardised.
 For-profit institutions employ and enrol a negligible share of professors and students respectively, while students at two-year institutions by majority intend to eventually enrol at a four-year institution \citep{mountjoy2022}, so that these institutions are not considered.
@@ -34,10 +34,10 @@ This gives a resulting panel data-set, where each row represents a university-ye
     \label{tab:ipeds-summary}
 \end{table}
 
-IPEDS provides information at the university level, yet lacks information on the distribution of salaries and professor count within a university.\footnote{
-    IPEDS provides total paid to salary and total faculty employed per university-year, so that I can investigate average professor salary per university-year with IPEDS data.
-    Unfortunately, this measure of professors' salaries is particularly crude in measuring on professors' salaries and other individual-outcomes; summary statistics on IPEDS data do not agree with trends in average professor salary over the sample time period \citep{aau2021survey}.
-    Similarly, IPEDS reports of the average salary paid to professors at private institutions also disagree with other sources, so are not considered in this analysis.
+IPEDS provides information at the university level, but only provides aggregated information within a university.\footnote{
+    IPEDS additionally gives a mean salary measure for faculty by rank (inconsistently) for each university.
+    Unfortunately, this measure of professors' salaries is particularly crude in measuring on professors' salaries and other individual-outcomes; summary statistics on IPEDS data do not agree with trends in average professor salary over the sample time period compared to summary statistics provided in \citealt{aau2021survey}.
+    Similarly, IPEDS reports of the average salary paid to professors at private institutions also disagree with other sources (including those calculated for in Illinois in the IBHED data later in this section) so are not considered in this analysis.
 }
 To investigate the distribution, I integrate individual-level data for every public university professor in the state of Illinois between the years 2010-2021.
 IBHED hosts the information;
