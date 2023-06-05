@@ -2,7 +2,7 @@
 
 Senan Hogan-Hennessy, 18 August 2022
 
-Latest revision: 17 March 2023
+Latest revision: 5 June 2023
 
 This is the replication package for the economics research paper ``Changes in Faculty Composition and Stagnating State Support for Higher Education,'' analysis using IPEDS and public Illinois data using *R*.
 A master bash file calls all code to build analysis data from raw files, and then produce analysis files.
