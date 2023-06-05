@@ -4,7 +4,7 @@ Senan Hogan-Hennessy, first draft on 18 August 2022.
 
 Latest revision: 5 June 2023
 
-This is the replication package for the economics research paper ``Changes in Faculty Composition and Stagnating State Support for Higher Education,'' analysis using IPEDS and public Illinois data using *R*.
+This is the replication package for the economics research paper ``Stagnating State Funding for Higher Education and its Effect on Faculty Composition at US Universities,'' analysis using IPEDS and public Illinois data using *R*.
 A master bash file calls all code to build analysis data from raw files, and then produce analysis files.
 The replicator should expect the code to run for less than 10 minutes, using at maximum 4GB of RAM.
 
@@ -23,7 +23,7 @@ See https://salarysearch.ibhe.org/ for publically available raw data.
 
 Folder "programs/" contains multiple analysis, all using the *R* language, to analyse the data.
 
-- "run.sh" sequentially calls the relevant scripts for analyse.
+- "run.sh" sequentially calls the relevant scripts for analysis, and complete replication of the entire paper.
 
 - "data-build/" contains *R* scripts that build analysis data files from raw data files.
 
@@ -32,3 +32,5 @@ Folder "programs/" contains multiple analysis, all using the *R* language, to an
 ## Text
 
 Folder "text/" contains all files regarding the final report, and write-up, of the empirical analysis.
+
+- "state-faculty-composition-2023.pdf" is the latest version of the working paper.
