@@ -1,6 +1,6 @@
 # state-faculty-composition
 
-Senan Hogan-Hennessy, 18 August 2022
+Senan Hogan-Hennessy, first draft on 18 August 2022.
 
 Latest revision: 5 June 2023
 
