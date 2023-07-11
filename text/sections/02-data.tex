@@ -7,7 +7,7 @@
 The data used in this analysis come from two primary sources: \citet[IPEDS]{ipeds} regarding institutional information including finances and enrolment, and \citet[IBHED]{ibhed} for data on every professor in the Illinois public university system.
 
 IPEDS is a survey of higher educational institutions in the US, and legally requires institutions to participate in order to receive Federal Title IV student aid.\footnote{
-    This statement means that IPEDS does not necessarily cover the universe of US higher education institutions, yet in practice every public university and not for-profit four-year institution is represented.
+    IPEDS does not necessarily cover the universe of US higher education institutions, yet in practice every public university and not for-profit four-year institution is represented.
 }
 Data are consistent between the years 1990 and 2021,\footnote{
     The years 1987-1989 are represented in these data in an incompletion fashion, so I focus on the years 1990 onwards.
@@ -26,14 +26,6 @@ This gives a resulting panel data-set, where each row represents a university-ye
 } for professors by position (lecturer, assistant, tenured, total).
 \autoref{tab:ipeds-summary} presents summary statistics for relevant variables in these data.
 
-\begin{table}[h!]
-    \singlespacing
-    %\centering
-    \caption{IPEDS Summary Statistics, Public Universities Panel 1987--2021}
-    \makebox[\textwidth][c]{\input{tables/ipeds-summary-fte.tex}}
-    \label{tab:ipeds-summary}
-\end{table}
-
 IPEDS provides information at the university level, but only provides aggregated information within a university.\footnote{
     IPEDS additionally gives a mean salary measure for faculty by rank (inconsistently) for each university.
     Unfortunately, this measure of professors' salaries is particularly crude in measuring on professors' salaries and other individual-outcomes; summary statistics on IPEDS data do not agree with trends in average professor salary over the sample time period compared to summary statistics provided in \citealt{aau2021survey}.
@@ -46,19 +38,8 @@ Public Act 96-0266 (effective 1 January 2010) requires that each university repo
 }
 These publicly available data provides the basis to build a panel of Illinois public university professors 2010-2021; I define a professor as an individual by their first plus last name and university pairing, and link this database to IPEDS regarding finances for their employing institution.
 
-The analysis sample represents 16,932 professors in the year 2010 and 15,352 in the year 2021, with summary statistics presented in \autoref{tab:illinois-summary}.
-Additionally, further analysis using the first year of a professor's employment focuses on the subset of professors with observed year of hiring between the years 2011 and 2021, representing 1,778 professors in 2011, and 9,099 in 2021.\footnote{
-    Summary statistics for this group, which over-represents lecturers compared to assistant and full professors, can be seen in \autoref{tab:illinois-summary-rolling}.
-    The reasons for considering the sub-sample with identified year of hire in the range 2011-2021 are explained in \autoref{sec:iv-model-indiv}.
-}
-
-\begin{table}[h!]
-    \singlespacing
-    \centering
-    \caption{IBHED Summary Statistics, Professor Panel 2010--2021.}
-    \makebox[\textwidth][c]{\input{tables/illinois-summary.tex}}
-    \label{tab:illinois-summary}
-\end{table}
+The Illinois sample represents 16,932 professors in the year 2010 and 15,352 in the year 2021, with summary statistics presented in \autoref{tab:illinois-summary}.
+Additionally, further analysis using the first year of a professor's employment focuses on the subset of professors with observed year of hiring between the years 2011 and 2021, representing 1,778 professors in 2011, and 9,099 in 2021.
 
 \subsection{Trends in Finances, Enrolment, and Faculty Composition}
 \label{sec:trends}
@@ -81,79 +62,10 @@ We see a rise in total revenues received by public universities (from all source
 At the same time, total state funding stagnated at around \$100 million per year-university for 1990--2008, falling around 2008 and have not recovered ever since.
 While public universities experienced a stagnation in state support, private universities were not exposed to the same constraints, receiving \$37,000 per student in 1990 and \$49,000 in 2021, experiencing no corresponding decline in any specific component.
 
-\begin{figure}[!htbp]
-    \centering
-    \singlespacing
-    \caption{Mean Total Funding among Public Universities, by Year.}
-    \begin{subfigure}[b]{0.495\textwidth}
-        \centering
-        \caption{Total, \$ 2021 CPI-U.}
-        \includegraphics[width=\textwidth]{figures/mean-funding-total.png}
-        \label{fig:mean-funding-total}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.495\textwidth}
-        \centering
-        \caption{Per Student, \$ 2021 CPI-U.}
-        \includegraphics[width=\textwidth]{figures/mean-funding-fte.png}
-        \label{fig:mean-funding-fte}
-    \end{subfigure}
-    \label{fig:funding}
-\end{figure}
-
-\begin{figure}[!htbp]
-    \centering
-    \singlespacing
-    \caption{Total Student enrolment, by University Sector and Year.}
-    \begin{subfigure}[b]{0.495\textwidth}
-        \centering
-        \caption{Total Enrolment, Nation-wide.}
-        \includegraphics[width=\textwidth]{figures/enrollment-total.png}
-        \label{fig:enrollment-total}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.495\textwidth}
-        \centering
-        \caption{Mean Enrolment, per University.}
-        \includegraphics[width=\textwidth]{figures/enrollment-mean.png}
-        \label{fig:enrollment-mean}
-    \end{subfigure}
-    \label{fig:enrolment}
-\end{figure}
-
 At the same time, student enrolment at public universities rose precipitously.
 6.2 million students were enrolled in public universities in 1990, and this number rose by 47\% to 9.1 million, with most of the increase occurring over the years 2000-2021.
 \autoref{fig:enrolment} shows that total enrolment at private universities has also risen over the same time period, but not as drastic in either relative or absolute terms; the mean private university grew from 9,800 students in 1990 to 11,800 in 2021.
 This means that revenues per student have stagnated across all measures (seen in \autoref{fig:mean-funding-fte}), and particularly fallen from a mean of \$11,000 per student in 1990 to less than \$8,000 per student in 2021.
-
-\begin{figure}[h!]
-    \centering
-    \singlespacing
-    \caption{Trends in Mean Student Enrolment per Professor, by University Sector and Faculty level.}
-    \begin{subfigure}[b]{0.495\textwidth}
-        \centering
-        \caption{Lecturer.}
-        \includegraphics[width=\textwidth]{figures/lecturer-fte-perprof.png}
-        \label{fig:lecturer-fte-perprof}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.495\textwidth}
-        \centering
-        \caption{Assistant.}
-        \includegraphics[width=\textwidth]{figures/assistant-fte-perprof.png}
-        \label{fig:assistant-fte-perprof}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.495\textwidth}
-        \centering
-        \caption{Full.}
-        \includegraphics[width=\textwidth]{figures/full-fte-perprof.png}
-        \label{fig:full-fte-perprof}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.495\textwidth}
-        \centering
-        \caption{All.}
-        \includegraphics[width=\textwidth]{figures/all-fte-perprof.png}
-        \label{fig:all-fte-perprof}
-    \end{subfigure}
-    \label{fig:fte-perprof}
-\end{figure}
 
 There are large differences in the average number of professors per student between the private and public sector.
 \autoref{fig:fte-perprof} shows that private universities start with  a higher baseline of around 4.5 professors per 100 students, and exhibited yearly variation of less than 0.5 professor per hundred students over the thirty years.
@@ -165,29 +77,11 @@ Over the same time period, we see the rise in use of non-tenure track instructor
 \subsection{Trends in Illinois}
 \label{sec:trends-illinois}
 
-The rate that Illinois funds higher education has stagnated to a similar extent as the average for the entire country.
-\autoref{fig:illinois-funding} shows the trends for funding sources among the seven Illinois public university campuses, including the falling share of state funding and substitution towards tuition revenue.
+Illinois funding for higher education has stagnated, and has experienced serious declines in the decade 2010--2021 --- similar in magnitude to the nation-wide decline over 1990--2021.
+State funding among the seven Illinois public university campuses has fallen by over 50\% for the last decade, on both an absolute and per student basis (see \autoref{fig:illinois-funding}).
+Similar to the figures for the rest of the country, there has been a corresponding substitution towards tuition revenue.
 
-\begin{figure}[h!]
-    \centering
-    \singlespacing
-    \caption{Mean Funding Sources among Illinois Public Universities, by Year.}
-    \begin{subfigure}[b]{0.495\textwidth}
-        \centering
-        \caption{Total, \$ 2021 CPI-U.}
-        \includegraphics[width=\textwidth]{figures/illinois-funding-total.png}
-        \label{fig:illinois-funding-total}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.495\textwidth}
-        \centering
-        \caption{Per Student, \$ 2021 CPI-U.}
-        \includegraphics[width=\textwidth]{figures/illinois-funding-fte.png}
-        \label{fig:illinois-funding-fte}
-    \end{subfigure}
-    \label{fig:illinois-funding}
-\end{figure}
-
-The decade of 2010--2021 has also seen yearly variation in its revenues, particularly around 2016.
+2010--2021 saw not only a decline, but also large yearly funding variation, particularly around 2016.
 In the calendar year 2015, partisan disagreements between the democratic legislature and republican governor led to the 2016 fiscal year starting with no state budget.
 State agencies, and higher education institutions, employed accounting techniques to continue operating without any resources provided by the state government.\footnote{
     Fiscal year 2016 refers to June 205 to June 2016, so is the same as the academic year definition.

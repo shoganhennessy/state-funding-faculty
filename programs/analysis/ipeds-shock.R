@@ -18,8 +18,19 @@ set.seed(47)
 digits.no <- 3
 
 # Size for figures
-fig.width <- 9
+fig.width <- 10
 fig.height <- fig.width * 0.85
+
+# Define a function to standardise the dplyr lag function
+# --- negative numbers mean a lag of t time periods, positive a lead of t.
+lag_lead <- function(column, t) {
+    if (t < 0) {
+        lag_column <- dplyr::lag(column, -t)
+    } else if (t >= 0) {
+        lag_column <- dplyr::lead(column, t)
+    }
+    return(lag_column)
+}
 
 
 # Load data sources ------------------------------------------------------------
@@ -83,7 +94,11 @@ reg.data <- reg.data %>%
         !is.na(enrollment_reported), enrollment_reported > 0,
         !is.na(all_prof_count),
         !is.na(stateappropriations_real),
-        !is.na(appropriationshock_perEnroll_real))
+        !is.na(appropriationshock_perEnroll_real)) %>%
+    # Restrict to uni-years with all professor counts.
+    filter(!is.na(lecturer_prof_count), lecturer_prof_count > 0) %>%
+    filter(!is.na(assistant_prof_count), assistant_prof_count > 0) %>%
+    filter(!is.na(full_prof_count), full_prof_count > 0)
 
 
 # Save memory by removing initally loaded files
@@ -109,7 +124,7 @@ reg.data %>%
         digits.extra = 0,
         covariate.labels = c(
             "Enrolment",
-            "State appropriations (millions 2021 USD)",
+            "State Funding (millions 2021 USD)",
             "Total revenues (millions 2021 USD)",
             "Non-institutional revenues (millions 2021 USD)",
             "Lecturers count",
@@ -121,54 +136,27 @@ reg.data %>%
         type = "text",
         out = "../../text/tables/ipeds-summary-fte.tex")
 
-# Summary Statistics for the Quantiles of the shift-share instrument.
-quantile.count <- 5
-reg.data %>%
-    mutate(instrument_quantile = round((quantile.count - 1) *
-        ecdf(appropriationshock_perEnroll_real)(
-            appropriationshock_perEnroll_real))) %>%
-    group_by(instrument_quantile) %>%
-    summarise(
-        `State Funding Shock, \\$ per student` = round(mean(appropriationshock_perEnroll_real, an.rm = TRUE)),
-        `State Funding, per student`           = round(mean(stateappropriations_real / enrollment_reported, na.rm = TRUE)),
-        `Total Full-time Enrolment`            = round(mean(enrollment_reported, na.rme = TRUE)),
-        `State Funding, \\$ millions`          = round(mean(stateappropriations_real / 10^6, na.rme = TRUE)),
-        `Total Revenues, \\$ millions`         = round(mean(totalrevenues_real / 10^6, na.rme = TRUE)),
-        `Total Revenues, \\$ per student`      = round(mean(totalrevenues_real / enrollment_reported, na.rm = TRUE)),
-        `Lecturer Count`                       = round(mean(lecturer_prof_count, na.rm = TRUE)),
-        `Assistant Professor Count`            = round(mean(assistant_prof_count, na.rm = TRUE)),
-        `Full Professor Count`                 = round(mean(full_prof_count, na.rm = TRUE)),
-        `Total Professor Count`                = round(mean(all_prof_count, na.rm = TRUE)),
-        `Lecturers, per student`               = mean(lecturer_prof_count / enrollment_reported, na.rm = TRUE),
-        `Assistant Professors, per student`    = mean(assistant_prof_count / enrollment_reported, na.rm = TRUE),
-        `Full Professors, per student`         = mean(full_prof_count / enrollment_reported, na.rm = TRUE),
-        `Total Professors, per student`        = mean(all_prof_count / enrollment_reported, na.rm = TRUE)
-            ) %>%
-    ungroup() %>%
-    pivot_longer(!instrument_quantile,
-        names_to = "variable", values_to = "value") %>%
-    pivot_wider(names_from = "instrument_quantile",
-        values_from = "value") %>%
-    transmute(`Instrument Quantile:` = variable,
-        `1st` = `0`,
-        `2nd` = `1`,
-        `3rd` = `2`,
-        `4th` = `3`,
-        `5th` = `4`) %>%
-    xtable(type = "latex",
-        digits = digits.no,
-        align = "llccccc") %>%
-    print(
-        sanitize.colnames.function = identity,
-        sanitize.text.function = identity,
-        format.args = list(big.mark = ",", decimal.mark = "."),
-        floating = FALSE,
-        floating.environment = "tabular",
-        include.rownames = FALSE,
-        file = "../../text/tables/summary-quantiles.tex")
-
 
 # Plot funding sources over time -----------------------------------------------
+
+# Plot total gov funding by state + year.
+mean_funding_fte.data <- reg.data %>%
+    group_by(state, year) %>%
+    summarise(
+        totalrevenues_real =
+            mean(totalrevenues_real / enrollment_reported, na.rm = TRUE),
+        nonauxrevenues_real =
+            mean(nonauxrevenues_real / enrollment_reported, na.rm = TRUE),
+        stateappropriations_real =
+            mean(stateappropriations_real / enrollment_reported, na.rm = TRUE),
+        tuitionrev_real =
+            mean(tuitionrev_real / enrollment_reported, na.rm = TRUE))
+
+# SHow how much finding MA gets in 1990 and 2021
+mean_funding_fte.data %>%
+    filter(state %in% c("CA", "IL")) %>%
+    filter(year %in% c(1990, 2021)) %>%
+    print()
 
 # Plot total gov funding by year.
 mean_funding_fte.data <- reg.data %>%
@@ -182,6 +170,7 @@ mean_funding_fte.data <- reg.data %>%
             mean(stateappropriations_real / enrollment_reported, na.rm = TRUE),
         tuitionrev_real =
             mean(tuitionrev_real / enrollment_reported, na.rm = TRUE))
+
 # Define the plot
 mean_funding_fte.graph <- mean_funding_fte.data %>%
     select(-totalrevenues_real) %>%
@@ -234,7 +223,7 @@ mean_funding.graph <- mean_funding.data %>%
     scale_x_continuous(name = "Year",
         breaks = seq(1985, 2020, by = 5)) +
     scale_y_continuous(name = "",
-        limits = c(0, 255),
+        limits = c(0, 300),
         breaks = seq(0, 500, by = 50),
         labels = scales::comma) +
     theme_bw() +
@@ -310,7 +299,7 @@ illinois_funding_fte.graph <- illinois_funding_fte.data %>%
         breaks = seq(0, 50, by = 5),
         labels = scales::comma) +
     theme_bw() +
-    ggtitle("Funding, $ thousands") +
+    ggtitle("Funding, $ thousands per student") +
     theme(plot.title = element_text(size = rel(1)),
         plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
         legend.position = "bottom",
@@ -365,6 +354,239 @@ illinois_funding.graph <- illinois_funding.data %>%
 ggsave("../../text/figures/illinois-funding-total.png",
     plot = illinois_funding.graph,
     units = "cm", dpi = 300, width = fig.width, height = fig.height)
+
+
+# Tables for Instrument Exogeneity ---------------------------------------------
+
+# Regressions for Instrument balance test, in log terms
+balance_log_enrollment_reported.reg <- reg.data %>%
+    felm(log(enrollment_reported) ~ 1 +
+        I(-log(appropriationshock_perEnroll_real)) |
+        unitid + year |
+        0 |
+        state + year,
+        data = .)
+balance_log_stateappropriations_real.reg <- reg.data %>%
+    felm(log(stateappropriations_real) ~ 1 +
+        I(-log(appropriationshock_perEnroll_real)) |
+        unitid + year |
+        0 |
+        state + year,
+        data = .)
+balance_log_totalrevenues_real.reg <- reg.data %>%
+    felm(log(totalrevenues_real) ~ 1 +
+        I(-log(appropriationshock_perEnroll_real)) |
+        unitid + year |
+        0 |
+        state + year,
+        data = .)
+balance_log_nonauxrevenues_real.reg <- reg.data %>%
+    felm(log(nonauxrevenues_real) ~ 1 +
+        I(-log(appropriationshock_perEnroll_real)) |
+        unitid + year |
+        0 |
+        state + year,
+        data = .)
+balance_log_lecturer_prof_count.reg <- reg.data %>%
+    felm(log(lecturer_prof_count) ~ 1 +
+        I(-log(appropriationshock_perEnroll_real)) |
+        unitid + year |
+        0 |
+        state + year,
+        data = .)
+balance_log_assistant_prof_count.reg <- reg.data %>%
+    felm(log(assistant_prof_count) ~ 1 +
+        I(-log(appropriationshock_perEnroll_real)) |
+        unitid + year |
+        0 |
+        state + year,
+        data = .)
+balance_log_full_prof_count.reg <- reg.data %>%
+    felm(log(full_prof_count) ~ 1 +
+        I(-log(appropriationshock_perEnroll_real)) |
+        unitid + year |
+        0 |
+        state + year,
+        data = .)
+balance_log_all_prof_count.reg <- reg.data %>%
+    felm(log(all_prof_count) ~ 1 +
+        I(-log(appropriationshock_perEnroll_real)) |
+        unitid + year |
+        0 |
+        state + year,
+        data = .)
+# Collate the results to a LaTeX table
+stargazer(
+    balance_log_enrollment_reported.reg,
+    balance_log_stateappropriations_real.reg,
+    balance_log_totalrevenues_real.reg,
+    balance_log_nonauxrevenues_real.reg,
+    balance_log_lecturer_prof_count.reg,
+    balance_log_assistant_prof_count.reg,
+    balance_log_full_prof_count.reg,
+    balance_log_all_prof_count.reg,
+    dep.var.caption = "Dependent Variables: University Characteristics",
+    dep.var.labels = c(
+        "Enrolment",
+        "State Funding",
+        "Total revenues",
+        "Non-inst. revenues",
+        "Lecturers",
+        "Assistant professors",
+        "Full professors",
+        "All professors"),
+    covariate.labels = c("State Funding"),
+    digits = digits.no,
+    digits.extra = digits.no,
+    model.names = FALSE,
+    omit = "factor|count|year",
+    intercept.bottom = TRUE,
+    omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq", "f"),
+    add.lines = list(
+        c("Uni. + Year fixed effects?", rep("Yes", 8))),
+    star.cutoffs = NA,
+    header = FALSE, float = FALSE, no.space = TRUE,
+    omit.table.layout = "n", notes.append = FALSE,
+    type = "text",
+    out = "../../text/tables/firststage-balance-log.tex")
+
+# Regressions for Instrument balance test, in raw terms
+balance_raw_enrollment_reported.reg <- reg.data %>%
+    felm(enrollment_reported ~ 1 +
+        I(-appropriationshock_perEnroll_real) |
+        unitid + year |
+        0 |
+        state + year,
+        data = .)
+balance_raw_stateappropriations_real.reg <- reg.data %>%
+    felm(stateappropriations_real ~ 1 +
+        I(-appropriationshock_perEnroll_real) |
+        unitid + year |
+        0 |
+        state + year,
+        data = .)
+balance_raw_totalrevenues_real.reg <- reg.data %>%
+    felm(totalrevenues_real ~ 1 +
+        I(-appropriationshock_perEnroll_real) |
+        unitid + year |
+        0 |
+        state + year,
+        data = .)
+balance_raw_nonauxrevenues_real.reg <- reg.data %>%
+    felm(nonauxrevenues_real ~ 1 +
+        I(-appropriationshock_perEnroll_real) |
+        unitid + year |
+        0 |
+        state + year,
+        data = .)
+balance_raw_lecturer_prof_count.reg <- reg.data %>%
+    felm(lecturer_prof_count ~ 1 +
+        I(-appropriationshock_perEnroll_real) |
+        unitid + year |
+        0 |
+        state + year,
+        data = .)
+balance_raw_assistant_prof_count.reg <- reg.data %>%
+    felm(assistant_prof_count ~ 1 +
+        I(-appropriationshock_perEnroll_real) |
+        unitid + year |
+        0 |
+        state + year,
+        data = .)
+balance_raw_full_prof_count.reg <- reg.data %>%
+    felm(full_prof_count ~ 1 +
+        I(-appropriationshock_perEnroll_real) |
+        unitid + year |
+        0 |
+        state + year,
+        data = .)
+balance_raw_all_prof_count.reg <- reg.data %>%
+    felm(all_prof_count ~ 1 +
+        I(-appropriationshock_perEnroll_real) |
+        unitid + year |
+        0 |
+        state + year,
+        data = .)
+# Collate the results to a LaTeX table
+stargazer(
+    balance_raw_enrollment_reported.reg,
+    balance_raw_stateappropriations_real.reg,
+    balance_raw_totalrevenues_real.reg,
+    balance_raw_nonauxrevenues_real.reg,
+    balance_raw_lecturer_prof_count.reg,
+    balance_raw_assistant_prof_count.reg,
+    balance_raw_full_prof_count.reg,
+    balance_raw_all_prof_count.reg,
+    dep.var.caption = "Dependent Variables: University Characteristics",
+    dep.var.labels = c(
+        "Enrolment",
+        "State Funding",
+        "Total revenues",
+        "Non-inst. revenues",
+        "Lecturers",
+        "Assistant professors",
+        "Full professors",
+        "All professors"),
+    covariate.labels = c("State Funding"),
+    digits = digits.no,
+    digits.extra = digits.no,
+    model.names = FALSE,
+    omit = "factor|count|year",
+    intercept.bottom = TRUE,
+    omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq", "f"),
+    add.lines = list(
+        c("Uni. + Year fixed effects?", rep("Yes", 8))),
+    star.cutoffs = NA,
+    header = FALSE, float = FALSE, no.space = TRUE,
+    omit.table.layout = "n", notes.append = FALSE,
+    type = "text",
+    out = "../../text/tables/firststage-balance-count.tex")
+
+# Summary Statistics for the Quantiles of the shift-share instrument.
+quantile.count <- 5
+reg.data %>%
+    mutate(instrument_quantile = round((quantile.count - 1) *
+        ecdf(appropriationshock_perEnroll_real)(
+            appropriationshock_perEnroll_real))) %>%
+    group_by(instrument_quantile) %>%
+    summarise(
+        `State Funding Shock, \\$ per student`   = round(mean(appropriationshock_perEnroll_real, an.rm = TRUE)),
+        `State Funding, per student`             = round(mean(stateappropriations_real / enrollment_reported, na.rm = TRUE)),
+        `Total Full-time Enrolment`              = round(mean(enrollment_reported, na.rme = TRUE)),
+        `State Funding, \\$ millions`            = round(mean(stateappropriations_real / 10^6, na.rme = TRUE)),
+        `Total Revenues, \\$ millions`           = round(mean(totalrevenues_real / 10^6, na.rme = TRUE)),
+        `Total Revenues, \\$ per student`        = round(mean(totalrevenues_real / enrollment_reported, na.rm = TRUE)),
+        `Lecturer Count`                         = round(mean(lecturer_prof_count, na.rm = TRUE)),
+        `Assistant Professor Count`              = round(mean(assistant_prof_count, na.rm = TRUE)),
+        `Full Professor Count`                   = round(mean(full_prof_count, na.rm = TRUE)),
+        `Total Professor Count`                  = round(mean(all_prof_count, na.rm = TRUE)),
+        `Lecturers, per 100 students`            = mean(100 * lecturer_prof_count / enrollment_reported, na.rm = TRUE),
+        `Assistant Professors, per 100 students` = mean(100 * assistant_prof_count / enrollment_reported, na.rm = TRUE),
+        `Full Professors, per 100 students`      = mean(100 * full_prof_count / enrollment_reported, na.rm = TRUE),
+        `Total Professors, per 100 students`     = mean(100 * all_prof_count / enrollment_reported, na.rm = TRUE)
+            ) %>%
+    ungroup() %>%
+    pivot_longer(!instrument_quantile,
+        names_to = "variable", values_to = "value") %>%
+    pivot_wider(names_from = "instrument_quantile",
+        values_from = "value") %>%
+    transmute(`Instrument Quantile:` = variable,
+        `1st` = `0`,
+        `2nd` = `1`,
+        `3rd` = `2`,
+        `4th` = `3`,
+        `5th` = `4`) %>%
+    xtable(type = "latex",
+        digits = 2,
+        align = "llccccc") %>%
+    print(
+        sanitize.colnames.function = identity,
+        sanitize.text.function = identity,
+        format.args = list(big.mark = ",", decimal.mark = "."),
+        floating = FALSE,
+        floating.environment = "tabular",
+        include.rownames = FALSE,
+        file = "../../text/tables/summary-quantiles.tex")
 
 
 # First stage Regressions ------------------------------------------------------
@@ -452,7 +674,7 @@ stargazer(
     model.names = FALSE,
     omit = "factor|count|year",
     intercept.bottom = TRUE,
-    covariate.labels = c("Appropriations Shock", "Tuition Revenue", "Constant"),
+    covariate.labels = c("Funding Shock", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq", "f"),
     add.lines = list(
         c("Uni. + Year fixed effects?", "Yes", "No", "Yes", "No"),
@@ -465,14 +687,65 @@ stargazer(
     type = "text",
     out = "../../text/tables/firststage-reg-fte.tex")
 
+# Plot the IV event-study equivalent.
+coefficient.list <- c()
+upper_ci.list <- c()
+lower_ci.list <- c()
+# Loop across time periods, to estimate the correlation between years.
+lag.levels <- -7:5
+for (t in lag.levels){
+    print(t)
+    lag.reg <- reg.data %>%
+        mutate(lag_log_outcome_fte = log(lag_lead(
+            stateappropriations_real / enrollment_reported, t))) %>%
+        felm(lag_log_outcome_fte ~ 1 +
+            I(-log(appropriationshock_perEnroll_real)) |
+            unitid + year |
+            0 |
+            state + year,
+            data = .) %>%
+        summary()
+    ci.halflength <- 1.96 * lag.reg$coefficients[2]
+    coefficient.list <- c(coefficient.list, lag.reg$coefficients[1])
+    upper_ci.list <- c(upper_ci.list, lag.reg$coefficients[1] + ci.halflength)
+    lower_ci.list <- c(lower_ci.list, lag.reg$coefficients[1] - ci.halflength)
+}
+lag.data <- data.frame(
+    t = lag.levels,
+    estimate = coefficient.list,
+    conf.low = upper_ci.list,
+    conf.high = lower_ci.list)
+# Plot the lagged results.
+lag.plot <- lag.data %>%
+    ggplot(aes(x = t)) +
+    geom_vline(xintercept = 0, alpha = 0.5) +
+    geom_hline(yintercept = 0, alpha = 0.5) +
+    geom_ribbon(aes(ymin = conf.low, ymax = conf.high),
+        alpha = 0.4, fill = "grey70") +
+    geom_point(aes(y = estimate), colour = "blue") +
+    geom_line(aes(y = estimate), colour = "blue") +
+    geom_line(aes(y = conf.low), linetype = "dashed") +
+    geom_line(aes(y = conf.high), linetype = "dashed") +
+    scale_x_continuous(name = "Years, Relative to Initital Shock",
+        breaks = lag.data$t, expand = c(0.01, 0.01)) +
+    scale_y_continuous(name = "",
+        #limits = c(-0.2, 0.75),
+        breaks = seq(-5, 5, by = 0.1)) +
+    theme_bw() +
+    ggtitle("Estimate") +
+    theme(plot.title = element_text(size = rel(1)),
+        plot.margin = unit(c(0.5, 1, 0, 0), "mm"))
+# Save this plot.
+ggsave("../../text/figures/lag-firststage.png",
+    plot = lag.plot,
+    units = "cm", dpi = 300, width = 1.5 * fig.width, height = fig.height)
+
 
 # Faculty Count Regressions ----------------------------------------------------
 
-## Non-tenured faculty Count
-lecturer.data <- reg.data %>%
-    filter(!is.na(lecturer_prof_count), lecturer_prof_count > 0)
+## Lecturer faculty Count
 # Naive OLS Regression
-naive_lecturer_count.reg <- lecturer.data %>%
+naive_lecturer_count.reg <- reg.data %>%
     mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
         log(stateappropriations_real / enrollment_reported)) %>%
     felm(log(lecturer_prof_count / enrollment_reported) ~ 1 +
@@ -482,7 +755,7 @@ naive_lecturer_count.reg <- lecturer.data %>%
         state + year,
         data = .)
 # Shift-share IV Regression, explained by state appropriation shock
-shiftshare_lecturer_count.reg <- lecturer.data %>%
+shiftshare_lecturer_count.reg <- reg.data %>%
     felm(log(lecturer_prof_count / enrollment_reported) ~ 1 |
         unitid + year |
         (log(stateappropriations_real / enrollment_reported) ~
@@ -490,11 +763,9 @@ shiftshare_lecturer_count.reg <- lecturer.data %>%
         state + year,
         data = .)
 
-## Tenure-track faculty Count
-assistant.data <- reg.data %>%
-    filter(!is.na(assistant_prof_count), assistant_prof_count > 0)
+## assistant professor Count
 # Naive OLS Regression
-naive_assistant_count.reg <- assistant.data %>%
+naive_assistant_count.reg <- reg.data %>%
     mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
         log(stateappropriations_real / enrollment_reported)) %>%
     felm(log(assistant_prof_count / enrollment_reported) ~ 1 +
@@ -504,7 +775,7 @@ naive_assistant_count.reg <- assistant.data %>%
         state + year,
         data = .)
 # Shift-share IV Regression, explained by state appropriation shock
-shiftshare_assistant_count.reg <- assistant.data %>%
+shiftshare_assistant_count.reg <- reg.data %>%
     felm(log(assistant_prof_count / enrollment_reported) ~ 1 |
         unitid + year |
         (log(stateappropriations_real / enrollment_reported) ~
@@ -512,12 +783,9 @@ shiftshare_assistant_count.reg <- assistant.data %>%
         state + year,
         data = .)
 
-
-## Tenured faculty Count
-full.data <- reg.data %>%
-    filter(!is.na(full_prof_count), full_prof_count > 0)
+## Full professor faculty Count
 # Naive OLS Regression
-naive_full_count.reg <- full.data %>%
+naive_full_count.reg <- reg.data %>%
     mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
         log(stateappropriations_real / enrollment_reported)) %>%
     felm(log(full_prof_count / enrollment_reported) ~ 1 +
@@ -527,7 +795,7 @@ naive_full_count.reg <- full.data %>%
         state + year,
         data = .)
 # Shift-share IV Regression, explained by state appropriation shock
-shiftshare_full_count.reg <- full.data %>%
+shiftshare_full_count.reg <- reg.data %>%
     felm(log(full_prof_count / enrollment_reported) ~ 1 |
         unitid + year |
         (log(stateappropriations_real / enrollment_reported) ~
@@ -555,12 +823,29 @@ shiftshare_all_count.reg <- reg.data %>%
         state + year,
         data = .)
 
+# Collate the outcome means
+outcome.means <- list(c("Outcome Mean",
+    # Lecturers
+    reg.data %>% mutate(outcome = lecturer_prof_count / (enrollment_reported / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
+    reg.data %>% mutate(outcome = lecturer_prof_count / (enrollment_reported / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
+    # naive_assistant_count.reg
+    reg.data %>% mutate(outcome = assistant_prof_count / (enrollment_reported / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
+    reg.data %>% mutate(outcome = assistant_prof_count / (enrollment_reported / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
+    # naive_full_count.reg
+    reg.data %>% mutate(outcome = full_prof_count / (enrollment_reported / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
+    reg.data %>% mutate(outcome = full_prof_count / (enrollment_reported / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
+    # naive_all_count.reg
+    reg.data %>% mutate(outcome = all_prof_count / (enrollment_reported / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
+    reg.data %>% mutate(outcome = all_prof_count / (enrollment_reported / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no)
+))
+
 # Collate the results to a LaTeX table
 stargazer(
     naive_lecturer_count.reg, shiftshare_lecturer_count.reg,
     naive_assistant_count.reg, shiftshare_assistant_count.reg,
     naive_full_count.reg, shiftshare_full_count.reg,
     naive_all_count.reg, shiftshare_all_count.reg,
+    add.lines = outcome.means,
     dep.var.caption = "Dependent Variable: Employment Count by Professor Group",
     dep.var.labels = c("Lecturer", "Assistant", "Full", "All"),
     column.labels = rep(c("OLS", "2SLS"), 4),
@@ -579,7 +864,68 @@ stargazer(
     out = "../../text/tables/facultycount-shock-reg-fte.tex")
 
 
-# Faculty Count (per student) Regressions --------------------------------------
+# Get the rates of susbtituion from the elasticity estimates -------------------
+
+# Plot the elasticities for profesorrs w.r.t state funding
+fixest::coefplot(list(
+    shiftshare_lecturer_count.reg, shiftshare_all_count.reg,
+    shiftshare_assistant_count.reg, shiftshare_full_count.reg))
+# https://cran.r-project.org/web/packages/jtools/vignettes/summ.html#plot_summs()_and_plot_coefs()
+
+# Calculate the elasticities of susbtituion, with SEs bootstrapped.
+# TODO: CALCULATE WITH A BOOTSTRAP FROM THE FOLLOWING:
+# TODO https://stackoverflow.com/questions/63777368/computing-the-standard-error-when-dividing-coefficients-of-different-regressions
+
+## write a function to calculate the lecturer <-> assistant prof elasticity
+assistant.fun <- function(data, inds){
+    substitution.reg <- fixest::feols(c(
+            log(lecturer_prof_count / enrollment_reported),
+            log(assistant_prof_count / enrollment_reported)
+        ) ~ 1 |
+        unitid + year |
+        log(stateappropriations_real / enrollment_reported) ~
+            I(-log(appropriationshock_perEnroll_real)),
+        vcov = ~ state^year,
+        data = data[inds, ])
+    # Get the lecturer elasticity
+    lecturer.elast <- coef(substitution.reg)[1, 3]
+    # Get the assistant professor elasticity.
+    prof.elast <- coef(substitution.reg)[2, 3]
+    # Return the division of the coefficients.
+    substitution.est <- lecturer.elast / prof.elast
+    return(substitution.est)
+}
+# bootstrap the function
+boot.calc <- boot(reg.data, statistic = assistant.fun, R = 10000)
+# calculate confidence intervals
+boot.ci(boot.calc, type = c("perc", "bca"))
+
+## write a function to calculate the lecturer <-> full prof elasticity
+full.fun <- function(data, inds){
+    substitution.reg <- fixest::feols(c(
+            log(lecturer_prof_count / enrollment_reported),
+            log(full_prof_count / enrollment_reported)
+        ) ~ 1 |
+        unitid + year |
+        log(stateappropriations_real / enrollment_reported) ~
+            I(-log(appropriationshock_perEnroll_real)),
+        vcov = ~ state^year,
+        data = data[inds, ])
+    # Get the lecturer elasticity
+    lecturer.elast <- coef(substitution.reg)[1, 3]
+    # Get the assistant professor elasticity.
+    prof.elast <- coef(substitution.reg)[2, 3]
+    # Return the division of the coefficients.
+    substitution.est <- lecturer.elast / prof.elast
+    return(substitution.est)
+}
+# bootstrap the function
+boot.calc <- boot(reg.data, statistic = full.fun, R = 10000)
+# calculate confidence intervals
+boot.ci(boot.calc, type = c("perc", "bca"))
+
+
+# Faculty Count (per student) Regressions, by tenured vs non-tenured -----------
 
 ## Non-tenured faculty Count
 # Naive OLS Regression
@@ -693,123 +1039,6 @@ stargazer(
     omit.table.layout = "n", notes.append = FALSE,
     type = "text",
     out = "../../text/tables/tenurecount-shock-reg-fte.tex")
-
-
-# Faculty Salary Regressions ---------------------------------------------------
-
-## Non-tenured faculty salaries
-lecturer.data <- reg.data %>%
-    filter(!is.na(lecturer_profmeansalary_real),
-        lecturer_profmeansalary_real > 0)
-# Naive OLS Regression
-naive_lecturer_salaries.reg <- lecturer.data %>%
-    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
-        log(stateappropriations_real / enrollment_reported)) %>%
-    felm(log(lecturer_profmeansalary_real) ~ 1 +
-        `log(stateappropriations_real/enrollment_reported)(fit)` |
-        unitid + year |
-        0 |
-        state + year,
-        data = .)
-# Shift-share IV Regression, explained by state appropriation shock
-shiftshare_lecturer_salaries.reg <- lecturer.data %>%
-    felm(log(lecturer_profmeansalary_real) ~ 1 |
-        unitid + year |
-        (log(stateappropriations_real / enrollment_reported) ~
-            I(-log(appropriationshock_perEnroll_real))) |
-        state + year,
-        data = .)
-
-## Tenure-track faculty salaries
-assistant.data <- reg.data %>%
-    filter(!is.na(assistant_profmeansalary_real),
-        assistant_profmeansalary_real > 0)
-# Naive OLS Regression
-naive_assistant_salaries.reg <- assistant.data %>%
-    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
-        log(stateappropriations_real / enrollment_reported)) %>%
-    felm(log(assistant_profmeansalary_real) ~ 1 +
-        `log(stateappropriations_real/enrollment_reported)(fit)` |
-        unitid + year |
-        0 |
-        state + year,
-        data = .)
-# Shift-share IV Regression, explained by state appropriation shock
-shiftshare_assistant_salaries.reg <- assistant.data %>%
-    felm(log(assistant_profmeansalary_real) ~ 1 |
-        unitid + year |
-        (log(stateappropriations_real / enrollment_reported) ~
-            I(-log(appropriationshock_perEnroll_real))) |
-        state + year,
-        data = .)
-
-## Tenured faculty salaries
-full.data <- reg.data %>%
-    filter(!is.na(full_profmeansalary_real),
-        full_profmeansalary_real > 0)
-# Naive OLS Regression
-naive_full_salaries.reg <- full.data %>%
-    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
-        log(stateappropriations_real / enrollment_reported)) %>%
-    felm(log(full_profmeansalary_real) ~ 1 +
-        `log(stateappropriations_real/enrollment_reported)(fit)` |
-        unitid + year |
-        0 |
-        state + year,
-        data = .)
-# Shift-share IV Regression, explained by state appropriation shock
-shiftshare_full_salaries.reg <- full.data %>%
-    felm(log(full_profmeansalary_real) ~ 1 |
-        unitid + year |
-        (log(stateappropriations_real / enrollment_reported) ~
-            I(-log(appropriationshock_perEnroll_real))) |
-        state + year,
-        data = .)
-
-## All faculty salaries
-all.data <- reg.data %>%
-    filter(!is.na(all_profmeansalary_real), all_profmeansalary_real > 0)
-# Naive OLS Regression
-naive_all_salaries.reg <- all.data %>%
-    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
-        log(stateappropriations_real / enrollment_reported)) %>%
-    felm(log(all_profmeansalary_real) ~ 1 +
-        `log(stateappropriations_real/enrollment_reported)(fit)` |
-        unitid + year |
-        0 |
-        state + year,
-        data = .)
-# Shift-share IV Regression, explained by state appropriation shock
-shiftshare_all_salaries.reg <- all.data %>%
-    felm(log(all_profmeansalary_real) ~ 1 |
-        unitid + year |
-        (log(stateappropriations_real / enrollment_reported) ~
-            I(-log(appropriationshock_perEnroll_real))) |
-        state + year,
-        data = .)
-
-# Collate the results to a LaTeX table
-stargazer(
-    naive_lecturer_salaries.reg, shiftshare_lecturer_salaries.reg,
-    naive_assistant_salaries.reg, shiftshare_assistant_salaries.reg,
-    naive_full_salaries.reg, shiftshare_full_salaries.reg,
-    naive_all_salaries.reg, shiftshare_all_salaries.reg,
-    dep.var.caption = "Dependent Variable: Mean Salary by Professor Group",
-    dep.var.labels = c("Lecturer", "Assistant", "Full", "All"),
-    column.labels = rep(c("OLS", "2SLS"), 4),
-    digits = digits.no,
-    digits.extra = digits.no,
-    model.names = FALSE,
-    omit = "factor|count|year",
-    intercept.bottom = TRUE,
-    order = c(2, 1, 3),
-    covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
-    omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
-    star.cutoffs = NA,
-    header = FALSE, float = FALSE, no.space = TRUE,
-    omit.table.layout = "n", notes.append = FALSE,
-    type = "text",
-    out = "../../text/tables/facultysalaries-shock-reg-fte.tex")
 
 
 # Research + Instruction Spending Regressions ----------------------------------
@@ -990,150 +1219,3 @@ stargazer(
     omit.table.layout = "n", notes.append = FALSE,
     type = "text",
     out = "../../text/tables/expenditures-shock-reg-fte.tex")
-
-
-
-# Local Projections for staying-power of effects -------------------------------
-
-# https://cran.r-project.org/web/packages/lpirfs/lpirfs.pdf
-library(plm)
-library(lpirfs)
-time.horizon <- 10
-
-# Define data sample for the LP estimation
-lp.data <- reg.data %>%
-    transmute(unitid = unitid,
-        year = year,
-        instid = factor(unitid),
-        academicyear = factor(year),
-        all_prof_count = log(all_prof_count / enrollment_reported),
-        lecturer_prof_count = log(lecturer_prof_count / enrollment_reported),
-        assistant_prof_count = log(assistant_prof_count / enrollment_reported),
-        full_prof_count = log(full_prof_count / enrollment_reported),
-        all_profmeansalary_real = log(all_profmeansalary_real),
-        stateappropriations_real =
-            log(stateappropriations_real / enrollment_reported),
-        appropriationshock_perEnroll_real =
-            - log(appropriationshock_perEnroll_real),
-        tuitionrev_real = log(tuitionrev_real / enrollment_reported)) %>%
-    pdata.frame(index = c("unitid", "year"), drop.index = FALSE)
-
-# Run the LP method for the first-stage regression.
-firststage.lpreg <-
-    lp_lin_panel(data_set = lp.data,
-        # Outcome variable
-        endog_data = "stateappropriations_real",
-        # Predictor variable
-        shock = "appropriationshock_perEnroll_real",
-        # Contemporaneous control, FE for unitid + year
-        c_exog_data = c("instid", "academicyear"),
-        # Option to use IV for predictor endogeneity (not used here)
-        iv_reg = FALSE,
-        # Add fixed effects + clsutered SEs in the panel
-        panel_model = "within",
-        panel_effect = "twoways",
-        robust_cov = "vcovHC",
-        robust_cluster = c("group", "time"),
-        confint = 1.96,
-        hor = time.horizon)
-plot(firststage.lpreg)
-# Save this plot
-ggsave("../../text/figures/firststage-lp.png",
-    plot = plot(firststage.lpreg),
-    units = "cm", dpi = 300, width = fig.width, height = fig.height)
-
-# Run the LP method for the second-stage, outcome count lecturers per student
-lecturer_count.lpreg <-
-    lp_lin_panel(data_set = lp.data,
-        # Outcome variable
-        endog_data = "lecturer_prof_count",
-        # Predictor variable
-        shock = "stateappropriations_real",
-        # Contemporaneous control, FE for unitid + year
-        c_exog_data = c("instid", "academicyear"),
-        # Option to use IV for predictor endogeneity
-        iv_reg = TRUE,
-        instrum = "appropriationshock_perEnroll_real",
-        # Add fixed effects + clsutered SEs in the panel
-        panel_model = "within",
-        panel_effect = "twoways",
-        robust_cov = "vcovHC",
-        robust_cluster = c("group", "time"),
-        confint = 1.96,
-        hor = time.horizon)
-# Save this plot
-ggsave("../../text/figures/lecturer-count-lp.png",
-    plot = plot(lecturer_count.lpreg),
-    units = "cm", dpi = 300, width = fig.width, height = fig.height)
-
-# Run the LP method for the second-stage, outcome count APs per student
-assistant_count.lpreg <-
-    lp_lin_panel(data_set = lp.data,
-        # Outcome variable
-        endog_data = "assistant_prof_count",
-        # Predictor variable
-        shock = "stateappropriations_real",
-        # Contemporaneous control, FE for unitid + year
-        c_exog_data = c("instid", "academicyear"),
-        # Option to use IV for predictor endogeneity
-        iv_reg = TRUE,
-        instrum = "appropriationshock_perEnroll_real",
-        # Add fixed effects + clsutered SEs in the panel
-        panel_model = "within",
-        panel_effect = "twoways",
-        robust_cov = "vcovHC",
-        robust_cluster = c("group", "time"),
-        confint = 1.96,
-        hor = time.horizon)
-# Save this plot
-ggsave("../../text/figures/assistant-count-lp.png",
-    plot = plot(assistant_count.lpreg),
-    units = "cm", dpi = 300, width = fig.width, height = fig.height)
-
-# Run the LP method for the second-stage, outcome count APs per student
-full_count.lpreg <-
-    lp_lin_panel(data_set = lp.data,
-        # Outcome variable
-        endog_data = "full_prof_count",
-        # Predictor variable
-        shock = "stateappropriations_real",
-        # Contemporaneous control, FE for unitid + year
-        c_exog_data = c("instid", "academicyear"),
-        # Option to use IV for predictor endogeneity
-        iv_reg = TRUE,
-        instrum = "appropriationshock_perEnroll_real",
-        # Add fixed effects + clsutered SEs in the panel
-        panel_model = "within",
-        panel_effect = "twoways",
-        robust_cov = "vcovHC",
-        robust_cluster = c("group", "time"),
-        confint = 1.96,
-        hor = time.horizon)
-# Save this plot
-ggsave("../../text/figures/full-count-lp.png",
-    plot = plot(full_count.lpreg),
-    units = "cm", dpi = 300, width = fig.width, height = fig.height)
-
-# Run the LP method for the second-stage, outcome count profs per student
-all_count.lpreg <-
-    lp_lin_panel(data_set = lp.data,
-        # Outcome variable
-        endog_data = "all_prof_count",
-        # Predictor variable
-        shock = "stateappropriations_real",
-        # Contemporaneous control, FE for unitid + year
-        c_exog_data = c("instid", "academicyear"),
-        # Option to use IV for predictor endogeneity
-        iv_reg = TRUE,
-        instrum = "appropriationshock_perEnroll_real",
-        # Add fixed effects + clsutered SEs in the panel
-        panel_model = "within",
-        panel_effect = "twoways",
-        robust_cov = "vcovHC",
-        robust_cluster = c("group", "time"),
-        confint = 1.96,
-        hor = time.horizon)
-# Save this plot
-ggsave("../../text/figures/all-count-lp.png",
-    plot = plot(all_count.lpreg),
-    units = "cm", dpi = 300, width = fig.width, height = fig.height)

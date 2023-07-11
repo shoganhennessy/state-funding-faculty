@@ -17,18 +17,22 @@ cd ..
 cd analysis
 # Generate graphs motivating the introduction.
 R CMD BATCH --no-save ipeds-public-private.R
-# Analysis and regressions at the institution-level.
+# Analysis and regressions at the institution-level, IPEDS
 R CMD BATCH --no-save ipeds-shock.R
-# Analysis and regressions at the individual-level, with base-year shock IV.
-R CMD BATCH --no-save individual-shock.R
-# Analysis and regressions at the individual-level, with rolling shock IV.
-R CMD BATCH --no-save individual-shock-rolling.R
+# Analysis and regressions at the institution-level, IPEDS, with count outcomes.
+R CMD BATCH --no-save ipeds-shock-rawcounts.R
+# Analysis and regressions at the individual-level, IBHED, base-year shock IV.
+R CMD BATCH --no-save ibhed-shock.R
+# Analysis and regressions at the individual-level, IBHED, with count outcomes.
+R CMD BATCH --no-save ibhed-shock-rawcounts.R
+# Analysis and regressions at the individual-level, IBHED, rolling shock IV.
+R CMD BATCH --no-save ibhed-shock-rolling.R
 # Analysis and regressions for rate of faculty hiring.
 R CMD BATCH --no-save hiring-shock.R
 cd ..
 
-# Compile paper, with outputs of progams as inputs for TeX files
+# Compile paper, with outputs from R scripts above as inputs for TeX files
 cd ../text
 latexmk -pdf paper.tex
 latexmk -c
-cp paper.pdf ../state-faculty-composition-2023.pdf
+cp paper.pdf ../state-funding-faculty-2023.pdf

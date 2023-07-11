@@ -3,21 +3,8 @@
 \section{Empirical Framework}
 \label{sec:empirics}
 
-Universities employ professors, so it stands to reason that if a university experiences a fall in one of their revenue sources --- similar to a demand shock in the private sector --- then they may respond by adjusting their employee composition.
-
-Na\"ively we can analyse the relationship between professor-outcomes $Y_{i,t}$ at university $i$ in year $t$ as a result of state funding per student $X_{i,t}$.
-This analysis focuses on the outcome of professor count per student within each university-year.
-So that $\beta$ represents the association with these outcomes and state funding per student,\footnote{
-    Note that dividing by student count also implicitly controls for the size of the university, so that this model implicitly accounts for yearly variation in professor count and university revenues arising from growth in a university.
-}
-including fixed effects to control for effects specific to the university and year.
-Log$(.)$ transforming the variables improves the interpretability of $\beta$ as an elasticity for professor count per student with respect to state funding per student.
-\begin{equation}
-    \label{eqn:naivereg}
-    Y_{i,t} = \alpha_i + \gamma_t + \beta X_{i,t} + \epsilon_{i,t}
-\end{equation}
-
-Yet a university's finances are not exogenous to state decisions for support of higher education, or exogenous to internal institutional decisions.
+This paper identifies the effects of changes in state funding on faculty.
+However, a university's state funding is not exogenous to state decisions for support of higher education, or exogenous to internal institutional decisions.
 Instead, the state government and university administration undertake a complex process of allotting resources across multiple different priorities, including instruction, research, or between departments.
 For example, it may be the case that a state government restricts funding for only its lowest performing universities in response to a budget shock, introducing a treatment selection-on-outcome threat to identification. 
 Importantly for this analysis, revenues received from an institution's state government provide opportunity to address such endogeneity.
@@ -26,17 +13,17 @@ Importantly for this analysis, revenues received from an institution's state gov
 \subsection{State Funding Shocks}
 \label{sec:approp-shocks}
 
-This analysis uses a shift-share instrument to address endogeneity concerns for the amount of funding a state gives to each of its public universities.
+This analysis uses a shift-share instrument to address endogeneity concerns for the amount of funding a state allots to each of its public universities.
 \cite{NBERw23736,NBERw27885} develop the instrument for public university finances by exploiting a shift-share instrument for changes in state-level funding interacted with university reliance on state funding in a base period.
 \begin{align}
     \label{eqn:public-instrument}
-    Z_{i,t} &\coloneqq - \log \left[
+    Z_{i,t} &\coloneqq - \left[
     \left( \frac{\text{Total State Funding}_{s(i),t}}{\text{Student Population}_{s(i),t}} \right)
     \sum_{\tau = 0}^{3} \frac 14
     \left( \frac{\text{State Funding}_{i,1990 + \tau}}{\text{Total Revenues}_{i,1990 + \tau}} \right) \right]
 \end{align}
 The system exploits the fact that institutions who rely on state funding more will be affected by state funding shocks.
-$Z_{i,t}$ is the instrument for (log) state funding for institution $i$ in year $t$, interacting the average funding for universities in state $s(i)$ with reliance on state funding relative to total revenues, averaged across the base years 1990--1993.\footnote{
+$Z_{i,t}$ is the instrument for state funding for institution $i$ in year $t$, interacting the average funding for universities in state $s(i)$ with reliance on state funding relative to total revenues, averaged across the base years 1990--1993.\footnote{
     1990--1993 are defined as data for public university finance data are most comparable (i.e. without many missing values) beginning in 1990.
     \cite{NBERw23736} use the single year 1990 as the base year, though I use the four years to ameliorate missing values in the single year of 1990.
     Results are similar in either specification.
@@ -50,25 +37,13 @@ State funding has been falling, so that the instrument describes shocks to unive
     Nonetheless, estimates including tuition revenues (per student) as a control in the second stage of the IV estimates produces results of very similar magnitude and direction, and so are omitted.
 }
 The instrument approach relies on the conditional independence assumption, that the instrument is independently assigned to the universities.
-While this assumption is fundamentally untestable, we see that universities are by-in-large smaller (in terms of enrolment, total revenues, and professor count) at the top of the state funding shock distribution.
+While this assumption is fundamentally untestable, we see that universities are by-in-large smaller (in terms of enrolment, total revenues, and professor count) at the top of the state funding shock distribution (see~\autoref{tab:summary-quantiles}).
 Though on a per student basis, there is little difference across the distribution (except in the outcomes under consideration).
+The state funding shock instrument is positively associated with the total enrolment and total amount of state funding for each university, in both \$ and $\log$/percentage change terms, while other the other sources of finances fopr the university are not associated with the funding shock.
+So that the other sources of finances are not clear confounders for the instrumental variables strategy, as they exhibit balance with respect to the funding shock instrument \citep{pei2019poorly}.
 Yearly and individual fixed effects are included in regressions throughout to implicitly condition on mean differences between universities and years, leading to the assumption of conditional independence of the instrument with respect to state funding for each public university.
 
-\begin{table}[h!]
-    \singlespacing
-    %\centering
-    \caption{Mean Characteristics for Public Universities, by State Funding Shock Instrument.}
-    \makebox[\textwidth][c]{\input{tables/summary-quantiles.tex}}
-    \label{tab:summary-quantiles}
-    
-    \footnotesize
-    %\vspace{1mm}
-    \textbf{Note}:
-    The column labelled ``1st'' refers to the mean for all university-year observations in the first quintile (bottom 20\%) of the funding shock distribution, and so on.
-    The mean of the funding shock within each quintile is shown in the first row of the table.
-\end{table}
-
-The state funding shock is an instrument for the amount of state funding for each university in each year.  
+The state funding shock is an instrument the level of state funding for each university in each year.  
 The first-stage is then as follows, including institution and year fixed effects, where $X_{i,t}$ represents the amount of state funding divided by the number of full-time students attending the university.
 \begin{equation}
     \label{eqn:firststage}
@@ -84,122 +59,88 @@ In this case, we satisfy the second: universities' institutional-level decisions
 }
 Lastly, the shift-share approach assumes that state funding shocks affect faculty outcomes only via affecting university finances.
 
-\begin{table}[h!]
-    \singlespacing
-    \centering
-    \caption{First Stage Estimates, for State Funding by funding shock.}
-    \makebox[\textwidth][c]{\input{tables/firststage-reg-fte.tex}}
-    \label{tab:firststage-reg}
-    \begin{flushleft}
-        \footnotesize
-        \textbf{Note}: Standard errors are clustered at the state-year level.
-    \end{flushleft}
-\end{table}
-
-The shift-share instrument performs excellently as an instrument for universities' yearly state funding.
-\autoref{tab:firststage-reg} presents results of the first-stage regression, separately with and without a control for tuition revenue per student, plus institution and year fixed effects.\footnote{
-    Representations for frequentist significance levels (i.e. 10, 5, 1\% etc.) are omitted here, and in all following tables.
+\textbf{TO-DO:
+    Add description the dollar-by-dollar, and log terms, of the first stage.
 }
+The shift-share instrument has a strong first stage for universities' yearly state funding.
+\autoref{tab:firststage-reg} presents results of the first-stage regression, separately with and without a control for tuition revenue per student, plus institution and year fixed effects.
 We note columns (1) and (2) estimate that a funding shock (per student in the entire state) of 10\% is associated with 9.8\% change in state funding per student at the university; the instrument is strong, and we note similarity in estimates with and without inclusion of fixed effects.
 Columns (3) and (4) include the tuition revenue control (explained in \autoref{foot:control}) to exhibit estimates with the inclusion of this possible collider or bad control.
 Column (3) shows similar estimates to columns (1), (2) thanks to inclusion of fixed effects, so that the fixed effects was effective in soaking variation in per-student tuition revenues at the institution-year level.
 Column (1) represents the estimates for \autoref{eqn:firststage} with fixed effects, omitting the tuition revenue control, and is the preferred form that I proceed with.
-Lastly, the state funding shock affects university revenues for multiple years after the initial shock (see \autoref{fig:firststage-lp}).
-We see a decaying, yet real and positive, effect of the shock on revenues for the next 10 years, illustrating that the state funding shock is a strong, if fading, instrument for state funding per student and justifying its use in later local projections models.
 
 These results, together with the case for exogeneity, show the funding shock instrument strongly predicts university revenues in the first-stage estimation.
 
 
-\subsection{Instrumental Variables Model, University-Level}
+\subsection{Instrumental Variables Model}
 \label{sec:iv-model-uni}
 
-The primary empirical model combines the instrumental variable for state funding shocks with the empirical model for the effects of state funding at the university-level --- i.e., parameter $\beta$ in the following.\footnote{
-    It is important to note the treatment effect isolated here; the instrumental variables approach identifies the local average treatment effects, one specific to the instrument.
-    So we interpret this treatment effect as a university's response in employment count and average salaries to state funding changes, changes specific to state funding shocks, among the complier group --- i.e., universities who respond to funding shocks who would not have made faculty-outcome changes absent the funding shock.
-    Also, we assume that no universities' total revenues increase in response to negative state funding shock (monotonicity).
+I use the instrument defined in \autoref{eqn:public-instrument} to overcome the endogeneity concerns for state funding to each public university, so the primary empirical model is an instrumental variables model.
+\autoref{eqn:firststage} is the first stage for exogenous variation in the state funding for university $i$ in year $t$, and \autoref{eqn:secondstage} the second stage for the effect of state funding on faculty outcomes.\footnote{
+    It is important to note the treatment effect isolated here; the instrumental variables approach identifies the local average treatment effect, one weighted to level of exposure when treatment is continuous as is the case here.
+    So we interpret this treatment effect as a weighted average of effects on faculty at public universities to state funding changes, specific to state funding shocks, among the complier group --- i.e., among universities who respond to funding shocks and would not have made faculty-outcome changes absent the funding shock.
+    Also, we assume that no universities state funding increased in response to the negative state funding shock (monotonicity).
 }
-\begin{eqnarray}
-    \label{eqn:secondstage1}
-    X_{i,t} &=& \eta_i + \zeta_t + \delta Z_{i,t} + \epsilon_{i,t} \\
-    \label{eqn:secondstage2}
-    Y_{i,t} &=& \alpha_i + \gamma_t + \beta \widehat X_{i,t} + \varepsilon_{i,t}
-\end{eqnarray}
-I estimate the system by two stage least squares, including institution and year fixed effects, and investigate outcomes at the university-level to analyse effects on the university as a result of changes in revenues.
-Additionally, I estimate the model via local projections \citep{jorda2005,miller2022} to investigate whether faculty composition is affected in the years after the initial funding shock (in addition to the initial year).\footnote{
-    The local projections method is an empirical model used to estimate dynamic treatment effects when the treatment is not binary, so that time-series confounding (i.e., treatment in time $t$ is correlated with treatment in time $t-1$) is present, even for instrumental variable models.
-    Inference in this method is for whether treatment $X_{i,t}$ affects the outcome $Y_{i,t+ k}$ in follow on years $k = 1, \hdots$, in addition to year $t$.
-    I present estimates in graphical form (see \autoref{fig:count-lp}).
+\begin{equation}
+    \label{eqn:secondstage}
+    Y_{i,t} = \alpha_i + \gamma_t + \beta \widehat X_{i,t} + \varepsilon_{i,t}
+\end{equation}
+I estimate the system by two stage least squares, including institution and year fixed effects.\footnote{
+    Note that dividing by student count also implicitly controls for the size of the university, so that this model implicitly accounts for yearly variation in professor count and university revenues arising from a university's size of growth/decline.
 }
-Regarding outcomes, I focus on the composition of the professors employed at the university by analysing (log) count of professors per student by each university.
+$Y_{i,t}$ represents faculty outcomes for university $i$ in year $t$, $\alpha_i, \gamma_t$ university and year fixed effects, and $\widehat X_{i,t}$ state funding for university $i$ estimated in first stage \eqref{eqn:firststage}.
 
-%\begin{figure}[H]
-%    \centering
-%    \singlespacing
-%    \caption{Instrument Variables Model for University Finances and Faculty Composition.}
-%    \begin{tikzpicture}
-%        \node[state] (instrument) at (0,0) {$Z$};
-%        \node at (-2.6,0.5){State};
-%        \node at (-1.9,0){appropriation};
-%        \node at (-2.6,-0.5){shock};
-%        \node[state] (endogenous) [right=of instrument] {$X$};
-%        \node at (2,1.5) {University};
-%        \node at (2,1) {revenues};
-%        \node[state] (outcome) [right=of endogenous] {$Y$};
-%        \node at (5.2,0.25) {Faculty};
-%        \node at (5.6,-0.25) {Composition};
-%        % Relevance condition
-%        \path (instrument) edge (endogenous);
-%        \path (endogenous) edge (outcome);
-%        % Exclusion Restriction
-%        \path (instrument) edge[bend right=60] (outcome);
-%        \node[color=red] at (2,-1.2) {X};
-%    \end{tikzpicture}
-%    \label{fig:SCM-ivmodel}
-%\end{figure}
-
-
-\subsection{Instrumental Variables Model, Individual Professor-Level}
-\label{sec:iv-model-indiv}
-
-This analysis additionally uses data on individual professors in the Illinois university system, to investigate the effects of changes in university revenues on the individual professors at the universities.
-Redefining the level of outcome requires adjustment to the empirical approach, leveraging variation in university finances for the years after a professor joins the university.\footnote{
+Additionally, I investigate the effect of changes in state funding among incumbent professors.
+Incumbent professors are faculty who are already employed at the university; state funding changes may affect faculty who are already at the university (beyond affecting whether they get hired), so I base the instrument in the year that the professor was hired, and include fixed effects for the hiring year.\footnote{
     This formulation follows that presented by \cite{NBERw27885}, where individual student outcomes are analysed via variation in state funding after their freshman-year.
     This contrasts with \autoref{sec:iv-model-uni} and \cite{NBERw23736}, where the unit of analysis is the university-year, where base year 1990 is more appropriate.
+    See \autoref{sec:iv-model-indiv} for the instrument and second-stage specification.
 }
+The instrument exogeneity and exclusion follows the same argument as above, where the Illinois legislature did not target any single campus for funding cuts and no single Illinois campus takes the majority of state funding.
 
-\autoref{eqn:rolling-instrument} defines a rolling-share variant of the instrument, $\tilde Z_{j,t}$, where the university's state funding share exposure is based in the year a professor joins the university --- and not the base period 1990--1993.
-$j$ indexes each professor in year $t$, $\tau(j)$ for the year the professor first joins their institution.\footnote{
-    Identifying $\tau(j)$ is possible for $j$ by restricting to all professors hired 2011-2021 --- i.e., in the years after the start of the full panel.
-    It is not possible to discern the hiring year for professors who  were hired in the years preceding 2011, and so the entire sample is only possible to analyse using the base-share in years 1990-1993 formulation (e.g., \autoref{tab:facultysalaries-shock-illinois}, \ref{tab:promotion-shock-illinois}).
-}
-\begin{align}
-    \label{eqn:rolling-instrument}
-    \tilde Z_{j,t} &\coloneqq - \log \left[
-    \left( \frac{\text{Total State Funding}_{s(j),t}}{\text{Student Population}_{s(j),t}} \right)
-    \left( \frac{\text{State Funding}_{\tau(j)}}{\text{Total Revenues}_{i,\tau(j)}} \right) \right]
-\end{align}
 
-This approach leverages an insight, made available by level of the data: that an individual professor is affected by changes in university revenues after they have joined the university.\footnote{
-    Notice that \autoref{sec:iv-model-uni} considers the number of professors employed by the university; whether a professor becomes employed at the university is likely affected by that university's finances.
-    The formulation in this section does not consider whether the professor joins the university, instead taking as given that the professor is employed at the university, and then projects the effect on the individual.
-}
-Exogeneity and relevance of the rolling-share instrument, $\tilde Z_{j,t}$, follows the same reasoning as that for the base-share instrument, $Z_{i,t}$, discussed in \autoref{sec:approp-shocks}.\footnote{
-    The base-share instrument is appropriate for some outcomes with the individual Illinois professors, where appropriate (\autoref{tab:facultysalaries-shock-illinois}, \ref{tab:promotion-shock-illinois}).
-}
-We satisfy the assumptions for exogeneity by noting that none of the Illinois public campuses take the majority of state funding, and that the identification strategy relies on exogeneity in changes in state funding to individual professor-outcomes, following the year they joined the university.\footnote{
-    Additionally, within-institution changes resulting from share reliance on state funding may be correlated with unobserved changes in the outcomes, so that \cite{NBERw27885} note the importance of controlling for the base share and state student population.
-    The formulation here implicitly controls for these factors via the fixed effects; results are relatively similar while including these controls with and without including fixed effects, and so are omitted.
-}
-\autoref{tab:firststage-illinois} presents results of the first stage estimation, showing that the instrument is strong in the same way as that for the university-level outcomes (\autoref{tab:firststage-reg}), with very similar estimates for the association between funding shocks and state funding.
+\subsection{Percent Change and Rates of Substitution}
+\label{sec:empirical-substituion}
 
-The instrumental variables model is then defined as follows, where $i(j)$ refers to the institution that professor $j$ is employed at, and $Y_{j,t}$ to individual-level outcomes total salary, rate of promotion, and propensity to leave the Illinois public university system.
-The system includes fixed effects for the institution and first year of employment.\footnote{
-    The instrument varies by institution, based in the year of first employment, so that these are the corresponding fixed effects and levels of clustered standard errors.
+It is not a priori clear which units are appropriate for this analysis;
+does it make sense to consider state funding in purely dollar amounts per student, or in percent change rate?
+The funding shock instrument is a strong predictor for the average university's level of state funding in either unit; a funding shock of \$-1,000 per student in the entire state leads to around \$-1,176 per student at the university, while a funding shock of -10\% leads to around -9.77\% less state funding per year.
+Yet, the level of state funding (and the outcome variables) vary greatly between states for the unit of analysis.
+For example, the average Illinois public university receives \$10,709 in state funding per student in 1990 and  \$6,713 in 2021 (a fall of over 30\%), while California went from \$19,224 per student to \$12,915 in the same time span (a fall of 37\%).
+While most states are not exactly the same to California and Illinois, this is example is telling for the phenomenon of stagnating state funding:
+states vary in how much the funding higher education in 1990, but most have experienced a decline on order of 30\%, so that the stagnation in state funding has been a percent change trend over this time period.
+As such, I focus on regression specifications where the explanatory and outcome variables are $\log$ transformed (unless otherwise mentioned).
+
+The estimand of a $\log-\log$ specification is a funding elasticity; a 1\% fall in state funding $X_{i,t}$ caused a $\beta$\% fall in outcome $Y_{i,t}$, as in \autoref{eqn:secondstage}.
+If the estimates are negative, then conceptually we consider the outcome to be inferior for a university's budgeting decisions with respect to state funding: if they are funded with more state resources they spend less on outcome $Y_{i,t}$.
+Conversely, outcome $Y_{i,t}$ is normal if the coefficient is positive.
+
+The funding elasticities can be used to recover the rates of substitution between two outcomes.
+For example, write $Y^1$ for the number of lecturers per student at the universities, and $Y^2$ for the number of full professors.
+I use the above approaches to estimate the funding elasticities, where $\% \Delta$ denotes percent change.
+\[ \beta_1 = \frac{\% \Delta Y^1}{\% \Delta X}
+\text{, and }
+\beta_2 = \frac{\% \Delta Y^2}{\% \Delta X} \]
+As such, it is possible to recover the elasticity for substitution between lecturers and full professors by the universities via the respective funding elasticities.
+\[ \frac{\% \Delta Y^1}{\% \Delta Y^2}
+= \frac{\% \Delta Y^1 / \% \Delta X}{\% \Delta Y^2 / \% \Delta X}
+= \frac{\beta_1}{\beta_2} \]
+I present results for the rates of substitution between different levels of faculty by this approach, dividing the relevant coefficient estimates and presenting standard errors calculated by a non-parametric bootstrap.
+% https://stackoverflow.com/questions/63777368/computing-the-standard-error-when-dividing-coefficients-of-different-regressions
+
+
+\subsection{Effects in Years After the Funding Shock}
+
+The effects of a change in the universities funding may not be immediate, and faculty in may be effected multiple years after a funding shock.
+Yet, the funding shock instrument is significantly auto-correlated year-on-year; a large state-level funding shock in year $t$ is also likely to experience a large funding shock in year $t-1$.
+Similarly, funding shocks to higher education in year are highly correlated with state funding per student in the 5 years before and after the original shock in IPEDS data (see \autoref{fig:lag-firststage}).
+Thus, a linear model correlated state funding in year $t$ with outcomes in year $t$ will suffer from time-series confounding.
+
+I employ a local projections approach to model how faculty outcomes in years $t+k$ are affected by state funding in year $t$, for future years $k > 0$ \citep{jorda2005}.
+The local projections method is an empirical model used to estimate dynamic treatment effects when the treatment is not binary, so that time-series confounding (i.e., treatment in time $t$ is correlated with treatment in time $t-1$) is present, even for instrumental variable models \citep{miller2022}.
+This method estimates the effect of treatment $X_{i,t}$ on outcome $Y_{i, t+ k}$ in follow-on years $k > 0$, while accounting for the auto-correlation between the other years.\footnote{
+    The funding shock has a persistent effect on state funding, multiple years after the initial funding shock, so that the instrument is similarly strong for the local projections method (see \autoref{fig:firststage-lp}).
 }
-\begin{eqnarray}
-    \label{eqn:secondstage1_indiv}
-    X_{i(j),t} &=& \theta_{i(j)} + \phi_{\tau(j)} + \delta \tilde Z_{i(j),t} + \epsilon_{i(j),t} \\
-    \label{eqn:secondstage2_indiv}
-    Y_{j,t} &=& \mu_{i(j)} + \nu_{\tau(j)} + \beta \widehat X_{i(j),t} + \varepsilon_{j,t}
-\end{eqnarray}
-We then interpret parameter $\beta$ as the effect of changes in state funding at an Illinois public university, via state funding shocks, on an individual professor's outcome $Y_{j,t}$.
+I present estimates in graphical form, where the x-axis represents the year relative to the funding shock (i.e., $x = 0$ represents the year of the state funding shock) and the y-axis represents the estimated effect of the funding shock on that year's outcome.\footnote{
+    See \autoref{fig:count-lp} for the graphical format, and the corresponding note for further explanation.
+}
