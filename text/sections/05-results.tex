@@ -4,30 +4,32 @@
 \label{sec:results}
 
 Changes in state funding have clear effects on the composition of faculty public universities employ.
-\autoref{tab:facultycount-shock-reg} presents OLS and IV estimates for the effecet of a change in state funding on the number of faculty at the university, individually by position (and for the total faculty), in both count of professors and in percent terms for faculty per student ratio.
+\autoref{tab:facultycount-shock-reg} presents OLS and IV estimates for the effect of a change in state funding on the number of faculty at the university, individually by position (and for the total faculty), in both count of professors and in percent terms for faculty per student ratio.
 An extra \$1,000 in state funding per student leads to the average university employing 6 fewer lecturers, with no discernible effect on the count of total professors (\autoref{tab:facultycount-shock-reg}, Panel A).
 In percentage terms, a 10\% increase in state funding lead to a 4.4\% decrease in the number of lecturers per student, an increase of 14\% for both assistant and full professors, leading to a 0.6\% increase in the total number of faculty per student.
 In the state of Illinois, using the count of professors represented in the IBHED databse, state funding is correlated with the number of faculty, but lacks precision to identify the exact effects given the 144 university-year observations in the panel for 2010--2021.
 
-Incumbent professors are relatively unaffected by changes in the state funding for their university in the years following their hire.
-\autoref{tab:faculty-shock-illinois-rolling} show estimates of a 1\% change in state funding per student on faculty salaries, rate of exiting the Illinois public university system, and rate of promotion; there are little effects discernible from zero, so that faculty who are already at the university have little of the effects of funding cuts passed on to them.
-
 Faculty composition is not only impacted in the same years as a state funding shock, but also for a number years following.
-\autoref{fig:all-count-lp} shows local projection estimates, where the elasticity of total professor count per student in year $t+k$ with respect to state funding in year $t$ is around 0.1, for follow-on years $k = 0, \hdots, 3$.
-These findings are in line with the observation that universities froze hiring for a couple of years in response to 2008 negative budget shocks, particularly for tenure-track positions \citep{turner2014impact}, and similarly from shocks to university endowments \citep{brown2014endowment}.
-For lecturers, we see a negative effect which lines up with two trends noted in \autoref{sec:trends}: funding for public universities (per student) is decreasing while relative usage of  lecturers increased rapidly.
-
-Decreases in state funding (via funding shocks) affects not only the total counts of professors, but also the composition in the years after thee funding shock.
+\autoref{fig:count-lp} shows local projection estimates, as a series of impulse responses, where the estimate is the elasticity for professor count per student in year $t+k$ with respect to state funding in year $t$ for follow-on years $k = 0, \hdots, 10$.
 A 10\% decrease in state funding increases count of lecturers per student by 4\% for the first two years after the initial shock.
 While count of assistant professors decreases 10 to 18.5\% three years later;
 count of tenured professors decreases 9 to 6\% three years later.
 Together, the total count of professors per student decreases around 1\% for three years after the initial funding shock, and the effect is not distinguishable from zero after this point.
-\autoref{fig:lecturer-count-lp}, \ref{fig:assistant-count-lp}, \ref{fig:full-count-lp} represents these estimates, using the local projection method, as a series of impulse responses for each outcome of professor count.
-These findings show that public universities increase (decrease) their count of tenure-track and tenured professors per student in years when revenues are more (less) plentiful, possibly by increasing hiring intensity or efforts to maintain incumbent professors.
-In the same vein, when revenues are bountiful, count of tenure-track and tenured professors per student increases --- and the opposite in years of funding cuts.
 
-\subsection{Rates of Substitution}
-\label{sec:results-substituion}
 
-Write here about the log results, including a figure for the university funding elasticities of faculty demand.
-Describe here the relevance of the elasticities, and describe the estimates for elasticity of substitution.
+Incumbent professors are relatively unaffected by changes in the state funding for their university in the years following their hire.
+\autoref{tab:faculty-shock-illinois-rolling} show estimates of a 1\% change in state funding per student on faculty salaries, rate of exiting the Illinois public university system, and rate of promotion.
+The estimates are not discernible from zero, so that faculty who are already at the university (incumbent faculty) seem to have no effects of state funding cuts passed on to them.
+
+%These findings show that public universities increase (decrease) their count of tenure-track and tenured professors per student in years when revenues are more (less) plentiful, possibly by increasing hiring intensity or efforts to maintain incumbent professors.
+%In the same vein, when funding increases, count of tenure-track and tenured professors per student increases --- and the opposite in years of funding cuts.
+%These findings are in line with the observation that universities froze hiring for a couple of years in response to 2008 negative budget shocks, particularly for tenure-track positions \citep{turner2014impact}, and similarly from shocks to university endowments \citep{brown2014endowment}.
+%For lecturers, we see a negative effect which lines up with two trends noted in \autoref{sec:trends}: funding for public universities (per student) is decreasing while relative usage of lecturers increased substantially.
+
+The composition of faculty changed at public universities 1990--2017 thanks to stagnating state funding, but there are little discernible effects on incumbent faculty.
+This may imply that the rate that public universities hired faculty was impacted by state funding cuts.
+I take recent data on the total faculty hired at US public universities over 2011--2021 (provided by \citealt{wapman2022quantifying}), to show that universities with lower state funding (per student) also hired fewer professors in the same time period --- shown in \autoref{fig:hiring-correlation}.
+Similarly, the funding shock IV model shows that a $10$\% cut in per student state funding leads to $13$\% fewer faculty hires per student across the decade 2011--2021.\footnote{
+    See \autoref{sec:appendix-hiring} for further details.
+}
+These results provide limited evidence that changes in faculty composition arose by disrupting hiring of new professors at public universities, corresponding to the results that incumbent faculty were not by meaningfully effected by the funding cuts.

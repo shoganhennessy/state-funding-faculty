@@ -59,11 +59,12 @@ In this case, we satisfy the second: universities' institutional-level decisions
 }
 Lastly, the shift-share approach assumes that state funding shocks affect faculty outcomes only via affecting university finances.
 
-\textbf{TO-DO:
-    Add description the dollar-by-dollar, and log terms, of the first stage.
-}
 The shift-share instrument has a strong first stage for universities' yearly state funding.
-\autoref{tab:firststage-reg} presents results of the first-stage regression, separately with and without a control for tuition revenue per student, plus institution and year fixed effects.
+\autoref{tab:firststage-reg} presents results of the first-stage regression, separately with and without a control for tuition revenue per student, plus institution and year fixed effects;
+Panel A shows estimates of a funding shock of \$1 per student in the state on state funding per student at the university, and Panel B the \% increase effects of a 1\% increase in the shock per student on state funding per student.
+\textbf{TO-DO:
+    Add description the dollar-by-dollar, of the first stage.
+}
 We note columns (1) and (2) estimate that a funding shock (per student in the entire state) of 10\% is associated with 9.8\% change in state funding per student at the university; the instrument is strong, and we note similarity in estimates with and without inclusion of fixed effects.
 Columns (3) and (4) include the tuition revenue control (explained in \autoref{foot:control}) to exhibit estimates with the inclusion of this possible collider or bad control.
 Column (3) shows similar estimates to columns (1), (2) thanks to inclusion of fixed effects, so that the fixed effects was effective in soaking variation in per-student tuition revenues at the institution-year level.
@@ -98,38 +99,17 @@ Incumbent professors are faculty who are already employed at the university; sta
 }
 The instrument exogeneity and exclusion follows the same argument as above, where the Illinois legislature did not target any single campus for funding cuts and no single Illinois campus takes the majority of state funding.
 
-
-\subsection{Percent Change and Rates of Substitution}
-\label{sec:empirical-substituion}
-
 It is not a priori clear which units are appropriate for this analysis;
 does it make sense to consider state funding in purely dollar amounts per student, or in percent change rate?
-The funding shock instrument is a strong predictor for the average university's level of state funding in either unit; a funding shock of \$-1,000 per student in the entire state leads to around \$-1,176 per student at the university, while a funding shock of -10\% leads to around -9.77\% less state funding per year.
+The funding shock instrument is a strong predictor for the average university's level of state funding in either unit; a funding shock of \$1,000 per student in the entire state leads to around \$1,176 per student at the university, while a funding shock of -10\% leads to around -9.77\% less state funding per year.
 Yet, the level of state funding (and the outcome variables) vary greatly between states for the unit of analysis.
 For example, the average Illinois public university receives \$10,709 in state funding per student in 1990 and  \$6,713 in 2021 (a fall of over 30\%), while California went from \$19,224 per student to \$12,915 in the same time span (a fall of 37\%).
 While most states are not exactly the same to California and Illinois, this is example is telling for the phenomenon of stagnating state funding:
 states vary in how much the funding higher education in 1990, but most have experienced a decline on order of 30\%, so that the stagnation in state funding has been a percent change trend over this time period.
-As such, I focus on regression specifications where the explanatory and outcome variables are $\log$ transformed (unless otherwise mentioned).
-
-The estimand of a $\log-\log$ specification is a funding elasticity; a 1\% fall in state funding $X_{i,t}$ caused a $\beta$\% fall in outcome $Y_{i,t}$, as in \autoref{eqn:secondstage}.
-If the estimates are negative, then conceptually we consider the outcome to be inferior for a university's budgeting decisions with respect to state funding: if they are funded with more state resources they spend less on outcome $Y_{i,t}$.
-Conversely, outcome $Y_{i,t}$ is normal if the coefficient is positive.
-
-The funding elasticities can be used to recover the rates of substitution between two outcomes.
-For example, write $Y^1$ for the number of lecturers per student at the universities, and $Y^2$ for the number of full professors.
-I use the above approaches to estimate the funding elasticities, where $\% \Delta$ denotes percent change.
-\[ \beta_1 = \frac{\% \Delta Y^1}{\% \Delta X}
-\text{, and }
-\beta_2 = \frac{\% \Delta Y^2}{\% \Delta X} \]
-As such, it is possible to recover the elasticity for substitution between lecturers and full professors by the universities via the respective funding elasticities.
-\[ \frac{\% \Delta Y^1}{\% \Delta Y^2}
-= \frac{\% \Delta Y^1 / \% \Delta X}{\% \Delta Y^2 / \% \Delta X}
-= \frac{\beta_1}{\beta_2} \]
-I present results for the rates of substitution between different levels of faculty by this approach, dividing the relevant coefficient estimates and presenting standard errors calculated by a non-parametric bootstrap.
-% https://stackoverflow.com/questions/63777368/computing-the-standard-error-when-dividing-coefficients-of-different-regressions
-
+As such, I include regression specifications where the explanatory and outcome variables are $\log$ transformed, and refer to these when stating results in percent change terms.
 
 \subsection{Effects in Years After the Funding Shock}
+\label{sec:empirical-substituion}
 
 The effects of a change in the universities funding may not be immediate, and faculty in may be effected multiple years after a funding shock.
 Yet, the funding shock instrument is significantly auto-correlated year-on-year; a large state-level funding shock in year $t$ is also likely to experience a large funding shock in year $t-1$.

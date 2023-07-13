@@ -38,28 +38,17 @@ Folder "text/" contains all files regarding the final report, and write-up, of t
 
 ## July to do (ordered):
 
-### Empirical analysis
-
-3. Sections writing.
-
-- Re-write of the results section, substitution subsection (including code).
-- Re-write of the discussion section.
-- Re-write of the intro section.
-
 ### Re-writing
 
 Pitch differently, following Evan's guide.
 
 - Re-write introduction, from the ground up, and following sections with a focus on mechanisms.  Add a data section in introduction.
-- De-emphasise hiring channel (replace with Illinois composition results).
-- Include a figure of the relative elasticities.
-- Writing code to present the division of regression coefficients. 
 - Add into a footnote that compliers are likely every (public) university, which can be mentioned in the discussion when a comparison to private unis.
 - Print out, and make notes for writing (topic sentences to start sections + paragraphs).
-- Describe differences between log and count results.
 - Add mention of tenure + free speech
 https://www.aeaweb.org/articles?id=10.1257/jep.13.1.85
 https://www.sciencedirect.com/science/article/abs/pii/0167268183900057
 https://doi.org/10.1016/0167-2681(92)90002-S
 
 2. Adjust the LaTeX tables, by hand, to follow the ``large and fill page'' tuning.
+See Table 5 of [this](https://doi.org/10.1162/rest_a_01098) for a publication-ready table, similar form to mine.

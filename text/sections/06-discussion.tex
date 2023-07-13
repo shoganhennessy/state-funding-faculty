@@ -2,38 +2,37 @@
 %% Discussion section
 \section{Discussion}
 
-Replace focus on hiring channel, describing how the results can be interpretted.
-
-Additionally, put into further context of the trends in university competition \citep{urquiola2020markets}, and XYZ \citep{ehrenberg2012american}.
-
-\textbf{Moved from Concepts section:}
-This paper shows that stagnating in state funding for public universities cause the changes in faculty composition among public universities, explaining about 40\% of the observed substitution towards contingent lecturers, so that it is possible that other systematic changes in higher education (such as changing selectivity) may explain the rest of the variation.
-
-\textbf{TODO: Rewrite this all, putting  a minimal focus on faculty hiring, and focusing on the mechanisms instead (mechanisms for decline in public unis).}
-
-
-The results show that the recent stagnation in state funding for higher education has affected the composition of faculty within public universities, away from tenure-track and tenured professors towards contingent lecturers.
-At the same time, there are little discernible effects on individual professors hired in the years 2011-2021 at Illinois public universities.
-The rate that faculty leave their university, and their rate of promotion between positions, are unaffected by the university revenues, so this leaves one primary channel to explain changes in faculty composition: hiring.
-
-The number of professors at a university changes between academic years: professors leave an institution (retiring, hired elsewhere, etc.), while others join (they are newly hired, end a sabbatical, etc.).
-Section~\ref{sec:results-indiv} shows that most of these channels are unaffected, implying that falls in hiring for tenured-track and tenured faculty must explain most of the substitution towards lecturers and away from tenured professors.
-Notably, faculty hiring is suspected to be impacted by changes in university funding; for example, \cite{turner2014impact} documents the wide-spread practice of hiring freezes at universities in response to budget shocks around the 2008 recession.
-Similar measures were taken by Illinois public universities in response to their deteriorating finances in the 2010s \citep{furlough2010}.
-The University of Illinois did not receive funding from the state of Illinois before the next fiscal year started, so enacted cost-cutting measures to stay fiscally solvent in the interim.
-As one such cost-cutting measure, the university system placed a freeze on all hiring for filling state-funded positions and promotions.
-
-The data used so far measure faculty count, so cannot disentangle which channels are most affected by changes in state funding at a public university.
-\autoref{fig:hiring-correlation.png} uses data on the total faculty hired at US public universities over 2011--2021, provided by \cite{wapman2022quantifying},\footnote{
-    \cite{wapman2022quantifying} provided an aggregated sample of their data as open-source, making this analysis possible.
-} showing a correlation between professor hiring rate and the total state funding per student.
-
-Universities with more state funding (for the entire decade) hired more professors (\autoref{fig:hiring-correlation.png}).
-Similarly, the funding shock IV model shows that a decrease of $-10$\% in state funding leads to $-13$\% fewer faculty hires per student across the decade 2011--2021 (see \autoref{tab:hiring-shock-reg} for full regression model results).\footnote{
-    These results were produced by integrating the total count of faculty hires for 2010--2021 for the top-ranked 180 US universities with a sum of the funding variables, and then estimating the models specified in \autoref{sec:iv-model-uni}.
-    There were no observable differences in the hiring rate of male vs female faculty.
-    See \autoref{sec:appendix-hiring} for further details.
+Universities received less state funding, relative to increasing enrolment, and reacted by increasing their reliance on lecturers relative to assistant and full professors in both the short and medium-run; these results imply that lecturers can be considered substitutes for professors in the tenure-system.\footnote{
+    Additional results in Appendix \autoref{sec:appendix-substitution} formalises the marginal rate of substitution between lecturers and professors on tenure-track, showing how assistant and full professors were substituted for lecturers while there is no substitution between assistant and full professors.
 }
-It is clear that public universities' hiring is negatively impacted by falls in state funding, even using this highly aggregated count of professor hiring across an entire decade.
-While this analysis strengthens the case negative effects on hiring plays, it is crude for measuring exact magnitudes for the effect on faculty hiring.
-I leave it to further research to delve deeper into the magnitudes that hiring plays as the primary causal mediator for the effects of falls in state funding on faculty composition at public universities.
+A public university's state funding per student fell by an average of 36\%, and the number of lecturers per student increased by 113\% (fell by 17\% for assistant and 23\% full professors).
+The estimates of elasticity for faculty count with respect to state funding imply that stagnating state funding explains about 40\% of the observed substitution towards lecturers and away from tenure-track and tenured faculty.
+
+These effects are persistent: public higher education in the US was not exposed to one large instance of funding cuts, but systematic funding short-falls across the last three decades.
+The long-term estimates (i.e., \autoref{fig:count-lp}) show that state funding cuts have effects on universities for multiple years after the initial funding cut, and these effects are compounded by the fact that public universities received persistent funding cuts for so many years.
+The end result is large changes in faculty composition, the long-run trend in stagnating state funding leading to a long-run substitution towards lecturers at public universities.
+
+At the same time, incumbent faculty in the state of Illinois are unaffected by the state funding cuts in terms of salary, promotion rate, and rate of leaving their faculty position.
+These results imply that composition change arose by lower hiring of tenure-track faculty in the public university system.
+The private university system did not grow in any corresponding amount, with the clear implication that there are fewer tenure-track openings at US universities.\footnote{
+    While the number of PhD graduates has continued to rise \citep{aau2021survey}.
+}
+Securing academic employment on the tenure-track is more selective than ever, so that more PhD graduates will end up teaching as lecturers or leaving academia.
+% Note: unclear effects on PhD students choosing to not enter acadmeia, or go towards private unis
+% Would be possible to study with data on PhD students, and whether they are more/less likely to enter academia after budget cuts to their PhD institution.
+
+The results here are squarely in line with theories explaining the increased competition and inequality between US universities.
+\cite{urquiola2020markets} interprets the success of research in US higher education as a result of free market policies, where increased competition in a free market in the early 1900s led to improvements in university research among US private universities.
+These changes have not just affected research, they have affected education, too.
+The rate of selectivity among US universities has become increasingly polarised, where top (and mostly private) universities with the most resources have become more selective at the undergraduate level \citep{hoxby2009changing}, and increasingly dominate academia at the graduate level \citep{wapman2022quantifying}.
+Public universities are by-in-large not selective, so are caught in a relative decline when their selective and private peers are increasingly more selective, and better performing in terms of research and student outcomes.
+
+While market forces have been effective in the successes of US higher education research, we should worry about the effects on education.
+Enrolment in higher education has increased drastically since 1990, and public universities educate more than twice as many undergraduates in 2021 as their private counterparts.
+%At the same time returns to higher education have increased drastically \citep{berman1998implications}.
+Increasingly these students are being taught by lecturers, and not tenured faculty.
+Lecturers are often employed on short-term or part-time contracts (adjunct), with limited job stability.
+While we should worry for faculty, and their working conditions, there is credible evidence that relying on adjunct lecturers leads to worse student outcomes, relative to full-time lecturers and professors \citep{zhu2021limited}.
+As tenure has increasingly become a private sector phenomenon, we should worry about the long-term effects on higher education, and the effect on the average student who attends a public university in the US.
+
+%Additionally, put into further context of the trends in university competition \citep{urquiola2020markets}, and XYZ \citep{ehrenberg2012american}.

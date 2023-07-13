@@ -873,11 +873,10 @@ fixest::coefplot(list(
 # https://cran.r-project.org/web/packages/jtools/vignettes/summ.html#plot_summs()_and_plot_coefs()
 
 # Calculate the elasticities of susbtituion, with SEs bootstrapped.
-# TODO: CALCULATE WITH A BOOTSTRAP FROM THE FOLLOWING:
-# TODO https://stackoverflow.com/questions/63777368/computing-the-standard-error-when-dividing-coefficients-of-different-regressions
+boot.count <- 10000
 
 ## write a function to calculate the lecturer <-> assistant prof elasticity
-assistant.fun <- function(data, inds){
+lecturer_assistant.fun <- function(data, inds){
     substitution.reg <- fixest::feols(c(
             log(lecturer_prof_count / enrollment_reported),
             log(assistant_prof_count / enrollment_reported)
@@ -896,12 +895,26 @@ assistant.fun <- function(data, inds){
     return(substitution.est)
 }
 # bootstrap the function
-boot.calc <- boot(reg.data, statistic = assistant.fun, R = 10000)
-# calculate confidence intervals
-boot.ci(boot.calc, type = c("perc", "bca"))
+boot.calc <- boot::boot(reg.data,
+    statistic = lecturer_assistant.fun, R = boot.count, parallel = "multicore")
+# calculate the standard error
+summary(boot.calc)
+boot.mean <- mean(boot.calc$t)
+boot.se <- sd(boot.calc$t)
+boot.ci <- quantile(boot.calc$t, probs = c(0.025, 0.975))
+# Check for normality -> result roughly normal
+boot.calc$t %>%
+    as.data.frame() %>%
+    ggplot(aes(V1)) +
+    geom_histogram(aes(y = after_stat(density)),
+        fill = "lightgray", col = "black") +
+    stat_function(fun = dnorm, args = list(mean = boot.mean, sd = boot.se))
+print(c("Calculated point est for substitution between lecturers + ast profs",
+    boot.mean, "with SEs", boot.se,
+    "and 95 % CI", boot.ci))
 
 ## write a function to calculate the lecturer <-> full prof elasticity
-full.fun <- function(data, inds){
+lecturer_full.fun <- function(data, inds){
     substitution.reg <- fixest::feols(c(
             log(lecturer_prof_count / enrollment_reported),
             log(full_prof_count / enrollment_reported)
@@ -920,9 +933,61 @@ full.fun <- function(data, inds){
     return(substitution.est)
 }
 # bootstrap the function
-boot.calc <- boot(reg.data, statistic = full.fun, R = 10000)
-# calculate confidence intervals
-boot.ci(boot.calc, type = c("perc", "bca"))
+boot.calc <- boot::boot(reg.data,
+    statistic = lecturer_full.fun, R = boot.count, parallel = "multicore")
+# calculate the standard error
+summary(boot.calc)
+boot.mean <- mean(boot.calc$t)
+boot.se <- sd(boot.calc$t)
+boot.ci <- quantile(boot.calc$t, probs = c(0.025, 0.975))
+# Check for normality -> result roughly normal
+boot.calc$t %>%
+    as.data.frame() %>%
+    ggplot(aes(V1)) +
+    geom_histogram(aes(y = after_stat(density)),
+        fill = "lightgray", col = "black") +
+    stat_function(fun = dnorm, args = list(mean = boot.mean, sd = boot.se))
+print(c("Calculated point est for substitution between lecturers + full profs",
+    boot.mean, "with SEs", boot.se,
+    "and 95 % CI", boot.ci))
+
+## write a function to calculate the assistant <-> full prof elasticity
+assistant_full.fun <- function(data, inds){
+    substitution.reg <- fixest::feols(c(
+            log(assistant_prof_count / enrollment_reported),
+            log(full_prof_count / enrollment_reported)
+        ) ~ 1 |
+        unitid + year |
+        log(stateappropriations_real / enrollment_reported) ~
+            I(-log(appropriationshock_perEnroll_real)),
+        vcov = ~ state^year,
+        data = data[inds, ])
+    # Get the lecturer elasticity
+    assistant.elast <- coef(substitution.reg)[1, 3]
+    # Get the assistant professor elasticity.
+    prof.elast <- coef(substitution.reg)[2, 3]
+    # Return the division of the coefficients.
+    substitution.est <- assistant.elast / prof.elast
+    return(substitution.est)
+}
+# bootstrap the function
+boot.calc <- boot::boot(reg.data,
+    statistic = assistant_full.fun, R = boot.count, parallel = "multicore")
+# calculate the standard error
+summary(boot.calc)
+boot.mean <- mean(boot.calc$t)
+boot.se <- sd(boot.calc$t)
+boot.ci <- quantile(boot.calc$t, probs = c(0.025, 0.975))
+# Check for normality -> result roughly normal
+boot.calc$t %>%
+    as.data.frame() %>%
+    ggplot(aes(V1)) +
+    geom_histogram(aes(y = after_stat(density)),
+        fill = "lightgray", col = "black") +
+    stat_function(fun = dnorm, args = list(mean = boot.mean, sd = boot.se))
+print(c("Calculated point est for substitution between ast + full profs",
+    boot.mean, "with SEs", boot.se,
+    "and 95 % CI", boot.ci))
 
 
 # Faculty Count (per student) Regressions, by tenured vs non-tenured -----------
