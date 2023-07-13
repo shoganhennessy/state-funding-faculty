@@ -42,7 +42,7 @@ Folder "text/" contains all files regarding the final report, and write-up, of t
 
 Pitch differently, following Evan's guide.
 
-- Re-write introduction, from the ground up, and following sections with a focus on mechanisms.  Add a data section in introduction.
+- Re-write introduction, from the ground up, and following sections with a focus on mechanisms.
 - Add into a footnote that compliers are likely every (public) university, which can be mentioned in the discussion when a comparison to private unis.
 - Print out, and make notes for writing (topic sentences to start sections + paragraphs).
 - Add mention of tenure + free speech
