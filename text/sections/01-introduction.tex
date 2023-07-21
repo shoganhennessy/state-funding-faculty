@@ -25,6 +25,10 @@ I employ a shift-share instrument to identify changes in state funding for highe
 State governments decide how to fund higher education by a complicated process which can be influenced by local economic conditions, changing state priorities, or even lobbying from the state universities themselves.
 As such, state funding is not randomly assigned to universities and so it is necessary to employ an identification strategy, such as the shift-share instrument, to account for this.
 The shift-share instrument interacts how much a university relies on state funding as a percent of revenues in a base period with the entire state's total funding per higher education student for each year, exploiting changes in funding and how much each university historically relied on state funding for higher education.
+Additionally, I estimate effect of state funding on faculty multiple years after the initial funding cuts, using the local projections method thanks to the presence of time-series confounding between the funding shock and later years' level of state funding.\footnote{
+    To the best of my knowledge, this is also the first paper to use the local projections method for a shift-share instrument.
+    %Previous work ignored the potential time-series confoduning, and estimated linear instrumental variables.
+}
 
 Falls in state funding affect faculty composition at public universities, which substitute away from tenured and tenure-track professors towards contingent lecturers.
 A funding cut of \$1,000 per student leads to an average university employing 6 more lecturers;

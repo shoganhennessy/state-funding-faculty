@@ -191,6 +191,7 @@ lp.data <- reg.data %>%
         academicyear = factor(year),
         lecturer = lecturer,
         assistant = assistant,
+        associate = associate,
         full = full,
         administrator = administrator,
         salary_real = log(salary_real + extra_salary_real),
@@ -228,9 +229,7 @@ lpreg.plot <- function(model.lpreg) {
         geom_line(aes(y = conf.high), linetype = "dashed") +
         scale_x_continuous(name = "Years, Relative to Initital Shock",
             breaks = model.lpdata$t, expand = c(0.01, 0.01)) +
-        scale_y_continuous(name = "",
-            limits = c(-0.05, 0.1),
-            breaks = seq(-2, 1, by = 0.025)) +
+        scale_y_continuous(name = "") +
         theme_bw() +
         ggtitle("Estimate") +
         theme(plot.title = element_text(size = rel(1)),
@@ -266,7 +265,7 @@ ggsave("../../text/figures/firststage-illinois-lp-rolling.png",
 
 # LP estimation for salaries of lecturers.
 lecturer_salaries.lpreg <-
-    lp_lin_panel(data_set = filter(lp.data, lecturer == 1),
+    lp_lin_panel(data_set = lp.data %>% filter(lecturer == 1),
         # Outcome variable
         endog_data = "salary_real",
         # Predictor variable
@@ -284,12 +283,15 @@ lecturer_salaries.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/salaries-lecturer-illinois-lp-rolling.png",
-    plot = lpreg.plot(lecturer_salaries.lpreg),
+    plot = (lpreg.plot(lecturer_salaries.lpreg) +
+        scale_y_continuous(name = "",
+            limits = c(-0.05, 0.1),
+            breaks = seq(-2, 1, by = 0.025))),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for salaries of APs.
 assistant_salaries.lpreg <-
-    lp_lin_panel(data_set = filter(lp.data, assistant == 1),
+    lp_lin_panel(data_set = lp.data %>% filter(assistant == 1),
         # Outcome variable
         endog_data = "salary_real",
         # Predictor variable
@@ -307,12 +309,15 @@ assistant_salaries.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/salaries-assistant-illinois-lp-rolling.png",
-    plot = lpreg.plot(assistant_salaries.lpreg),
+    plot = (lpreg.plot(assistant_salaries.lpreg) +
+        scale_y_continuous(name = "",
+            limits = c(-0.05, 0.1),
+            breaks = seq(-2, 1, by = 0.025))),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for salaries of full profs.
 full_salaries.lpreg <-
-    lp_lin_panel(data_set = filter(lp.data, full == 1),
+    lp_lin_panel(data_set = lp.data %>% filter(associate + full > 0),
         # Outcome variable
         endog_data = "salary_real",
         # Predictor variable
@@ -330,12 +335,15 @@ full_salaries.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/salaries-full-illinois-lp-rolling.png",
-    plot = lpreg.plot(full_salaries.lpreg),
+    plot = (lpreg.plot(full_salaries.lpreg) +
+        scale_y_continuous(name = "",
+            limits = c(-0.05, 0.1),
+            breaks = seq(-2, 1, by = 0.025))),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for salaries of administrator faculty.
 administrator_salaries.lpreg <-
-    lp_lin_panel(data_set = filter(lp.data, administrator == 1),
+    lp_lin_panel(data_set = lp.data %>% filter(administrator == 1),
         # Outcome variable
         endog_data = "salary_real",
         # Predictor variable
@@ -353,7 +361,10 @@ administrator_salaries.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/salaries-administrator-illinois-lp-rolling.png",
-    plot = lpreg.plot(administrator_salaries.lpreg),
+    plot = (lpreg.plot(administrator_salaries.lpreg) +
+        scale_y_continuous(name = "",
+            limits = c(-0.05, 0.1),
+            breaks = seq(-2, 1, by = 0.025))),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for salaries of all faculty.
@@ -376,7 +387,10 @@ all_salaries.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/salaries-all-illinois-lp-rolling.png",
-    plot = lpreg.plot(all_salaries.lpreg),
+    plot = (lpreg.plot(all_salaries.lpreg) +
+        scale_y_continuous(name = "",
+            limits = c(-0.05, 0.1),
+            breaks = seq(-2, 1, by = 0.025))),
     units = "cm", width = fig.width, height = fig.height)
 
 
@@ -385,8 +399,8 @@ ggsave("../../text/figures/salaries-all-illinois-lp-rolling.png",
 # LP estimation for salaries of lecturers.
 lecturer_promoted.lpreg <-
     lp_lin_panel(
-        data_set =
-            filter(lp.data, ever_lecturer == 1, lecturer + assistant > 0),
+        data_set = lp.data %>%
+            filter(ever_lecturer == 1, lecturer + assistant > 0),
         # Outcome variable
         endog_data = "promoted",
         # Predictor variable
@@ -404,14 +418,17 @@ lecturer_promoted.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/promoted-lecturer-illinois-lp-rolling.png",
-    plot = lpreg.plot(lecturer_promoted.lpreg),
+    plot = (lpreg.plot(lecturer_promoted.lpreg) +
+        scale_y_continuous(name = "",
+            limits = c(-0.1, 0.2),
+            breaks = seq(-2, 1, by = 0.05))),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for promotion rate of APs.
 assistant_promoted.lpreg <-
     lp_lin_panel(
-        data_set =
-            filter(lp.data, ever_assistant == 1, assistant + associate > 0),
+        data_set = lp.data %>%
+            filter(ever_assistant == 1, assistant + associate > 0),
         # Outcome variable
         endog_data = "promoted",
         # Predictor variable
@@ -429,12 +446,17 @@ assistant_promoted.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/promoted-assistant-illinois-lp-rolling.png",
-    plot = lpreg.plot(assistant_promoted.lpreg),
+    plot = (lpreg.plot(assistant_promoted.lpreg) +
+        scale_y_continuous(name = "",
+            limits = c(-0.1, 0.2),
+            breaks = seq(-2, 1, by = 0.05))),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for promotion rate of full profs.
 full_promoted.lpreg <-
-    lp_lin_panel(data_set = filter(lp.data, full == 1),
+    lp_lin_panel(
+        data_set = lp.data %>%
+            filter(ever_associate == 1, full > 0),
         # Outcome variable
         endog_data = "promoted",
         # Predictor variable
@@ -452,17 +474,141 @@ full_promoted.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/promoted-full-illinois-lp-rolling.png",
-    plot = lpreg.plot(full_promoted.lpreg),
+    plot = (lpreg.plot(full_promoted.lpreg) +
+        scale_y_continuous(name = "",
+            limits = c(-0.1, 0.2),
+            breaks = seq(-2, 1, by = 0.05))),
     units = "cm", width = fig.width, height = fig.height)
 
 
-
-
-
-
-
-
 # Local Projection Estimates of Faculty Exit Rate -------------------------
-#TODO: WRITE HERE FOR THE LP OF EXITS
 
-        endog_data = "notemployed_nextyear"
+# LP estimation for exit rate of lecturers.
+lecturer_exit.lpreg <-
+    lp_lin_panel(data_set = lp.data %>% filter(lecturer == 1),
+        # Outcome variable
+        endog_data = "notemployed_nextyear",
+        # Predictor variable
+        shock = "stateappropriations_real",
+        # Contemporaneous control, plus FE for unitid + firstyear
+        c_exog_data = c("instid", "firstyear"),
+        # Option to use IV for predictor endogeneity
+        iv_reg = TRUE,
+        instrum = "appropriationshock_perEnroll_rolling",
+        # Add clustered SEs in the panel
+        panel_model = "pooling",
+        robust_cov = "vcovHC",
+        robust_cluster = c("group", "time"),
+        confint = 1.96,
+        hor = time.horizon)
+# Save this plot
+ggsave("../../text/figures/exit-lecturer-illinois-lp-rolling.png",
+    plot = (lpreg.plot(lecturer_exit.lpreg) +
+        scale_y_continuous(name = "",
+            limits = c(-0.1, 0.2),
+            breaks = seq(-2, 1, by = 0.05))),
+    units = "cm", width = fig.width, height = fig.height)
+
+# LP estimation for exit rate of APs.
+assistant_exit.lpreg <-
+    lp_lin_panel(data_set = lp.data %>% filter(assistant == 1),
+        # Outcome variable
+        endog_data = "notemployed_nextyear",
+        # Predictor variable
+        shock = "stateappropriations_real",
+        # Contemporaneous control, plus FE for unitid + firstyear
+        c_exog_data = c("instid", "firstyear"),
+        # Option to use IV for predictor endogeneity
+        iv_reg = TRUE,
+        instrum = "appropriationshock_perEnroll_rolling",
+        # Add clustered SEs in the panel
+        panel_model = "pooling",
+        robust_cov = "vcovHC",
+        robust_cluster = c("group", "time"),
+        confint = 1.96,
+        hor = time.horizon)
+# Save this plot
+ggsave("../../text/figures/exit-assistant-illinois-lp-rolling.png",
+    plot = (lpreg.plot(assistant_exit.lpreg) +
+        scale_y_continuous(name = "",
+            limits = c(-0.1, 0.2),
+            breaks = seq(-2, 1, by = 0.05))),
+    units = "cm", width = fig.width, height = fig.height)
+
+# LP estimation for exit rate of full profs.
+full_exit.lpreg <-
+    lp_lin_panel(data_set = lp.data %>% filter(associate + full > 0),
+        # Outcome variable
+        endog_data = "notemployed_nextyear",
+        # Predictor variable
+        shock = "stateappropriations_real",
+        # Contemporaneous control, plus FE for unitid + firstyear
+        c_exog_data = c("instid", "firstyear"),
+        # Option to use IV for predictor endogeneity
+        iv_reg = TRUE,
+        instrum = "appropriationshock_perEnroll_rolling",
+        # Add clustered SEs in the panel
+        panel_model = "pooling",
+        robust_cov = "vcovHC",
+        robust_cluster = c("group", "time"),
+        confint = 1.96,
+        hor = time.horizon)
+# Save this plot
+ggsave("../../text/figures/exit-full-illinois-lp-rolling.png",
+    plot = (lpreg.plot(full_exit.lpreg) +
+        scale_y_continuous(name = "",
+            limits = c(-0.1, 0.2),
+            breaks = seq(-2, 1, by = 0.05))),
+    units = "cm", width = fig.width, height = fig.height)
+
+# LP estimation for exit rate of administrator faculty.
+administrator_exit.lpreg <-
+    lp_lin_panel(data_set = lp.data %>% filter(administrator == 1),
+        # Outcome variable
+        endog_data = "notemployed_nextyear",
+        # Predictor variable
+        shock = "stateappropriations_real",
+        # Contemporaneous control, plus FE for unitid + firstyear
+        c_exog_data = c("instid", "firstyear"),
+        # Option to use IV for predictor endogeneity
+        iv_reg = TRUE,
+        instrum = "appropriationshock_perEnroll_rolling",
+        # Add clustered SEs in the panel
+        panel_model = "pooling",
+        robust_cov = "vcovHC",
+        robust_cluster = c("group", "time"),
+        confint = 1.96,
+        hor = time.horizon)
+# Save this plot
+ggsave("../../text/figures/exit-administrator-illinois-lp-rolling.png",
+    plot = (lpreg.plot(administrator_exit.lpreg) +
+        scale_y_continuous(name = "",
+            limits = c(-0.1, 0.2),
+            breaks = seq(-2, 1, by = 0.05))),
+    units = "cm", width = fig.width, height = fig.height)
+
+# LP estimation for exit rate of all faculty.
+all_exit.lpreg <-
+    lp_lin_panel(data_set = lp.data,
+        # Outcome variable
+        endog_data = "notemployed_nextyear",
+        # Predictor variable
+        shock = "stateappropriations_real",
+        # Contemporaneous control, plus FE for unitid + firstyear
+        c_exog_data = c("instid", "firstyear"),
+        # Option to use IV for predictor endogeneity
+        iv_reg = TRUE,
+        instrum = "appropriationshock_perEnroll_rolling",
+        # Add clustered SEs in the panel
+        panel_model = "pooling",
+        robust_cov = "vcovHC",
+        robust_cluster = c("group", "time"),
+        confint = 1.96,
+        hor = time.horizon)
+# Save this plot
+ggsave("../../text/figures/exit-all-illinois-lp-rolling.png",
+    plot = (lpreg.plot(all_exit.lpreg) +
+        scale_y_continuous(name = "",
+            limits = c(-0.1, 0.2),
+            breaks = seq(-2, 1, by = 0.05))),
+    units = "cm", width = fig.width, height = fig.height)
