@@ -21,12 +21,16 @@ R CMD BATCH --no-save ipeds-public-private.R
 R CMD BATCH --no-save ipeds-shock.R
 # Analysis and regressions at the institution-level, IPEDS, with count outcomes.
 R CMD BATCH --no-save ipeds-shock-rawcounts.R
+# Analysis and regressions at the institution-level, IPEDS, local porjections.
+R CMD BATCH --no-save ipeds-shock-longterm.R
 # Analysis and regressions at the individual-level, IBHED, base-year shock IV.
 R CMD BATCH --no-save ibhed-shock.R
-# Analysis and regressions at the individual-level, IBHED, with count outcomes.
+# Analysis and regressions at the using IBHED count outcomes, instituion level.
 R CMD BATCH --no-save ibhed-shock-rawcounts.R
 # Analysis and regressions at the individual-level, IBHED, rolling shock IV.
 R CMD BATCH --no-save ibhed-shock-rolling.R
+# Analysis and regressions at the institutionindividual-level, IBHED, local porjections.
+R CMD BATCH --no-save ibhed-shock-longterm.R
 # Analysis and regressions for rate of faculty hiring.
 R CMD BATCH --no-save hiring-shock.R
 cd ..

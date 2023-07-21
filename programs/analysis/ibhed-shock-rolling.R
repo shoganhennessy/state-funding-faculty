@@ -174,6 +174,7 @@ reg.data <- reg.data %>%
     mutate(unitid = factor(unitid),
         name = factor(name))
 
+
 # Summary Table ----------------------------------------------------------------
 
 # Generate the TeX summary table.

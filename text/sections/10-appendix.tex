@@ -111,6 +111,89 @@ The instrument varies by institution, based in the year of first employment, so 
 We then interpret parameter $\beta$ as the effect of changes in state funding at an Illinois public university, via state funding shocks, on an individual professor's outcome $Y_{j,t}$.
 
 \newpage
+\begin{figure}[H]
+    \centering
+    \singlespacing
+    \caption{Local Projection Estimates for Effect of State Funding on Faculty Promotion Rate at Illinois Public Universities, by Professor Group.}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Lecturers.}
+        \includegraphics[width=\textwidth]{figures/promotion-lecturer-illinois-lp-rolling.png}
+        \label{fig:promotion-lecturer-illinois-lp-rolling}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Assistant Professors.}
+        \includegraphics[width=\textwidth]{figures/promotion-assistant-illinois-lp-rolling.png}
+        \label{fig:promotion-assistant-illinois-lp-rolling}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Full Professors.}
+        \includegraphics[width=\textwidth]{figures/promotion-full-illinois-lp-rolling.png}
+        \label{fig:promotion-full-illinois-lp-rolling}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Administrator Professors.}
+        \includegraphics[width=\textwidth]{figures/promotion-administrator-illinois-lp-rolling.png}
+        \label{fig:promotion-administrator-illinois-lp-rolling}
+    \end{subfigure}
+    \label{fig:promotion-illinois-lp-rolling}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These figures show the local projections estimates of regression specification \eqref{eqn:secondstage}, with the funding shock as an instrument for state funding.
+    The unit of analysis is an individual faculty member (at an Illinois public university); funding data come from IPEDS, and faculty promotion rate from IBHED.
+    The coefficient estimate is effect of state funding ($X_{i(j),t}$) on faculty promotion rate ($Y_{j,t}$), while accounting for auto-correlation between different time periods --- i.e., between $X_{i(j),t}, X_{i(j),t-1}$ and $Y_{i(j),t}, Y_{i(j),t-1}$.
+    These results use a rate$-\log$ specification, so the estimates are for the rate of promotion in a year $t+k$ affected by a 1\% change in state funding in year $t$, where years $k = 0, \hdots, 4$ are on the x-axis. 
+    Standard errors are clustered at the university-year level.
+\end{figure}
+
+\newpage
+\begin{figure}[H]
+    \centering
+    \singlespacing
+    \caption{Local Projection Estimates for Effect of State Funding on Faculty Exit Rate at Illinois Public Universities, by Professor Group.}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Lecturers.}
+        \includegraphics[width=\textwidth]{figures/exit-lecturer-illinois-lp-rolling.png}
+        \label{fig:exit-lecturer-illinois-lp-rolling}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Assistant Professors.}
+        \includegraphics[width=\textwidth]{figures/exit-assistant-illinois-lp-rolling.png}
+        \label{fig:exit-assistant-illinois-lp-rolling}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Full Professors.}
+        \includegraphics[width=\textwidth]{figures/exit-full-illinois-lp-rolling.png}
+        \label{fig:exit-full-illinois-lp-rolling}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Administrator Professors.}
+        \includegraphics[width=\textwidth]{figures/exit-administrator-illinois-lp-rolling.png}
+        \label{fig:exit-administrator-illinois-lp-rolling}
+    \end{subfigure}
+    \label{fig:exit-illinois-lp-rolling}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These figures show the local projections estimates of regression specification \eqref{eqn:secondstage}, with the funding shock as an instrument for state funding.
+    The unit of analysis is an individual faculty member (at an Illinois public university); funding data come from IPEDS, and faculty promotion rate from IBHED.
+    The coefficient estimate is effect of state funding ($X_{i(j),t}$) on faculty promotion rate ($Y_{j,t}$), while accounting for auto-correlation between different time periods --- i.e., between $X_{i(j),t}, X_{i(j),t-1}$ and $Y_{i(j),t}, Y_{i(j),t-1}$.
+    These results use a rate$-\log$ specification, so the estimates are for the rate of promotion in a year $t+k$ affected by a 1\% change in state funding in year $t$, where years $k = 0, \hdots, 4$ are on the x-axis. 
+    Standard errors are clustered at the university-year level.
+\end{figure}
+
+
+
+
+\newpage
 \subsection{Additional Results, Faculty Hiring}
 \label{sec:appendix-hiring}
 
