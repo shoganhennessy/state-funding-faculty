@@ -51,8 +51,8 @@ A number of statistical packages, for the $R$ language \citep{R2022}, made the e
     \footnotesize
     \textbf{Note}:
     This figure shows the correlation between state funding in year $t+k$ with the funding shock in year $t$ for a university, where $k = -7, \hdots, 5$ are the years on the x-axis.
-    This shows that state funding and the funding shock have dynamic correaltion, so that dynamic effects must be estimated by localc projects -- and not simple OLS or 2SLS.
-    The estimates are of \eqref{eqn:firststage}, calculated with IPEDS data, separatly for each year relative to initial shock, using the $\log-\log$ specification, including fixed effects for university $+$ year, and clustering standard errors by university $+$ year.
+    This shows that state funding and the funding shock have dynamic correlation, so that dynamic effects must be estimated by local projections -- and not simple OLS or 2SLS.
+    The estimates are of \eqref{eqn:firststage}, calculated with IPEDS data, separately for each year relative to initial shock, using the $\log-\log$ specification, including fixed effects for university $+$ year, and clustering standard errors by university $+$ year.
 \end{figure}
 
 \begin{figure}[H]
@@ -245,7 +245,7 @@ Yearly variation is not observed here, so that only the aggregate level, for 180
     \textbf{Note}: 
     This table show the second stage 2SLS estimates of regression specification \eqref{eqn:secondstage}, showing the effect of state funding changes on the number of faculty hires (per student) total for 2011--2021 at US public universities, using the funding shock to instrument for state funding.
     Each observation is a university--year at a public university, where funding data come from IPEDS and faculty count total for 2011--2021 from \citep{wapman2022quantifying}.
-    The panels shows the effect of a $1$\% change in state funding per student at the university (total for 2011--2021) on the number of new faculty hires by gender (and all).
+    The panels show the effect of a $1$\% change in state funding per student at the university (total for 2011--2021) on the number of new faculty hires by gender (and all).
     Standard errors are clustered at the university-year level, and university $+$ year fixed effects are included through--out.
 \end{table}
 
@@ -268,9 +268,9 @@ I present results for the rates of substitution between different levels of facu
 In practice, this corresponds to division of the estimates of the elasticity for employment of professors (by rank) with respect to state funding, presented in Panel B \autoref{tab:facultycount-shock-reg}, and bootstrapping the results to generate standard errors and confidence intervals.
 % https://stackoverflow.com/questions/63777368/computing-the-standard-error-when-dividing-coefficients-of-different-regressions
 
-The implied marginal rate of substitution between lecturers and assistant professors is estimated as -3.26 (standard error 0.50), based on based on 10,000 bootstrap samples.
+The implied marginal rate of substitution between lecturers and assistant professors is estimated as -3.26 (standard error 0.50), based on 10,000 bootstrap samples.
 This means that public universities increased their number lecturers per student by 3.26\% when they decreased their count of assistant professors, on average and subject to the changes in state funding they experienced 1990--2017.
-Between lecturers and full professors the rate of subsitution is -3.19 (0.34), which implies that universities subsitute between lecturers and full professors in the same way.
+Between lecturers and full professors the rate of substitution is -3.19 (0.34), which implies that universities substitute between lecturers and full professors in the same way.
 Between assistant and full professors the rate of substitution is 0.99 (0.11), which intuitively implies that universities treated assistant and full professors (i.e., those before and after tenure in the tenure system) as complements.
 
 %"Calculated point est for substitution between lecturers + ast profs" 
