@@ -117,10 +117,11 @@ Similarly, funding shocks to higher education in year are highly correlated with
 Thus, a linear model correlated state funding in year $t$ with outcomes in year $t$ will suffer from time-series confounding.
 
 I employ a local projections approach to model how faculty outcomes in years $t+k$ are affected by state funding in year $t$, for future years $k > 0$ \citep{jorda2005}.
-The local projections method is an empirical model used to estimate dynamic treatment effects when the treatment is not binary, so that time-series confounding (i.e., treatment in time $t$ is correlated with treatment in time $t-1$) is present, even for instrumental variable models \citep{miller2022}.
+The local projections method is an empirical model used to estimate dynamic treatment effects when the treatment is not binary, so that time-series confounding (i.e., treatment in time $t$ is correlated with treatment in time $t-1$) is present, even for instrumental variable models \citep{montiel2021local}.
 This method estimates the effect of treatment $X_{i,t}$ on outcome $Y_{i, t+ k}$ in follow-on years $k > 0$, while accounting for the auto-correlation between the other years.\footnote{
     The funding shock has a persistent effect on state funding, multiple years after the initial funding shock, so that the instrument is similarly strong for the local projections method (see \autoref{fig:firststage-lp}).
 }
+Additionally, the approach accomodates use of an instrument for the regressor \citep{olea2021inference}, so that I use the shift-share instument as part of the local projections estimation.
 I present estimates in graphical form, where the x-axis represents the year relative to the funding shock (i.e., $x = 0$ represents the year of the state funding shock) and the y-axis represents the estimated effect of the funding shock on that year's outcome.\footnote{
     See \autoref{fig:count-lp} for the graphical format, and the corresponding note for further explanation.
 }
