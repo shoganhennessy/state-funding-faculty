@@ -26,7 +26,7 @@
     This figure shows the mean funding for US public universities as a total (in figure a.) and divided by student enrolment (figure b.).
     The numbers are adjusted to 2021 figures by CPI-U.
     Non-institutional revenues refers to the sum of federal, state, and local funding plus tuition revenues; these sum to the majority of university funding, but exclude numbers such as university income from capital projects.
-    These figures are calculated in IPEDS data.
+    These figures are calculated with IPEDS data.
 \end{figure}
 
 \begin{figure}[H]
@@ -51,7 +51,7 @@
     \textbf{Note}:
     This figure shows the total and mean enrolment for US universities, comparing public and private universities.
     Most of the higher education enrolment increase for the last 30 years was in public universities, who continue to enrol the vast majority of higher education students in the US.
-    These figures are calculated in IPEDS data.
+    These figures are calculated with IPEDS data.
 \end{figure}
 
 \newpage
@@ -89,8 +89,8 @@
     \footnotesize
     \textbf{Note}:
     This figure shows the average number of students per faculty member, by different faculty position, at US public universities.
-    E.g., panel A calculates the mean of (lecturer count) / (student enrolment) at US public universities, for each year of 1990--2017, to show the average trend in faculty composition.
-    These figures are calculated in IPEDS data.
+    E.g., panel A calculates the mean of (lecturer count) / (student enrolment) at US public universities, for each year of 1990--2017, to show the average trend in faculty composition compared to student enrolment.
+    These figures are calculated with IPEDS data.
 \end{figure}
 
 \newpage
@@ -118,7 +118,7 @@
     This figure shows the mean funding for Illinois public universities as a total (in figure a.) and divided by student enrolment (figure b.).
     The numbers are adjusted to 2021 figures by CPI-U.
     Non-institutional revenues refers to the sum of federal, state, and local funding plus tuition revenues; these sum to the majority of university funding, but exclude numbers such as university income from capital projects.
-    These figures are calculated in IPEDS data.
+    These figures are calculated with IPEDS data.
 \end{figure}
 
 \newpage
@@ -156,7 +156,7 @@
     \textbf{Note}:
     These figures show the local projections estimates of regression specification \eqref{eqn:secondstage}, with the funding shock as an instrument for state funding
     The unit of analysis is the university, and uses IPEDS data.
-    The coefficient estimate is effect of state funding ($X_{i,t}$) on faculty count per student ($Y_{i,t}$), while accounting for auto-correlation between different time periods --- i.e., between $X_{i,t}, X_{i,t-1}$ and $Y_{i,t}, Y_{i,t-1}$.
+    The coefficient estimate is effect of state funding ($X_{i,t}$) on faculty count per student ($Y_{i,t}$), using the funding shock instrument ($Z_{i,t}$), while accounting for auto-correlation between different time periods --- i.e., between $X_{i,t}, X_{i,t-1}$ and $Y_{i,t}, Y_{i,t-1}$.
     These results use a $\log-\log$ specification, so the estimates are for the elasticity of professor count per student in a year $t+k$ with respect to state funding in year $t$, where years $k = 0, \hdots, 10$ are on the x-axis. 
     Standard errors are clustered at the state-year level.
 \end{figure}
@@ -196,9 +196,9 @@
     \textbf{Note}:
     These figures show the local projections estimates of regression specification \eqref{eqn:secondstage}, with the funding shock as an instrument for state funding.
     The unit of analysis is an individual faculty member (at an Illinois public university); funding data come from IPEDS, and faculty salaries from IBHED.
-    The coefficient estimate is effect of state funding ($X_{i(j),t}$) on faculty salaries ($Y_{j,t}$), while accounting for auto-correlation between different time periods --- i.e., between $X_{i(j),t}, X_{i(j),t-1}$ and $Y_{i(j),t}, Y_{i(j),t-1}$.
+    The coefficient estimate is effect of state funding ($X_{i(j),t}$) on faculty salaries ($Y_{j,t}$), using the funding shock instrument ($Z_{i(j),t}$), while accounting for auto-correlation between different time periods --- i.e., between $X_{i(j),t}, X_{i(j),t-1}$ and $Y_{i(j),t}, Y_{i(j),t-1}$.
     These results use a $\log-\log$ specification, so the estimates are for the elasticity of faculty salaries student in a year $t+k$ with respect to state funding in year $t$, where years $k = 0, \hdots, 4$ are on the x-axis. 
-    Standard errors are clustered at the university-year level.
+    Standard errors are clustered at the university-year level, and \autoref{sec:iv-model-indiv} fully describes the differences in empirical specification when unit of analysis is an individual faculty member.
 \end{figure}
 
 
@@ -283,14 +283,14 @@
     \footnotesize
     \textbf{Note}:
     These tables show the OLS estimates of regression specification \eqref{eqn:firststage}, showing the effect of the funding shock on other outcomes to gauge balance of the instrument with respect to university characteristics
-    ENrolment is measured in thousands of students.
+    Enrolment is measured in thousands of students.
     Each observation is a public univeristy-year, in the IPEDS data.
     Panel A shows the effect of an funding shock of \$-1,000 per student in the state on the counts of the outcome --- i.e.,
     \$-1,000 funding shock per student in the state is associated with 517 more students (as enrolment is measured in thousands) in column 1.
     Panel B shows the effect of a $-10$\% change funding shock per student in the state on $10$\% change in the outcomes --- i.e.,
     $-10$\% funding shock per student in the state is associated with an increase in 1.07\% more students at the unviersity according to prefferred column 1.        
     Standard errors are clustered at the state-year level, and univeristy $+$ year fixed effects are included where noted.
-    \label{tab:facultycount-shock-reg}
+    \label{tab:firststage-balance}
 \end{table}
 
 \newpage

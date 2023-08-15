@@ -51,7 +51,7 @@ A number of statistical packages, for the $R$ language \citep{R2022}, made the e
     \footnotesize
     \textbf{Note}:
     This figure shows the correlation between state funding in year $t+k$ with the funding shock in year $t$ for a university, where $k = -7, \hdots, 5$ are the years on the x-axis.
-    This shows that state funding and the funding shock have dynamic correlation, so that dynamic effects must be estimated by local projections -- and not simple OLS or 2SLS.
+    This shows that state funding and the funding shock have dynamic correlation, so that dynamic effects must be estimated by local projections --- and not simple OLS or 2SLS.
     The estimates are of \eqref{eqn:firststage}, calculated with IPEDS data, separately for each year relative to initial shock, using the $\log-\log$ specification, including fixed effects for university $+$ year, and clustering standard errors by university $+$ year.
 \end{figure}
 
@@ -77,14 +77,14 @@ A number of statistical packages, for the $R$ language \citep{R2022}, made the e
 This paper uses data on individual professors in the Illinois university system, to investigate the effects of changes in university revenues on the individual professors at the universities.
 The outcomes here now refer to individual professors (e.g., their salary and promotion rate), so requires adjustment to the empirical approach, leveraging variation in university funding for the years after a professor joins the university.
 
-\autoref{eqn:rolling-instrument} defines a rolling-share variant of the instrument, $\tilde Z_{j,t}$, where the university's state funding share exposure is based in the year a professor joins the university --- and not the base period 1990--1993.
+\autoref{eqn:rolling-instrument} defines a rolling-share variant of the instrument, $\tilde Z_{i(j),t}$, where the university's state funding share exposure is based in the year a professor joins the university --- and not the base period 1990--1993.
 $j$ indexes each professor in year $t$, $\tau(j)$ for the year the professor first joins their institution.
 Identifying $\tau(j)$ is possible for $j$ by restricting to all professors hired 2011-2021 --- i.e., in the years after the start of the full panel.
 It is not possible to discern the hiring year for professors who  were hired in the years preceding 2011, and so the entire sample is only possible to analyse using the base-share in years 1990-1993 formulation.
 
 \begin{align}
     \label{eqn:rolling-instrument}
-    \tilde Z_{j,t} &\coloneqq - \left[
+    \tilde Z_{i(j),t} &\coloneqq - \left[
     \left( \frac{\text{Total State Funding}_{s(j),t}}{\text{Student Population}_{s(j),t}} \right)
     \left( \frac{\text{State Funding}_{\tau(j)}}{\text{Total Revenues}_{i,\tau(j)}} \right) \right]
 \end{align}
@@ -93,7 +93,7 @@ This approach leverages an insight, made available by level of the data: that an
 \autoref{sec:iv-model-uni} considers the number of professors employed by the university; whether a professor becomes employed at the university is likely affected by that university's finances.
 The formulation here takes as given that the professor is already employed at the university, and then projects the effect of changes in state funding on these \textit{incumbent} professors following the state funding shock.
 
-Exogeneity and relevance of the rolling-share instrument, $\tilde Z_{j,t}$, follows the same reasoning as that for the base-share instrument, $Z_{i,t}$, discussed in \autoref{sec:approp-shocks}.
+Exogeneity and relevance of the rolling-share instrument, $\tilde Z_{i(j),t}$, follows the same reasoning as that for the base-share instrument, $Z_{i,t}$, discussed in \autoref{sec:approp-shocks}.
 The base-share instrument is appropriate for some outcomes with the individual Illinois professors, where appropriate.
 We satisfy the assumptions for exogeneity by noting that none of the Illinois public campuses take the majority of state funding, and that the identification strategy relies on exogeneity in changes in state funding to individual professor-outcomes, following the year they joined the university.
 Additionally, within-institution changes resulting from share reliance on state funding may be correlated with unobserved changes in the outcomes, so that \cite{NBERw27885} note the importance of controlling for the base share and state student population.
@@ -139,9 +139,9 @@ We then interpret parameter $\beta$ as the effect of changes in state funding at
     \textbf{Note}:
     These figures show the local projections estimates of regression specification \eqref{eqn:secondstage}, with the funding shock as an instrument for state funding.
     The unit of analysis is an individual faculty member (at an Illinois public university); funding data come from IPEDS, and faculty promotion rate from IBHED.
-    The coefficient estimate is effect of state funding ($X_{i(j),t}$) on faculty promotion rate ($Y_{j,t}$), while accounting for auto-correlation between different time periods --- i.e., between $X_{i(j),t}, X_{i(j),t-1}$ and $Y_{i(j),t}, Y_{i(j),t-1}$.
-    These results use a rate$-\log$ specification, so the estimates are for the rate of promotion in a year $t+k$ affected by a 1\% change in state funding in year $t$, where years $k = 0, \hdots, 4$ are on the x-axis. 
-    Standard errors are clustered at the university-year level.
+    The coefficient estimate is effect of state funding ($X_{i(j),t}$) on faculty promotion rate ($Y_{j,t}$), using the funding shock instrument ($Z_{i(j),t}$), while accounting for auto-correlation between different time periods --- i.e., between $X_{i(j),t}, X_{i(j),t-1}$ and $Y_{i(j),t}, Y_{i(j),t-1}$.
+    These results use a $\log-\log$ specification, so the estimates are for the rate of promotion in a year $t+k$ affected by a 1\% change in state funding in year $t$, where years $k = 0, \hdots, 4$ are on the x-axis. 
+    Standard errors are clustered at the university-year level, and \autoref{sec:iv-model-indiv} fully describes the differences in empirical specification when unit of analysis is an individual faculty member.
 \end{figure}
 
 \newpage
@@ -179,9 +179,9 @@ We then interpret parameter $\beta$ as the effect of changes in state funding at
     \textbf{Note}:
     These figures show the local projections estimates of regression specification \eqref{eqn:secondstage}, with the funding shock as an instrument for state funding.
     The unit of analysis is an individual faculty member (at an Illinois public university); funding data come from IPEDS, and faculty promotion rate from IBHED.
-    The coefficient estimate is effect of state funding ($X_{i(j),t}$) on faculty promotion rate ($Y_{j,t}$), while accounting for auto-correlation between different time periods --- i.e., between $X_{i(j),t}, X_{i(j),t-1}$ and $Y_{i(j),t}, Y_{i(j),t-1}$.
+    The coefficient estimate is effect of state funding ($X_{i(j),t}$) on faculty promotion rate ($Y_{j,t}$), using the funding shock instrument ($Z_{i(j),t}$), while accounting for auto-correlation between different time periods --- i.e., between $X_{i(j),t}, X_{i(j),t-1}$ and $Y_{i(j),t}, Y_{i(j),t-1}$.
     These results use a rate$-\log$ specification, so the estimates are for the rate of promotion in a year $t+k$ affected by a 1\% change in state funding in year $t$, where years $k = 0, \hdots, 4$ are on the x-axis. 
-    Standard errors are clustered at the university-year level.
+    Standard errors are clustered at the university-year level, and \autoref{sec:iv-model-indiv} fully describes the differences in empirical specification when unit of analysis is an individual faculty member.
 \end{figure}
 
 
@@ -204,7 +204,7 @@ There were no observable differences in the hiring rate of male vs female facult
     \footnotesize
     \textbf{Note}:
     This figure shows the correlation between state funding and the number of total number of faculty hired at public universities between 2011--2021, and the line is a line of best-fit.
-    Data for the number of faculty hired at public universities are provided by \cite{wapman2022quantifying}, and funding data from IPEDS.
+    Data for the number of faculty hired at public universities are provided by \cite{wapman2022quantifying,wapman2022zenodo}, and funding data from IPEDS.
 \end{figure}
 
 \newpage
@@ -244,7 +244,7 @@ Yearly variation is not observed here, so that only the aggregate level, for 180
     \footnotesize
     \textbf{Note}: 
     This table show the second stage 2SLS estimates of regression specification \eqref{eqn:secondstage}, showing the effect of state funding changes on the number of faculty hires (per student) total for 2011--2021 at US public universities, using the funding shock to instrument for state funding.
-    Each observation is a university--year at a public university, where funding data come from IPEDS and faculty count total for 2011--2021 from \citep{wapman2022quantifying}.
+    Each observation is a university--year at a public university, where funding data come from IPEDS and faculty count total for 2011--2021 from \citep{wapman2022quantifying,wapman2022zenodo}.
     The panels show the effect of a $1$\% change in state funding per student at the university (total for 2011--2021) on the number of new faculty hires by gender (and all).
     Standard errors are clustered at the university-year level, and university $+$ year fixed effects are included through--out.
 \end{table}
