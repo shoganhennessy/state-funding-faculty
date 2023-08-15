@@ -7,13 +7,12 @@ This paper identifies the effects of changes in state funding on faculty.
 However, a university's state funding is not exogenous to state decisions for support of higher education, or exogenous to internal institutional decisions.
 Instead, the state government and university administration undertake a complex process of allotting resources across multiple different priorities, including instruction, research, or between departments.
 For example, it may be the case that a state government restricts funding for only its lowest performing universities in response to a budget shock, introducing a treatment selection-on-outcome threat to identification. 
-Importantly for this analysis, revenues received from an institution's state government provide opportunity to address such endogeneity.
-
+Importantly, funding from a university's state government provides opportunity to address such endogeneity.
 
 \subsection{State Funding Shocks}
 \label{sec:approp-shocks}
 
-This analysis uses a shift-share instrument to address endogeneity concerns for the amount of funding a state allots to each of its public universities.
+I use a shift-share instrument to address endogeneity concerns for the amount of funding a state allots to each of its public universities.
 \cite{NBERw23736,NBERw27885} develop the instrument for public university finances by exploiting a shift-share instrument for changes in state-level funding interacted with university reliance on state funding in a base period.
 \begin{align}
     \label{eqn:public-instrument}
@@ -28,7 +27,9 @@ $Z_{i,t}$ is the instrument for state funding for institution $i$ in year $t$, i
     \cite{NBERw23736} use the single year 1990 as the base year, though I use the four years to ameliorate missing values in the single year of 1990.
     Results are similar in either specification.
 }
-$Z_{i,t}$ is constructed as negative to reflect the fact that the long term trend in, and most of the short-run shocks to, state funding for higher education has been negative.
+$Z_{i,t}$ is constructed as negative to reflect the fact that the long term trend in, and most of the short-run shocks to, state funding for higher education have been negative.\footnote{
+    When used in log terms, the instrument is the negative of the logged shock --- i.e., $- \log \left( -Z_{i,t} \right)$ as opposed to log of the negative shock $\log Z_{i,t}$ directly.
+}
 State funding has been falling, so that the instrument describes shocks to university revenues, mostly in a negative direction.\footnote{
     \label{foot:control}
     \cite{NBERw27885} note the tendency for public universities to respond to state funding cuts by increasing reliance on tuition, where \cite{NBERw23736} specifically instruments for tuition revenues with collected information on legislative tuition price controls.
@@ -60,10 +61,10 @@ In this case, we satisfy the second: universities' institutional-level decisions
 Lastly, the shift-share approach assumes that state funding shocks affect faculty outcomes only via affecting university finances.
 
 The shift-share instrument has a strong first stage for universities' yearly state funding.
-\autoref{tab:firststage-reg} presents results of the first-stage regression, separately with and without a control for tuition revenue per student, plus institution and year fixed effects;
-Panel A shows estimates of a funding shock of \$1 per student in the state on state funding per student at the university, and Panel B the \% increase effects of a 1\% increase in the shock per student on state funding per student.
-Columns (1) shows that a funding shock of \$10 (per student in the entire state) is associated with \$11.76 less state funding per student at the univeristy, with the corresponding -10\% funding shock leads to -9.77\%
-less funding (coumn 1, panel B), with similar estimates with and without including fixed effects.
+\autoref{tab:firststage-reg} presents results of the first-stage regression, separately with and without a control for tuition revenue per student, plus institution and year fixed effects.
+\autoref{tab:firststage-reg} Panel A shows estimates of a funding shock of \$1 per student in the state on state funding per student at the university, and Panel B the \% increase effects of a 1\% increase in the shock per student on state funding per student.
+Column (1) shows that a funding shock of \$10 (per student in the entire state) is associated with \$11.76 less state funding per student at the university, with the corresponding -10\% funding shock leads to -9.77\%
+less funding (column 1, panel B), with similar estimates with and without including fixed effects.
 Column (2) shows estimates of the first-stage without including fixed effects, and gives less precise estimates for the funding shock, likely thanks to systematic differences in universities unaccounted for without fixed effects.
 Columns (3) and (4) include the tuition revenue control (explained in \autoref{foot:control}) to exhibit estimates with the inclusion of this possible collider (or bad control).
 Column (3) shows similar estimates to column (1) in both Panels A and B thanks to inclusion of fixed effects, so that the uncertainty in including tuition revenue as a possible bad control for the level of state funding does not matter thanks to the inclusion of fixed effects.
@@ -116,10 +117,11 @@ Similarly, funding shocks to higher education in year are highly correlated with
 Thus, a linear model correlated state funding in year $t$ with outcomes in year $t$ will suffer from time-series confounding.
 
 I employ a local projections approach to model how faculty outcomes in years $t+k$ are affected by state funding in year $t$, for future years $k > 0$ \citep{jorda2005}.
-The local projections method is an empirical model used to estimate dynamic treatment effects when the treatment is not binary, so that time-series confounding (i.e., treatment in time $t$ is correlated with treatment in time $t-1$) is present, even for instrumental variable models \citep{miller2022}.
+The local projections method is an empirical model used to estimate dynamic treatment effects when the treatment is not binary, so that time-series confounding (i.e., treatment in time $t$ is correlated with treatment in time $t-1$) is present, even for instrumental variable models \citep{montiel2021local}.
 This method estimates the effect of treatment $X_{i,t}$ on outcome $Y_{i, t+ k}$ in follow-on years $k > 0$, while accounting for the auto-correlation between the other years.\footnote{
     The funding shock has a persistent effect on state funding, multiple years after the initial funding shock, so that the instrument is similarly strong for the local projections method (see \autoref{fig:firststage-lp}).
 }
+Additionally, the approach accomodates use of an instrument for the regressor \citep{olea2021inference}, so that I use the shift-share instument as part of the local projections estimation.
 I present estimates in graphical form, where the x-axis represents the year relative to the funding shock (i.e., $x = 0$ represents the year of the state funding shock) and the y-axis represents the estimated effect of the funding shock on that year's outcome.\footnote{
     See \autoref{fig:count-lp} for the graphical format, and the corresponding note for further explanation.
 }
