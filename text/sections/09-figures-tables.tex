@@ -157,7 +157,7 @@
     These figures show the local projections estimates of regression specification \eqref{eqn:secondstage}, with the funding shock as an instrument for state funding
     The unit of analysis is the university, and uses IPEDS data.
     The coefficient estimate is effect of state funding ($X_{i,t}$) on faculty count per student ($Y_{i,t}$), using the funding shock instrument ($Z_{i,t}$), while accounting for auto-correlation between different time periods --- i.e., between $X_{i,t}, X_{i,t-1}$ and $Y_{i,t}, Y_{i,t-1}$.
-    These results use a $\log-\log$ specification, so the estimates are for the elasticity of professor count per student in a year $t+k$ with respect to state funding in year $t$, where years $k = 0, \hdots, 10$ are on the x-axis. 
+    These results use a $\log-\log$ specification, so the estimates are for the elasticity of professor count per student in a year $t+k$ with respect to state funding in year $t$, where years $k = 0, \hdots, 10$ are on the $x$-axis. 
     Standard errors are clustered at the state-year level.
 \end{figure}
 
@@ -197,7 +197,7 @@
     These figures show the local projections estimates of regression specification \eqref{eqn:secondstage}, with the funding shock as an instrument for state funding.
     The unit of analysis is an individual faculty member (at an Illinois public university); funding data come from IPEDS, and faculty salaries from IBHED.
     The coefficient estimate is effect of state funding ($X_{i(j),t}$) on faculty salaries ($Y_{j,t}$), using the funding shock instrument ($Z_{i(j),t}$), while accounting for auto-correlation between different time periods --- i.e., between $X_{i(j),t}, X_{i(j),t-1}$ and $Y_{i(j),t}, Y_{i(j),t-1}$.
-    These results use a $\log-\log$ specification, so the estimates are for the elasticity of faculty salaries student in a year $t+k$ with respect to state funding in year $t$, where years $k = 0, \hdots, 4$ are on the x-axis. 
+    These results use a $\log-\log$ specification, so the estimates are for the elasticity of faculty salaries student in a year $t+k$ with respect to state funding in year $t$, where years $k = 0, \hdots, 4$ are on the $x$-axis. 
     Standard errors are clustered at the university-year level, and \autoref{sec:iv-model-indiv} fully describes the differences in empirical specification when unit of analysis is an individual faculty member.
 \end{figure}
 
@@ -285,8 +285,8 @@
     These tables show the OLS estimates of regression specification \eqref{eqn:firststage}, showing the effect of the funding shock on other outcomes to gauge balance of the instrument with respect to university characteristics
     Enrolment is measured in thousands of students.
     Each observation is a public univeristy-year, in the IPEDS data.
-    Panel A shows the effect of an funding shock of \$-1,000 per student in the state on the counts of the outcome --- i.e.,
-    \$-1,000 funding shock per student in the state is associated with 517 more students (as enrolment is measured in thousands) in column 1.
+    Panel A shows the effect of an funding shock of \$$-1,000$ per student in the state on the counts of the outcome --- i.e.,
+    \$$-1,000$ funding shock per student in the state is associated with 517 more students (as enrolment is measured in thousands) in column 1.
     Panel B shows the effect of a $-10$\% change funding shock per student in the state on $10$\% change in the outcomes --- i.e.,
     $-10$\% funding shock per student in the state is associated with an increase in 1.07\% more students at the unviersity according to prefferred column 1.        
     Standard errors are clustered at the state-year level, and univeristy $+$ year fixed effects are included where noted.
@@ -313,8 +313,8 @@
     \textbf{Note}:
     These tables show the second stage OLS and 2SLS estimates of regression specification \eqref{eqn:secondstage}, showing the effect of state funding changes on faculty outcomes, using the funding shock to instrument for state funding in the columns labelled 2SLS.
     Each observation is a public university-year, in the IPEDS data.
-    Panel A shows the effect of a fall in state funding \$-1,000 per student in the state on the number of professors --- i.e.,
-    an extra \$1,000 per student leads to 6 fewer lecturers according to column 2.
+    Panel A shows the effect of a fall in state funding \$$-1,000$ per student in the state on the number of professors --- i.e.,
+    an extra \$$1,000$ per student leads to 6 fewer lecturers according to column 2.
     Panel B shows the effect of a $10$\% change in state funding per student at the university on the 10\% change in the number of professors per students --- i.e.,
     an extra 10\% of state funding per student leads to 4.37\% fewer lecturers per student according to column 2.
     Outcome-mean is the mean of the outcome, for Panel A the number of professors per student, for Panel B the number of faculty per student.
@@ -343,7 +343,7 @@
     \textbf{Note}:
     These tables show the second stage OLS and 2SLS estimates of regression specification \eqref{eqn:secondstage}, showing the effect of state funding changes on number of faculty per student in Illinois universities, using the funding shock to instrument for state funding in the columns labelled 2SLS.
     Each observation is a public university-year in the state of Illinois, where funding data come from IPEDS and faculty count come from IBHED data.
-    Panel A shows the effect of a fall in state funding \$-1,000 per student in the state on the number of professors.
+    Panel A shows the effect of a fall in state funding \$$-1,000$ per student in the state on the number of professors.
     Panel B shows the effect of a $10$\% change in state funding per student at the university on the 10\% change in the number of professors per students.
     Outcome-mean is the mean of the outcome, for Panel A the number of professors per student, for Panel B the number of faculty per student.
     Panel B uses $\log$ faculty count per student as the outcome, though the outcome mean is count of faculty per student (not in $\log$ terms).
@@ -354,8 +354,8 @@
 \begin{table}[H]
     \singlespacing
     \centering
-    \caption{
-        Effects of Changes in State Funding on Faculty Salaries and Exit Rate, in Illinois 2010--2021, 2SLS Estimates.}
+    \caption{Effects of Changes in State Funding on Faculty Salaries and Exit Rate, in Illinois 2010--2021, 2SLS Estimates.}
+    \label{tab:faculty-shock-illinois-rolling}
     \makebox[\textwidth][c]{\input{tables/facultysalaries-shock-illinois-rolling.tex}}
     
     \makebox[\textwidth][c]{\input{tables/facultyleaving-shock-illinois-rolling.tex}}
@@ -368,7 +368,6 @@
     These tables show the second stage 2SLS estimates of regression specification \eqref{eqn:secondstage}, showing the effect of state funding changes on faculty outcomes at Illinois universities, using the funding shock to instrument for state funding.
     The shift-share instrument is based in the year the professor was hired, following definition in \autoref{sec:iv-model-indiv}.
     Each observation is a faculty member--year at an Illinois public university, where funding data come from IPEDS and faculty outcomes from IBHED data.
-    The panels shows the effect of a $1$\% change in state funding per student at the university on faculties' salaries (base salary $+$ benefits), promotion rate (e.g., assistant professor to associate professor) , and rate of leaving their university (i.e., by quitting, retiring, or moving to another university).
+    The panels shows the effect of a $1$\% change in state funding per student at the university on faculties' salaries (base salary $+$ benefits), promotion rate (e.g., assistant professor to associate professor), and rate of leaving their university (i.e., by quitting, retiring, or moving to another university).
     Standard errors are clustered at the university-year of hire level, and university $+$ year of hire fixed effects are included through--out.
-    \label{tab:faculty-shock-illinois-rolling}
 \end{table}

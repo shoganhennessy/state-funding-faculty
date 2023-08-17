@@ -18,7 +18,7 @@ Any comments or suggestions may be sent to me at \href{mailto:seh325@cornell.edu
 
 A number of statistical packages, for the $R$ language \citep{R2022}, made the empirical analysis for this paper possible.
 \begin{itemize}
-    \item \textit{Tidyverse} \citep{tidyverse} collected tools for data analysis in the R language.
+    \item \textit{Tidyverse} \citep{tidyverse} collected tools for data analysis in the $R$ language.
     \item \textit{LFE} \citep{lfe} implemented linear fixed effect models, with instruments, crucial for the empirical estimation in \autoref{sec:empirics}.
     \item \textit{Stargazer} \citep{stargazer} provided methods to efficiently convert empirical results into presentable output in \LaTeX.
     \item \textit{Lpirfs} \citep{lpirfs2019} implemented estimation of the \cite{jorda2005} local projections methods, with instrumental variables, crucial to the local projections estimates presented in this project.
@@ -50,7 +50,7 @@ A number of statistical packages, for the $R$ language \citep{R2022}, made the e
     \justify
     \footnotesize
     \textbf{Note}:
-    This figure shows the correlation between state funding in year $t+k$ with the funding shock in year $t$ for a university, where $k = -7, \hdots, 5$ are the years on the x-axis.
+    This figure shows the correlation between state funding in year $t+k$ with the funding shock in year $t$ for a university, where $k = -7, \hdots, 5$ are the years on the $x$-axis.
     This shows that state funding and the funding shock have dynamic correlation, so that dynamic effects must be estimated by local projections --- and not simple OLS or 2SLS.
     The estimates are of \eqref{eqn:firststage}, calculated with IPEDS data, separately for each year relative to initial shock, using the $\log-\log$ specification, including fixed effects for university $+$ year, and clustering standard errors by university $+$ year.
 \end{figure}
@@ -66,7 +66,7 @@ A number of statistical packages, for the $R$ language \citep{R2022}, made the e
     \textbf{Note}:
     These figures show the local projections estimates of regression specification \eqref{eqn:firststage}, with the funding shock as an instrument for state funding, using IPEDS data.
     The coefficient estimate is effect of funding shock ($Z_{i,t}$) on state funding ($X_{i,t}$), while accounting for auto-correlation between different time periods --- i.e., between $Z_{i,t}, Z_{i,t-1}$ and $X_{i,t}, X_{i,t-1}$.
-    These results use a $\log-\log$ specification, so the estimates are for the elasticity of state funding per student in a year $t+k$ with respect to funding shock in year $t$, where years $k = 0, \hdots, 10$ are on the x-axis. 
+    These results use a $\log-\log$ specification, so the estimates are for the elasticity of state funding per student in a year $t+k$ with respect to funding shock in year $t$, where years $k = 0, \hdots, 10$ are on the $x$-axis. 
     Standard errors are clustered at the state-year level.
 \end{figure}
 
@@ -140,7 +140,7 @@ We then interpret parameter $\beta$ as the effect of changes in state funding at
     These figures show the local projections estimates of regression specification \eqref{eqn:secondstage}, with the funding shock as an instrument for state funding.
     The unit of analysis is an individual faculty member (at an Illinois public university); funding data come from IPEDS, and faculty promotion rate from IBHED.
     The coefficient estimate is effect of state funding ($X_{i(j),t}$) on faculty promotion rate ($Y_{j,t}$), using the funding shock instrument ($Z_{i(j),t}$), while accounting for auto-correlation between different time periods --- i.e., between $X_{i(j),t}, X_{i(j),t-1}$ and $Y_{i(j),t}, Y_{i(j),t-1}$.
-    These results use a $\log-\log$ specification, so the estimates are for the rate of promotion in a year $t+k$ affected by a 1\% change in state funding in year $t$, where years $k = 0, \hdots, 4$ are on the x-axis. 
+    These results use a $\log-\log$ specification, so the estimates are for the rate of promotion in a year $t+k$ affected by a 1\% change in state funding in year $t$, where years $k = 0, \hdots, 4$ are on the $x$-axis. 
     Standard errors are clustered at the university-year level, and \autoref{sec:iv-model-indiv} fully describes the differences in empirical specification when unit of analysis is an individual faculty member.
 \end{figure}
 
@@ -180,7 +180,7 @@ We then interpret parameter $\beta$ as the effect of changes in state funding at
     These figures show the local projections estimates of regression specification \eqref{eqn:secondstage}, with the funding shock as an instrument for state funding.
     The unit of analysis is an individual faculty member (at an Illinois public university); funding data come from IPEDS, and faculty promotion rate from IBHED.
     The coefficient estimate is effect of state funding ($X_{i(j),t}$) on faculty promotion rate ($Y_{j,t}$), using the funding shock instrument ($Z_{i(j),t}$), while accounting for auto-correlation between different time periods --- i.e., between $X_{i(j),t}, X_{i(j),t-1}$ and $Y_{i(j),t}, Y_{i(j),t-1}$.
-    These results use a rate$-\log$ specification, so the estimates are for the rate of promotion in a year $t+k$ affected by a 1\% change in state funding in year $t$, where years $k = 0, \hdots, 4$ are on the x-axis. 
+    These results use a rate$-\log$ specification, so the estimates are for the rate of promotion in a year $t+k$ affected by a 1\% change in state funding in year $t$, where years $k = 0, \hdots, 4$ are on the $x$-axis. 
     Standard errors are clustered at the university-year level, and \autoref{sec:iv-model-indiv} fully describes the differences in empirical specification when unit of analysis is an individual faculty member.
 \end{figure}
 
@@ -226,10 +226,10 @@ There were no observable differences in the hiring rate of male vs female facult
     \textbf{Note}:
     These tables show the second stage OLS and 2SLS estimates of regression specification \eqref{eqn:secondstage}, showing the effect of state funding changes on number of faculty hires at Illinois universities, using the funding shock to instrument for state funding in the columns labelled 2SLS.
     Each observation is a public university-year in the state of Illinois, where funding data come from IPEDS and faculty count come from IBHED data.
-    Panel A shows the effect of a fall in state funding \$-1,000 per student in the state on the number of new faculty hires by position.
+    Panel A shows the effect of a fall in state funding \$$-1,000$ per student in the state on the number of new faculty hires by position.
     Panel B shows the effect of a $10$\% change in state funding per student at the university on the 10\% change in the number of faculty hires per students.
     Outcome-mean is the mean of the outcome, for Panel A the number of faculty hires, for Panel B the number of faculty hires per student.
-    Panel B uses $\log$ new faculty hires per student as the outcome, though the outcome mean is count of new faculty hires  per student (not in $\log$ terms).
+    Panel B uses new faculty hires per student as the outcome (in $\log$ terms), though the outcome mean is count of new faculty hires per student (not in $\log$ terms).
     Standard errors are clustered at the university-year level, and university $+$ year fixed effects are included through--out.
 \end{table}
 

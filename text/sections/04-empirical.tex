@@ -113,7 +113,7 @@ As such, I include regression specifications where the explanatory and outcome v
 The effects of a change in the universities funding may not be immediate, and faculty may be affected multiple years after a funding shock.
 Yet, the funding shock instrument is significantly auto-correlated year-on-year; a large state-level funding shock in year $t$ is also likely to experience a large funding shock in year $t-1$.
 Similarly, funding shocks to higher education in a year are highly correlated with state funding per student in the 5 years before and after the initial shock in IPEDS data (see \autoref{fig:lag-firststage}).
-Thus, a linear model correlated state funding in year $t$ with outcomes in year $t$ will suffer from time-series confounding.
+Thus, a linear model correlated state funding in year $t$ with outcomes in year $t+k$ will suffer from time-series confounding.
 
 I employ a local projections approach to model how faculty outcomes in years $t+k$ are affected by state funding in year $t$, for future years $k > 0$ \citep{jorda2005}.
 The local projections method is an empirical model used to estimate dynamic treatment effects when the treatment is not binary, so that time-series confounding (i.e., treatment in time $t$ is correlated with treatment in time $t-1$) is present \citep{montiel2021local}.
@@ -121,6 +121,6 @@ This method estimates the effect of treatment $X_{i,t}$ on outcome $Y_{i, t+ k}$
     The funding shock has a persistent effect on state funding, multiple years after the initial funding shock, so that the instrument is similarly strong for the local projections method (see \autoref{fig:firststage-lp}).
 }
 Additionally, the approach accomodates use of an instrument for state funding \citep{olea2021inference}, so that I use the shift-share instument in local projections estimates as in the rest of the empirical analysis.
-I present estimates in graphical form, where the x-axis represents the year relative to the funding shock (i.e., $x = 0$ represents the year of the state funding shock) and the y-axis represents the estimated effect of the funding shock on that year's outcome.\footnote{
+I present estimates in graphical form, where the $x$-axis represents the year relative to the funding shock (i.e., $x = 0$ represents the year of the state funding shock) and the $y$-axis represents the estimated effect of the funding shock on that year's outcome.\footnote{
     See \autoref{fig:count-lp} for the graphical format, and the corresponding note for further explanation.
 }
