@@ -92,6 +92,33 @@ It is not possible to discern the hiring year for professors who  were hired in 
 This approach leverages an insight, made available by level of the data: that an individual professor is affected by changes in university revenues after they have joined the university.
 \autoref{sec:iv-model-uni} considers the number of professors employed by the university; whether a professor becomes employed at the university is likely affected by that university's finances.
 The formulation here takes as given that the professor is already employed at the university, and then projects the effect of changes in state funding on these \textit{incumbent} professors following the state funding shock.
+\autoref{tab:firststage-illinois} presents the first-stage results in Illinois data .
+
+\begin{table}[h!]
+    \singlespacing
+    \centering
+    \caption{First Stage Estimates, for State Funding by Funding Shock in IBHED Data.}
+    %\textbf{Panel A: units in \$ per student}
+    %
+    %\makebox[\textwidth][c]{\input{tables/firststage-reg-rawcount.tex}}
+    
+    \textbf{Panel A: units in log \$ per student}
+    
+    \makebox[\textwidth][c]{\input{tables/firststage-illinois.tex}}
+    
+    \label{tab:firststage-illinois}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These tables show the first stage OLS estimates of regression specification \eqref{eqn:secondstage1_indiv}, showing the effect of the funding shock on state funding to gauge performance as an instrument.
+    Each observation is a professor-year, in the IBHED data, and funding data are merged from IPEDS.
+    %Panel A shows the effect of an funding shock of \$-1 per student in the state on the number of \$'s of state funding per student at the university --- i.e.,
+    %\$-1 funding shock per student in the state leads to \$1.176 less state funding per student at the university according to preferred specification column 1.
+    Panel A shows the effect of a $-10$\% change funding shock per student in the state on $10$\% change in state funding per student at the university --- i.e.,
+    $-10$\% funding shock per student in the state leads to $-9.77$\% less state funding per student at the university according to prefferred specification column 1.        
+    Standard errors are clustered at the institution-year level, and institution $+$ year fixed effects are included where noted.
+\end{table}
+
 
 Exogeneity and relevance of the rolling-share instrument, $\tilde Z_{i(j),t}$, follows the same reasoning as that for the base-share instrument, $Z_{i,t}$, discussed in \autoref{sec:approp-shocks}.
 The base-share instrument is appropriate for some outcomes with the individual Illinois professors, where appropriate.
@@ -143,6 +170,33 @@ We then interpret parameter $\beta$ as the effect of changes in state funding at
     These results use a $\log-\log$ specification, so the estimates are for the rate of promotion in a year $t+k$ affected by a 1\% change in state funding in year $t$, where years $k = 0, \hdots, 4$ are on the $x$-axis. 
     Standard errors are clustered at the university-year level, and \autoref{sec:iv-model-indiv} fully describes the differences in empirical specification when unit of analysis is an individual faculty member.
 \end{figure}
+
+\newpage
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{Effects of Changes in State Funding on University Faculty Composition, in Illinois 2010--2021, OLS and 2SLS Estimates.}
+
+    \textbf{Panel A: units in \$ per student}
+
+    \makebox[\textwidth][c]{\input{tables/facultycount-illinois-reg-rawcount.tex}}
+    
+    \textbf{Panel B: units in log \$ per student}
+    
+    \makebox[\textwidth][c]{\input{tables/facultycount-illinois-reg-fte.tex}}
+
+    \label{tab:facultycount-illinois-reg}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These tables show the second stage OLS and 2SLS estimates of regression specification \eqref{eqn:secondstage}, showing the effect of state funding changes on number of faculty per student in Illinois universities, using the funding shock to instrument for state funding in the columns labelled 2SLS.
+    Each observation is a public university-year in the state of Illinois, where funding data come from IPEDS and faculty count come from IBHED data.
+    Panel A shows the effect of a fall in state funding \$$-1,000$ per student in the state on the number of professors.
+    Panel B shows the effect of a $10$\% change in state funding per student at the university on the 10\% change in the number of professors per students.
+    Outcome-mean is the mean of the outcome, for Panel A the number of professors per student, for Panel B the number of faculty per student.
+    Panel B uses $\log$ faculty count per student as the outcome, though the outcome mean is count of faculty per student (not in $\log$ terms).
+    Standard errors are clustered at the university-year level, and university $+$ year fixed effects are included through--out.
+\end{table}
 
 \newpage
 \begin{figure}[H]

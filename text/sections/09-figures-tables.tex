@@ -243,7 +243,7 @@
 \begin{table}[h!]
     \singlespacing
     \centering
-    \caption{First Stage Estimates, for State Funding by funding shock.}
+    \caption{First Stage Estimates, for State Funding by Funding Shock in IPEDS Data.}
     \textbf{Panel A: units in \$ per student}
     
     \makebox[\textwidth][c]{\input{tables/firststage-reg-rawcount.tex}}
@@ -320,34 +320,6 @@
     Outcome-mean is the mean of the outcome, for Panel A the number of professors per student, for Panel B the number of faculty per student.
     Panel B uses $\log$ faculty count per student as the outcome, though the outcome mean is count of faculty per student (not in $\log$ terms).
     Standard errors are clustered at the state-year level, and university $+$ year fixed effects are included through--out.
-\end{table}
-
-
-\newpage
-\begin{table}[H]
-    \singlespacing
-    \centering
-    \caption{Effects of Changes in State Funding on University Faculty Composition, in Illinois 2010--2021, OLS and 2SLS Estimates.}
-
-    \textbf{Panel A: units in \$ per student}
-
-    \makebox[\textwidth][c]{\input{tables/facultycount-illinois-reg-rawcount.tex}}
-    
-    \textbf{Panel B: units in log \$ per student}
-    
-    \makebox[\textwidth][c]{\input{tables/facultycount-illinois-reg-fte.tex}}
-
-    \label{tab:facultycount-illinois-reg}
-    \justify
-    \footnotesize
-    \textbf{Note}:
-    These tables show the second stage OLS and 2SLS estimates of regression specification \eqref{eqn:secondstage}, showing the effect of state funding changes on number of faculty per student in Illinois universities, using the funding shock to instrument for state funding in the columns labelled 2SLS.
-    Each observation is a public university-year in the state of Illinois, where funding data come from IPEDS and faculty count come from IBHED data.
-    Panel A shows the effect of a fall in state funding \$$-1,000$ per student in the state on the number of professors.
-    Panel B shows the effect of a $10$\% change in state funding per student at the university on the 10\% change in the number of professors per students.
-    Outcome-mean is the mean of the outcome, for Panel A the number of professors per student, for Panel B the number of faculty per student.
-    Panel B uses $\log$ faculty count per student as the outcome, though the outcome mean is count of faculty per student (not in $\log$ terms).
-    Standard errors are clustered at the university-year level, and university $+$ year fixed effects are included through--out.
 \end{table}
 
 \newpage

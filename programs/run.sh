@@ -29,7 +29,7 @@ R CMD BATCH --no-save ibhed-shock.R
 R CMD BATCH --no-save ibhed-shock-rawcounts.R
 # Analysis and regressions at the individual-level, IBHED, rolling shock IV.
 R CMD BATCH --no-save ibhed-shock-rolling.R
-# Analysis and regressions at the institutionindividual-level, IBHED, local porjections.
+# Analysis and regressions at the institution-individual-level, IBHED, local porjections.
 R CMD BATCH --no-save ibhed-shock-longterm.R
 # Analysis and regressions for rate of faculty hiring.
 R CMD BATCH --no-save hiring-shock.R
