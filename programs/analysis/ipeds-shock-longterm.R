@@ -98,8 +98,7 @@ reg.data <- reg.data %>%
         stateappropriations_real =
             log(stateappropriations_real / enrollment_reported),
         appropriationshock_perEnroll_real =
-            - log(appropriationshock_perEnroll_real),
-        tuitionrev_real = log(tuitionrev_real / enrollment_reported)) %>%
+            - log(appropriationshock_perEnroll_real)) %>%
     pdata.frame(index = c("unitid", "year"), drop.index = FALSE)
 
 # Save memory by removing initally loaded files
@@ -119,9 +118,10 @@ gc()
 library(plm)
 library(lpirfs)
 time.horizon <- 11
+limits.vector <- c(-0.1, 0.6)
 
 ## Define a function to nicely plot the LP results.
-lpreg.plot <- function(model.lpreg) {
+lpreg.plot <- function(model.lpreg, limits.vector) {
     ## Input a LP-reg (estimates an elesticity \in [-1,1])
     ## And the time.hirozon for how far to plot LP model
     # Get the estimates
@@ -143,8 +143,8 @@ lpreg.plot <- function(model.lpreg) {
         scale_x_continuous(name = "Years, Relative to Initital Shock",
             breaks = model.lpdata$t, expand = c(0.01, 0.01)) +
         scale_y_continuous(name = "",
-            limits = c(-0.2, 0.75),
-            breaks = seq(-2, 1, by = 0.1)) +
+            limits = limits.vector,
+            breaks = seq(-5, 5, by = 0.1)) +
         theme_bw() +
         ggtitle("Estimate") +
         theme(plot.title = element_text(size = rel(1)),
@@ -163,6 +163,9 @@ firststage.lpreg <-
         shock = "appropriationshock_perEnroll_real",
         # Option to use IV for predictor endogeneity (not used here)
         iv_reg = FALSE,
+        # LP options
+        diff_shock = FALSE,
+        cumul_mult = FALSE,
         # Add fixed effects + clsutered SEs in the panel
         panel_model = "within",
         panel_effect = "twoways",
@@ -170,11 +173,10 @@ firststage.lpreg <-
         robust_cluster = c("group", "time"),
         confint = 1.96,
         hor = time.horizon)
+plot(firststage.lpreg)
 # Save this plot
 ggsave("../../text/figures/firststage-lp.png",
-    plot = (lpreg.plot(firststage.lpreg) +
-        scale_y_continuous(name = "",
-            breaks = seq(-2, 1, by = 0.1))),
+    plot = lpreg.plot(firststage.lpreg, c(-1.15, 0.2)),
     units = "cm", dpi = 300, width = fig.width, height = fig.height)
 
 # Run the LP method for the second-stage, outcome count lecturers per student
@@ -187,6 +189,9 @@ lecturer_count.lpreg <-
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_real",
+        # LP options
+        cumul_mult = FALSE,
+        diff_shock = FALSE,
         # Add fixed effects + clsutered SEs in the panel
         panel_model = "within",
         panel_effect = "twoways",
@@ -194,12 +199,10 @@ lecturer_count.lpreg <-
         robust_cluster = c("group", "time"),
         confint = 1.96,
         hor = time.horizon)
+plot(lecturer_count.lpreg)
 # Save this plot
 ggsave("../../text/figures/lecturer-count-lp.png",
-    plot = (lpreg.plot(lecturer_count.lpreg) +
-        scale_y_continuous(name = "",
-            limits = c(-0.75, 0.2),
-            breaks = seq(-2, 1, by = 0.1))),
+    plot = lpreg.plot(lecturer_count.lpreg, - limits.vector[c(2, 1)]),
     units = "cm", dpi = 300, width = fig.width, height = fig.height)
 
 # Run the LP method for the second-stage, outcome count APs per student
@@ -212,16 +215,20 @@ assistant_count.lpreg <-
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_real",
+        # LP options
+        diff_shock = FALSE,
+        cumul_mult = FALSE,
         # Add fixed effects + clsutered SEs in the panel
         panel_model = "within",
-        panel_effect = "twoways",
+        panel_effect = "individual",
         robust_cov = "vcovHC",
         robust_cluster = c("group", "time"),
         confint = 1.96,
         hor = time.horizon)
+plot(assistant_count.lpreg)
 # Save this plot
 ggsave("../../text/figures/assistant-count-lp.png",
-    plot = lpreg.plot(assistant_count.lpreg),
+    plot = lpreg.plot(assistant_count.lpreg, limits.vector),
     units = "cm", dpi = 300, width = fig.width, height = fig.height)
 
 # Run the LP method for the second-stage, outcome count APs per student
@@ -234,6 +241,9 @@ full_count.lpreg <-
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_real",
+        # LP options
+        diff_shock = FALSE,
+        cumul_mult = FALSE,
         # Add fixed effects + clsutered SEs in the panel
         panel_model = "within",
         panel_effect = "twoways",
@@ -241,9 +251,10 @@ full_count.lpreg <-
         robust_cluster = c("group", "time"),
         confint = 1.96,
         hor = time.horizon)
+plot(full_count.lpreg)
 # Save this plot
 ggsave("../../text/figures/full-count-lp.png",
-    plot = lpreg.plot(full_count.lpreg),
+    plot = lpreg.plot(full_count.lpreg, limits.vector),
     units = "cm", dpi = 300, width = fig.width, height = fig.height)
 
 # Run the LP method for the second-stage, outcome count profs per student
@@ -256,6 +267,9 @@ all_count.lpreg <-
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_real",
+        # LP options
+        diff_shock = FALSE,
+        cumul_mult = FALSE,
         # Add fixed effects + clsutered SEs in the panel
         panel_model = "within",
         panel_effect = "twoways",
@@ -263,10 +277,8 @@ all_count.lpreg <-
         robust_cluster = c("group", "time"),
         confint = 1.96,
         hor = time.horizon)
+plot(all_count.lpreg)
 # Save this plot
 ggsave("../../text/figures/all-count-lp.png",
-    plot = lpreg.plot(all_count.lpreg),
+    plot = lpreg.plot(all_count.lpreg, limits.vector),
     units = "cm", dpi = 300, width = fig.width, height = fig.height)
-
-
-

@@ -154,7 +154,7 @@
     \justify
     \footnotesize
     \textbf{Note}:
-    These figures show the local projections estimates of regression specification \eqref{eqn:secondstage}, with the funding shock as an instrument for state funding
+    These figures show the local projections estimates of regression specification \eqref{eqn:secondstage}, with the funding shock as an instrument for state funding.
     The unit of analysis is the university, and uses IPEDS data.
     The coefficient estimate is effect of state funding ($X_{i,t}$) on faculty count per student ($Y_{i,t}$), using the funding shock instrument ($Z_{i,t}$), while accounting for auto-correlation between different time periods --- i.e., between $X_{i,t}, X_{i,t-1}$ and $Y_{i,t}, Y_{i,t-1}$.
     These results use a $\log-\log$ specification, so the estimates are for the elasticity of professor count per student in a year $t+k$ with respect to state funding in year $t$, where years $k = 0, \hdots, 10$ are on the $x$-axis. 
@@ -240,7 +240,7 @@
 \end{table}
 
 \newpage
-\begin{table}[h!]
+\begin{table}[H]
     \singlespacing
     \centering
     \caption{First Stage Estimates, for State Funding by Funding Shock in IPEDS Data.}
@@ -251,7 +251,7 @@
     \textbf{Panel B: units in log \$ per student}
     
     \makebox[\textwidth][c]{\input{tables/firststage-reg-fte.tex}}
-    
+
     \label{tab:firststage-reg}
     \justify
     \footnotesize
@@ -263,34 +263,6 @@
     Panel B shows the effect of a $-10$\% change funding shock per student in the state on $10$\% change in state funding per student at the university --- i.e.,
     $-10$\% funding shock per student in the state leads to $-9.77$\% less state funding per student at the university according to prefferred specification column 1.        
     Standard errors are clustered at the state-year level, and univeristy $+$ year fixed effects are included where noted.
-\end{table}
-
-\newpage
-\begin{table}[H]
-    \singlespacing
-    \centering
-    \caption{Shift-Share Instrument Balance Test, in IPEDS 1990--2017.}
-
-    \textbf{Panel A: units in \$}
-
-    \makebox[\textwidth][c]{\input{tables/firststage-balance-count.tex}}
-    
-    \textbf{Panel B: units in log \$ per student}
-    
-    \makebox[\textwidth][c]{\input{tables/firststage-balance-log.tex}}
-
-    \justify
-    \footnotesize
-    \textbf{Note}:
-    These tables show the OLS estimates of regression specification \eqref{eqn:firststage}, showing the effect of the funding shock on other outcomes to gauge balance of the instrument with respect to university characteristics
-    Enrolment is measured in thousands of students.
-    Each observation is a public universit--year, in the IPEDS data.
-    Panel A shows the effect of a funding shock of \$$-1,000$ (per student in the state) on the outcome --- i.e.,
-    \$$-1,000$ funding shock per student in the state is associated with 517 more students (as enrolment is measured in thousands) in column 1.
-    Panel B shows the effect of a $-10$\% change funding shock per student in the state on $10$\% change in the outcomes --- i.e.,
-    $-10$\% funding shock per student in the state is associated with an increase in 1.07\% more students at the university according to preferred column 1.
-    Standard errors are clustered at the state-year level, and university $+$ year fixed effects are included where noted.
-    \label{tab:firststage-balance}
 \end{table}
 
 \newpage

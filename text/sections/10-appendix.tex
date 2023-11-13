@@ -25,6 +25,32 @@ A number of statistical packages, for the $R$ language \citep{R2022}, made the e
 \end{itemize}
 
 \subsection{IPEDS First Stage}
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{Shift-Share Instrument Balance Test, in IPEDS 1990--2017.}
+
+    \textbf{Panel A: units in \$}
+
+    \makebox[\textwidth][c]{\input{tables/firststage-balance-count.tex}}
+    
+    \textbf{Panel B: units in log \$ per student}
+    
+    \makebox[\textwidth][c]{\input{tables/firststage-balance-log.tex}}
+
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These tables show the OLS estimates of regression specification \autoref{eqn:firststage}, showing the effect of the funding shock on other outcomes to gauge balance of the instrument with respect to university characteristics
+    Enrolment is measured in thousands of students.
+    Each observation is a public universit--year, in the IPEDS data.
+    Panel A shows the effect of a funding shock of \$$-1,000$ (per student in the state) on the outcome --- i.e.,
+    \$$-1,000$ funding shock per student in the state is associated with 517 more students (as enrolment is measured in thousands) in column 1.
+    Panel B shows the effect of a $-10$\% change funding shock per student in the state on $10$\% change in the outcomes --- i.e.,
+    $-10$\% funding shock per student in the state is associated with an increase in 1.07\% more students at the university according to preferred column 1.
+    Standard errors are clustered at the state-year level, and university $+$ year fixed effects are included where noted.
+    \label{tab:firststage-balance}
+\end{table}
 
 \begin{table}[H]
     \singlespacing
@@ -242,7 +268,7 @@ We then interpret parameter $\beta$ as the effect of changes in state funding at
 
 
 \newpage
-\subsection{Additional Results, Faculty Hiring}
+\subsection{Faculty Hiring}
 \label{sec:appendix-hiring}
 
 These results were produced by integrating the total count of faculty hires for 2010--2021 for the top-ranked 180 US universities with a sum of the funding variables, and then estimating the models specified in \autoref{sec:iv-model-uni}.
@@ -306,7 +332,7 @@ There were no observable differences in the hiring rate of male vs female facult
 
 
 \newpage
-\subsection{Additional Results, Rates of Substitution}
+\subsection{Rates of Substitution}
 \label{sec:appendix-substitution}
 
 The funding elasticities can be used to recover the marginal rate of substitution between two outcomes.

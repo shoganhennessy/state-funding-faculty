@@ -229,7 +229,9 @@ lpreg.plot <- function(model.lpreg) {
         geom_line(aes(y = conf.high), linetype = "dashed") +
         scale_x_continuous(name = "Years, Relative to Initital Shock",
             breaks = model.lpdata$t, expand = c(0.01, 0.01)) +
-        scale_y_continuous(name = "") +
+        scale_y_continuous(name = "",
+            limits = c(-0.2, 0.2),
+            breaks = seq(-1, , by = 0.05)) +
         theme_bw() +
         ggtitle("Estimate") +
         theme(plot.title = element_text(size = rel(1)),
@@ -275,6 +277,9 @@ lecturer_salaries.lpreg <-
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_rolling",
+        # LP options
+        diff_shock = FALSE,
+        cumul_mult = FALSE,
         # Add clustered SEs in the panel
         panel_model = "pooling",
         robust_cov = "vcovHC",
@@ -283,10 +288,7 @@ lecturer_salaries.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/salaries-lecturer-illinois-lp-rolling.png",
-    plot = (lpreg.plot(lecturer_salaries.lpreg) +
-        scale_y_continuous(name = "",
-            limits = c(-0.05, 0.1),
-            breaks = seq(-2, 1, by = 0.025))),
+    plot = lpreg.plot(lecturer_salaries.lpreg),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for salaries of APs.
@@ -301,6 +303,9 @@ assistant_salaries.lpreg <-
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_rolling",
+        # LP options
+        diff_shock = FALSE,
+        cumul_mult = FALSE,
         # Add clustered SEs in the panel
         panel_model = "pooling",
         robust_cov = "vcovHC",
@@ -309,10 +314,7 @@ assistant_salaries.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/salaries-assistant-illinois-lp-rolling.png",
-    plot = (lpreg.plot(assistant_salaries.lpreg) +
-        scale_y_continuous(name = "",
-            limits = c(-0.05, 0.1),
-            breaks = seq(-2, 1, by = 0.025))),
+    plot = lpreg.plot(assistant_salaries.lpreg),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for salaries of full profs.
@@ -327,6 +329,9 @@ full_salaries.lpreg <-
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_rolling",
+        # LP options
+        diff_shock = FALSE,
+        cumul_mult = FALSE,
         # Add clustered SEs in the panel
         panel_model = "pooling",
         robust_cov = "vcovHC",
@@ -335,10 +340,7 @@ full_salaries.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/salaries-full-illinois-lp-rolling.png",
-    plot = (lpreg.plot(full_salaries.lpreg) +
-        scale_y_continuous(name = "",
-            limits = c(-0.05, 0.1),
-            breaks = seq(-2, 1, by = 0.025))),
+    plot = lpreg.plot(full_salaries.lpreg),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for salaries of administrator faculty.
@@ -353,6 +355,9 @@ administrator_salaries.lpreg <-
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_rolling",
+        # LP options
+        diff_shock = FALSE,
+        cumul_mult = FALSE,
         # Add clustered SEs in the panel
         panel_model = "pooling",
         robust_cov = "vcovHC",
@@ -361,10 +366,7 @@ administrator_salaries.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/salaries-administrator-illinois-lp-rolling.png",
-    plot = (lpreg.plot(administrator_salaries.lpreg) +
-        scale_y_continuous(name = "",
-            limits = c(-0.05, 0.1),
-            breaks = seq(-2, 1, by = 0.025))),
+    plot = lpreg.plot(administrator_salaries.lpreg),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for salaries of all faculty.
@@ -379,6 +381,9 @@ all_salaries.lpreg <-
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_rolling",
+        # LP options
+        diff_shock = FALSE,
+        cumul_mult = FALSE,
         # Add clustered SEs in the panel
         panel_model = "pooling",
         robust_cov = "vcovHC",
@@ -387,10 +392,7 @@ all_salaries.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/salaries-all-illinois-lp-rolling.png",
-    plot = (lpreg.plot(all_salaries.lpreg) +
-        scale_y_continuous(name = "",
-            limits = c(-0.05, 0.1),
-            breaks = seq(-2, 1, by = 0.025))),
+    plot = lpreg.plot(all_salaries.lpreg),
     units = "cm", width = fig.width, height = fig.height)
 
 
@@ -410,6 +412,9 @@ lecturer_promoted.lpreg <-
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_rolling",
+        # LP options
+        diff_shock = FALSE,
+        cumul_mult = FALSE,
         # Add clustered SEs in the panel
         panel_model = "pooling",
         robust_cov = "vcovHC",
@@ -418,10 +423,7 @@ lecturer_promoted.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/promoted-lecturer-illinois-lp-rolling.png",
-    plot = (lpreg.plot(lecturer_promoted.lpreg) +
-        scale_y_continuous(name = "",
-            limits = c(-0.1, 0.2),
-            breaks = seq(-2, 1, by = 0.05))),
+    plot = lpreg.plot(lecturer_promoted.lpreg),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for promotion rate of APs.
@@ -438,6 +440,9 @@ assistant_promoted.lpreg <-
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_rolling",
+        # LP options
+        diff_shock = FALSE,
+        cumul_mult = FALSE,
         # Add clustered SEs in the panel
         panel_model = "pooling",
         robust_cov = "vcovHC",
@@ -446,10 +451,7 @@ assistant_promoted.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/promoted-assistant-illinois-lp-rolling.png",
-    plot = (lpreg.plot(assistant_promoted.lpreg) +
-        scale_y_continuous(name = "",
-            limits = c(-0.1, 0.2),
-            breaks = seq(-2, 1, by = 0.05))),
+    plot = lpreg.plot(assistant_promoted.lpreg),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for promotion rate of full profs.
@@ -466,6 +468,9 @@ full_promoted.lpreg <-
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_rolling",
+        # LP options
+        diff_shock = FALSE,
+        cumul_mult = FALSE,
         # Add clustered SEs in the panel
         panel_model = "pooling",
         robust_cov = "vcovHC",
@@ -474,10 +479,7 @@ full_promoted.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/promoted-full-illinois-lp-rolling.png",
-    plot = (lpreg.plot(full_promoted.lpreg) +
-        scale_y_continuous(name = "",
-            limits = c(-0.1, 0.2),
-            breaks = seq(-2, 1, by = 0.05))),
+    plot = lpreg.plot(full_promoted.lpreg),
     units = "cm", width = fig.width, height = fig.height)
 
 
@@ -495,6 +497,9 @@ lecturer_exit.lpreg <-
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_rolling",
+        # LP options
+        diff_shock = FALSE,
+        cumul_mult = FALSE,
         # Add clustered SEs in the panel
         panel_model = "pooling",
         robust_cov = "vcovHC",
@@ -503,10 +508,7 @@ lecturer_exit.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/exit-lecturer-illinois-lp-rolling.png",
-    plot = (lpreg.plot(lecturer_exit.lpreg) +
-        scale_y_continuous(name = "",
-            limits = c(-0.1, 0.2),
-            breaks = seq(-2, 1, by = 0.05))),
+    plot = lpreg.plot(lecturer_exit.lpreg),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for exit rate of APs.
@@ -521,6 +523,9 @@ assistant_exit.lpreg <-
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_rolling",
+        # LP options
+        diff_shock = FALSE,
+        cumul_mult = FALSE,
         # Add clustered SEs in the panel
         panel_model = "pooling",
         robust_cov = "vcovHC",
@@ -529,10 +534,7 @@ assistant_exit.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/exit-assistant-illinois-lp-rolling.png",
-    plot = (lpreg.plot(assistant_exit.lpreg) +
-        scale_y_continuous(name = "",
-            limits = c(-0.1, 0.2),
-            breaks = seq(-2, 1, by = 0.05))),
+    plot = lpreg.plot(assistant_exit.lpreg),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for exit rate of full profs.
@@ -547,6 +549,9 @@ full_exit.lpreg <-
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_rolling",
+        # LP options
+        diff_shock = FALSE,
+        cumul_mult = FALSE,
         # Add clustered SEs in the panel
         panel_model = "pooling",
         robust_cov = "vcovHC",
@@ -555,10 +560,7 @@ full_exit.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/exit-full-illinois-lp-rolling.png",
-    plot = (lpreg.plot(full_exit.lpreg) +
-        scale_y_continuous(name = "",
-            limits = c(-0.1, 0.2),
-            breaks = seq(-2, 1, by = 0.05))),
+    plot = lpreg.plot(full_exit.lpreg),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for exit rate of administrator faculty.
@@ -573,6 +575,9 @@ administrator_exit.lpreg <-
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_rolling",
+        # LP options
+        diff_shock = FALSE,
+        cumul_mult = FALSE,
         # Add clustered SEs in the panel
         panel_model = "pooling",
         robust_cov = "vcovHC",
@@ -581,10 +586,7 @@ administrator_exit.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/exit-administrator-illinois-lp-rolling.png",
-    plot = (lpreg.plot(administrator_exit.lpreg) +
-        scale_y_continuous(name = "",
-            limits = c(-0.1, 0.2),
-            breaks = seq(-2, 1, by = 0.05))),
+    plot = lpreg.plot(administrator_exit.lpreg),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for exit rate of all faculty.
@@ -599,6 +601,9 @@ all_exit.lpreg <-
         # Option to use IV for predictor endogeneity
         iv_reg = TRUE,
         instrum = "appropriationshock_perEnroll_rolling",
+        # LP options
+        diff_shock = FALSE,
+        cumul_mult = FALSE,
         # Add clustered SEs in the panel
         panel_model = "pooling",
         robust_cov = "vcovHC",
@@ -607,8 +612,5 @@ all_exit.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/exit-all-illinois-lp-rolling.png",
-    plot = (lpreg.plot(all_exit.lpreg) +
-        scale_y_continuous(name = "",
-            limits = c(-0.1, 0.2),
-            breaks = seq(-2, 1, by = 0.05))),
+    plot = lpreg.plot(all_exit.lpreg),
     units = "cm", width = fig.width, height = fig.height)
