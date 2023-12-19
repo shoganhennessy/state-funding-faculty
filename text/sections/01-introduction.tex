@@ -23,16 +23,14 @@ For example, university administrations may directly cut salaries or lay-off inc
 This happened in 2015 when the state of Illinois shut-down without setting a state budget, and the University of Illinois furloughed faculty unable to pay salaries \citep{furlough2010}.
 Similarly, faculty hiring committees are often cancelled or disrupted in response to funding cuts, meaning there are fewer faculty entering a department to replace those leaving.
 On the other hand, some faculty positions may grow at universities in response to funding cuts.
-Public universities do not restrict enrolment in response to funding cuts, so someone must teach the next year of students.
-Lecturers can fill in teaching duties, at a lower cost for the universities than tenure-track professors, with less employment protections (e.g., no tenure).
-But it is not certain that universities would hire more lecturers in the face of budget cuts; they may not hire any more instructional staff at all.
-Similarly, the universities may be limited from hiring more lecturers by competitive pressures from peer institutions \citep{hoxby2009changing,urquiola2020markets}, and instead focus on filling the funding gap by raising revenue from other sources, such as private funds or raising tuition.
+Lecturers can fill in teaching duties when professors are unavailable, and may do so at a lower cost  on on short-term and contracts with less employment protections.
+But it is not certain that universities would hire more lecturers in the face of budget cuts; they may not hire any more lewcturers or professors at all.
+Similarly, the universities may be limited from hiring more lecturers by competitive pressures from peer institutions \citep{hoxby2009changing,urquiola2020markets}, and instead focus on filling the funding gap by courting private funding or raising tuition prices.
 
-In both analyses, I employ a shift-share instrument to identify changes in state funding for higher education.
-State governments decide how to fund higher education by a complicated process which can be influenced by local economic conditions, changing state priorities, or informal lobbying from universities.
-As such, state funding is not randomly assigned to universities and so it is necessary to employ an identification strategy to account for this.
-The shift-share instrument identifies exogenous changes in state funding by exploiting differences in how much each university relied on state funding, interacted with state-wide changes in higher education funding --- following \cite{NBERw23736,NBERw27885}.
-The approach relies on the insight that yearly state government budgets are decided without targetting individual universities for funding cuts, and exploits the fact that more reliant universities will be more affected by state-wide changes in higher education funding.
+State governments decide how to fund higher education by a complicated process, which could be influenced by lobbying, changing state priorities, or local economic conditions.
+As such, it would be na\"ive to think of state higher education funding as independent of public university faculty, so I employ a shift-share instrumental variable approach to identify causal effects of state funding cuts.
+The shift-share instrument identifies exogenous changes in state funding by exploiting differences in how much universities relied on that funding, interacted with state-wide changes in higher education funding --- following \cite{NBERw23736,NBERw27885}.
+Yearly state government budgets are decided without targetting individual universities for funding cuts, so more reliant universities will be more affected by state-wide changes in higher education funding, allowing the shift-share approach to estimate causal effects among more reliant unversities.
 Additionally, I estimate effect of state funding on faculty multiple years after the initial funding cuts, using the local projections method thanks to time-series confounding between the funding shock and later years' level of state funding.\footnote{
     To the best of my knowledge, this is also the first paper to use the local projections method for a shift-share instrument, and to acknowledge the time-series confounding for shift-share IV models when the outcome is in future time periods.
 }
