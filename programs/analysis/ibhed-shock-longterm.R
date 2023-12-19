@@ -227,7 +227,7 @@ lpreg.plot <- function(model.lpreg) {
         geom_line(aes(y = estimate), colour = "blue") +
         geom_line(aes(y = conf.low), linetype = "dashed") +
         geom_line(aes(y = conf.high), linetype = "dashed") +
-        scale_x_continuous(name = "Years, Relative to Initital Shock",
+        scale_x_continuous(name = "Years, Relative to Funding Cut",
             breaks = model.lpdata$t, expand = c(0.01, 0.01)) +
         scale_y_continuous(name = "",
             limits = c(-0.2, 0.2),
