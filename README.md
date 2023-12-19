@@ -2,9 +2,9 @@
 
 Senan Hogan-Hennessy, first draft on 18 August 2022.
 
-Latest revision: 27 October 2023
+Latest revision: 18 December 2023
 
-This is the replication package for the economics research paper ``Stagnating State Funding for Higher Education and its Effect on Faculty at US Universities,'' with statistical analysis on IPEDS and public Illinois data using the programming language *R*, and associated packages.
+This is the replication package for the economics research paper ``Less Funding, More Lecturers, and Fewer Professors: Stagnating State Funding for Higher Education and its Effect on Faculty at US Universities,'' with statistical analysis on IPEDS and public Illinois data using the programming language *R*, and associated packages.
 A master bash file calls all code to build analysis data from raw files, produce the analysis files, and compile the final paper in one-go.
 
 The replicator should expect the code to run for less than 10 minutes, using at maximum 4GB of RAM.

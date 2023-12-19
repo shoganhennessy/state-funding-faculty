@@ -863,6 +863,61 @@ stargazer(
     type = "text",
     out = "../../text/tables/facultycount-shock-reg-fte.tex")
 
+# Plot the results.
+library(jtools)
+# Estimate with separate names
+plot_lecturer_count.reg <- reg.data %>%
+    mutate(lect_funding = log(stateappropriations_real / enrollment_reported)) %>%
+    felm(log(lecturer_prof_count / enrollment_reported) ~ 1 |
+        unitid + year |
+        (lect_funding ~ I(-log(appropriationshock_perEnroll_real))) |
+        state + year,
+        data = .)
+plot_assistant_count.reg <- reg.data %>%
+    mutate(asst_funding = log(stateappropriations_real / enrollment_reported)) %>%
+    felm(log(assistant_prof_count / enrollment_reported) ~ 1 |
+        unitid + year |
+        (asst_funding ~ I(-log(appropriationshock_perEnroll_real))) |
+        state + year,
+        data = .)
+plot_full_count.reg <- reg.data %>%
+    mutate(full_funding = log(stateappropriations_real / enrollment_reported)) %>%
+    felm(log(full_prof_count / enrollment_reported) ~ 1 |
+        unitid + year |
+        (full_funding ~ I(-log(appropriationshock_perEnroll_real))) |
+        state + year,
+        data = .)
+plot_all_count.reg <- reg.data %>%
+    mutate(all_funding = log(stateappropriations_real / enrollment_reported)) %>%
+    felm(log(all_prof_count / enrollment_reported) ~ 1 |
+        unitid + year |
+        (all_funding ~ I(-log(appropriationshock_perEnroll_real))) |
+        state + year,
+        data = .)
+elasticity.plot <- plot_summs(
+    plot_lecturer_count.reg,
+    plot_assistant_count.reg,
+    plot_full_count.reg,
+    plot_all_count.reg,
+    coefs = c(
+        "Lecturers" = "`lect_funding(fit)`",
+        "Assistant Professors" = "`asst_funding(fit)`",
+        "Full Professors" = "`full_funding(fit)`",
+        "All Professors" = "`all_funding(fit)`"),
+    legend.title = "",
+    plot.distributions = TRUE,
+    inner_ci_level = 0.95) +
+    theme_bw() +
+    theme(
+        #plot.title = element_text(size = rel(1)),
+        plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
+        legend.position = "none",
+        legend.margin = margin(t = -10))
+# Save this plot
+ggsave("../../text/figures/elasticity-plot.png",
+    plot = elasticity.plot,
+    units = "cm", dpi = 300, width = 1.3 * fig.width, height = 0.9 * fig.height)
+
 
 # Get the rates of susbtituion from the elasticity estimates -------------------
 
