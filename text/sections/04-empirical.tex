@@ -14,6 +14,7 @@ Importantly, funding from a university's state government provides opportunity t
 
 I use a shift-share instrument to address endogeneity concerns for the amount of funding a state allots to each of its public universities.
 \cite{NBERw23736,NBERw27885} develop the instrument for public university finances by exploiting a shift-share instrument for changes in state-level funding interacted with university reliance on state funding in a base period.
+
 \begin{align}
     \label{eqn:public-instrument}
     Z_{i,t} &\coloneqq - \left[
@@ -21,6 +22,7 @@ I use a shift-share instrument to address endogeneity concerns for the amount of
     \sum_{\tau = 0}^{3} \frac 14
     \left( \frac{\text{State Funding}_{i,1990 + \tau}}{\text{Total Revenues}_{i,1990 + \tau}} \right) \right]
 \end{align}
+
 The system exploits the fact that institutions who rely on state funding more will be affected by state funding shocks.
 $Z_{i,t}$ is the instrument for state funding for institution $i$ in year $t$, interacting the average funding for universities in state $s(i)$ with reliance on state funding relative to total revenues, averaged across the base years 1990--1993.\footnote{
     1990--1993 are defined as data for public university finance data are most comparable (i.e. without many missing values) beginning in 1990.
