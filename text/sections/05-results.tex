@@ -6,16 +6,17 @@
 \subsection{First Stage Estimates}
 The shift-share instrument has a strong first stage for universities' yearly state funding.
 \autoref{tab:firststage-reg} presents results of the first-stage regression among IPEDS data, separately with and without a control for tuition revenue per student, plus institution and year fixed effects.
-I use the same empirical strategy in the analysis of Illinois faculty, so  \autoref{tab:firststage-illinois} presents first-stage estimates among the IBHED data (which are very similar to those calculated in IPEDS data).
-\autoref{tab:firststage-reg} Panel A shows estimates of a funding shock of \$1 per student in the state on state funding per student at the university, and Panel B the \% increase effects of a 1\% increase in the shock per student on state funding per student.
-Column (1) shows that a funding shock of \$10 (per student in the entire state) is associated with \$11.76 less state funding per student at the university, with the corresponding -10\% funding shock leads to -9.77\%
-less funding (column 1, panel B), with similar estimates with and without including fixed effects.
-Column (2) shows estimates of the first-stage without including fixed effects, and gives less precise estimates for the funding shock, likely thanks to systematic differences in universities unaccounted for without fixed effects.
-Columns (3) and (4) include the tuition revenue control (explained in \autoref{foot:control}) to exhibit estimates with the inclusion of this possible collider (or bad control).
-Column (3) shows similar estimates to column (1) in both Panels A and B thanks to inclusion of fixed effects, so that the uncertainty in including tuition revenue as a possible bad control for the level of state funding does not matter thanks to the inclusion of fixed effects.
-Column (1) represents the estimates for \autoref{eqn:firststage} with fixed effects, omitting the tuition revenue control, and is the preferred form that I proceed with.
+I use the same empirical strategy in the analysis of Illinois faculty, and \autoref{tab:firststage-illinois} presents first-stage estimates among the IBHED data ; results are similar to those calculated in IPEDS data.
+\autoref{tab:firststage-reg} Panel A shows estimates of a state-wide funding shock of \$1 per student on state funding per student at the university, and Panel B the effects of a 1\% increase in the state-wide funding shock on state funding per student.
+Column (1) shows that a state-wide funding shock of \$10 per student is associated with \$11.76 less state funding per student at the university; -10\% state-wide funding shock leads to -9.77\% state funding per student at the average university.
+Estimates with and without including fixed effects.
+Column (2) shows estimates of the first-stage without including fixed effects, and gives less precise estimates for the funding shock --- this may be due to systematic differences in universities, which are not accounted for without fixed effects.
+Columns (3) and (4) include the tuition revenue as a control (explained in \autoref{foot:control}) to exhibit estimates with or without this control variable.
+Column (3) shows similar estimates to column (1) in both Panels A and B thanks to inclusion of fixed effects, so that 
+whether tuition revenue is a bad control or not does not affect empirical estimates.
+Column (1) represents the estimates for \autoref{eqn:firststage} with fixed effects (not including tuition revenue as a control variable), and is the preferred form that I proceed with.
 
-The above shows that the first stage is strong among both IPEDS and IBHED data, and the argument in \autoref{sec:empirics} for exogenity comes from independence of the state funding mechanism to any indivdiaul public university campus.
+The first stage is strong in both IPEDS and IBHED data, and the argument in \autoref{sec:empirics} for exogeneity comes from independence of the state funding mechanism to any individual public university campus.
 \autoref{tab:firststage-balance} provides a balance test, showing that the shift-share instrument is correlated with the professor outcomes, but not with other sources of university funding.
 These results, together with the case for exogeneity, show the funding shock instrument
 strongly predicts university revenues in the first-stage estimation.
@@ -52,12 +53,13 @@ For lecturers, we see a negative effect which lines up with two trends noted in 
 \subsection{Reduced Hiring of New Professors}
 Public universities substituted professors for more lecturers thanks to stagnating state funding, but there are little discernible effects on incumbent professors or lecturers.
 This implies that the substitution arose by impacting the hiring of new professors to replace those retiring or leaving academia.
-% \textbf{Expand this paragraph}.
+% \textbf{Expand this paragraph, referencing the figure, and the OLS tables for the appendix}.
 I take recent data on the total faculty hired at US public universities over 2011--2021 (provided by \citealt{wapman2022quantifying,wapman2022zenodo}), to show that universities with lower state funding (per student) also hired fewer professors in the same time period --- shown in \autoref{fig:hiring-correlation}.
-The shift-share IV model shows that a $10$\% cut in per student state funding leads to $13$\% fewer faculty hires per student across the decade 2011--2021.\footnote{
+The shift-share IV model shows that a $10$\% per-student state funding cut leads to $13$\% fewer faculty hires per student across the decade 2011--2021.\footnote{
     This limited sample of data are a cross-section for count of professor hires 2011--2021, so that local projection estimates are not possible here.
     See \autoref{sec:appendix-hiring} for further details.
 }
+
 These results provide suggestive evidence that funding cuts caused faculty substitution by disrupting hiring of new professors at public universities.
 This provides a coherent mechanism for how incumbent faculty (those who are already hired at the university) were not meaningfully impacted by funding cuts, yet their wider composition nonetheless changed when their universities experienced funding cuts. 
 
