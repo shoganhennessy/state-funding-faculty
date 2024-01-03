@@ -4,58 +4,68 @@
 \label{sec:data}
 
 \subsection{Data Description}
-The data used in this paper come from two primary sources: \citet[IPEDS]{ipeds} regarding institutional information including finances and enrolment, and \citet[IBHED]{ibhed} for data on every professor in the Illinois public university system.
+The data used in this paper come from two primary sources: \citet[IPEDS]{ipeds} for data on university funding, finances, and enrolment, and \citet[IBHED]{ibhed} for data on every professor in the Illinois public university system.
 
 IPEDS is a survey of higher educational institutions in the US, and legally requires institutions to participate in order to receive Federal Title IV student aid.\footnote{
     IPEDS does not necessarily cover the universe of US higher education institutions, yet in practice every public university and not for-profit four-year institution is represented.
 }
-Data are consistent between the years 1990 and 2021,\footnote{
+Data are consistent for 1990--2021,\footnote{
     The years 1987-1989 are represented in these data in an incompletion fashion, so I focus on the years 1990 onwards.
     Year refers to the calendar year of the spring term --- i.e., 1990 refers to the academic year that ran August 1989 to July 1990.
 }
-and provide information on the total revenues a university received from every source (including state governments), enrolment, plus faculty count and total expenditures on salaries.\footnote{
-    I combine the Urban Institute's 2018 compilation of IPEDS data for the years 1990--2017, and manually combine raw NCES data on 2018-2021 for all relevant variables.
+and provide information on university funding, enrolment, and numerous other characteristics.\footnote{
+    I combine the Urban Institute's 2018 compilation of IPEDS data for the years 1990--2017, and manually combine raw National Center for Education Statistics (NCES) data on 2018--2021 for all relevant variables.
     Figures for enrolment and faculty counts come from the raw NCES version of IPEDS for all years, addressing inconsistencies in the Urban Institute's data formulation for these variables.
 }
-I restrict analysis to public, four-year, degree-granting institutions, as these institutions adhere to a standardised concept of faculty profile, where tenure and title of appointment (lecturer, assistant professor, etc.) are relatively standardised.
+I restrict analysis to public, four-year, degree-granting institutions, as these institutions have the largest majority of faculty employed and students enrolled.
 For-profit institutions employ and enrol a negligible share of professors and students respectively, while students at two-year institutions by majority intend to eventually enrol at a four-year institution \citep{mountjoy2022}, so that these institutions are not considered.
-
-IPEDS reports the count of professors employed by position, as well as total salary expenditures by position.
-This gives a resulting panel data-set, where each row represents a university-year, and includes columns for university finances, plus total count and average salary\footnote{
+IPEDS reports the count of professors employed by position.\footnote{
+    IPEDS gives a mean salary measure for faculty by rank, but these figures have many missing values and disagree with calculated values from other reputable sources.
+    Over 40\% of university--year observations are missing in the IPEDS panel data-set, representing an average of 55\% undergraduate enrolment in each year.
+    Yearly averages of faculty salaries by the non-missing values do not agree with trends in average professor salary over the sample time period compared to summary statistics provided in \cite{aau2021survey}.
+    IPEDS values consistently report that public university professors are paid on average 20\% more than private sector faculty, which disagrees with other sources on the salary gap direction, and IPEDS figures are consistently higher than averages calculated from individual-level IBHED data.
+    For these reasons I do not further analyse IPEDS salary data, and use salary data from IBHED to analyse faculty salaries.
+    Notably, IPEDS data on faculty counts do not suffer from these problems.
+}
+This gives a resulting panel data-set, where each row represents a university-year, and includes columns for university funding and tuition revenue, plus total count\footnote{
     Real salary is computed by scaling nominal salary to 2021 dollars by the CPI-U.
-} for professors by position (lecturer, assistant, tenured, total).
-\autoref{tab:ipeds-summary} presents summary statistics for relevant variables in these data.
+} for each faculty position (lecturer, assistant professor, tenured professor, and total faculty), and other university characteristics.
+\autoref{tab:ipeds-summary} presents summary statistics for these variables in IPEDS data.
 
-IPEDS provides information at the university level, but only provides aggregated information within a university.\footnote{
-    IPEDS additionally gives a mean salary measure for faculty by rank (inconsistently) for each university.
-    Unfortunately, this measure of professors' salaries is particularly crude in measuring on professors' salaries and other individual-outcomes; summary statistics on IPEDS data do not agree with trends in average professor salary over the sample time period compared to summary statistics provided in \citealt{aau2021survey}.
-    Similarly, IPEDS reports of the average salary paid to professors at private institutions also disagree with other sources (including those calculated for Illinois in IBHED data later in this section) so are not considered in this analysis.
+IPEDS provides information at the university level, but only provides aggregated information within a university.
+To investigate outcomes for individual faculty members, I integrate individual-level data for all faculty members at all Illinois public universities 2010--2021.
+These data allow me to investigate how individual faculty members are affected by funding cuts to their university, investigating outcomes are more granular details than total faculty counts.
+IBHED freely provides this information, as the state of Illinois is required to publicly report base salary and benefits for all administrators, faculty members, and instructors employed by each public college or university.\footnote{
+    Public Act 96-0266, effective 1 January 2010, is the relevant Illinois law that requires publicly publishing salary data for all public university faculty salary and benefits \citep{illinois-public-act}.
+    A pdf copy of Public Act 096-0266 is included in the supplmentary data of this paper.
+    This law applies to all nine Illinois public universities: Chicago State University, Eastern Illinois University, Governors State University, Illinois State University, Northeastern Illinois University, Northern Illinois University, Southern Illinois University (all five campuses), University of Illinois (all four campuses), Western Illinois University.
 }
-To investigate the distribution, I integrate individual-level data for every public university professor in the state of Illinois between the years 2010-2021.
-IBHED hosts the information;
-Public Act 96-0266 (effective 1 January 2010) requires that each university report base salary and benefits all administrators, faculty members, and instructors employed by the college or university.\footnote{
-    The universities included are all campuses of the nine Illinois public universities: Chicago State University, Eastern Illinois University, Governors State University, Illinois State University, Northeastern Illinois University, Northern Illinois University, Southern Illinois University  (all five campuses), University of Illinois (all four campuses), Western Illinois University.
+These data provide the basis to build a panel of Illinois public university faculty across years 2010--2021; I define a faculty member as an individual by their first plus last name and university pairing,\footnote{
+    Some faculty are listed multiple times in these panel data.
+    For example, Professor Alberto Agustin Lopez-Scala of the University of Illinois Chicago has two appointments, one as an adjunct faculty and one as a department director.
+    For this observation I take the highest paid position (department director) as the primary appointment and drop the secondary appointment (adjunct faculty).
+    In analysis of faculty exit rate, I collapse the appointments into one and only consider faculty exits as having a faculty appointment versus no appointment.
 }
-These publicly available data provides the basis to build a panel of Illinois public university professors 2010-2021; I define a professor as an individual by their first plus last name and university pairing, and link this database to IPEDS regarding finances for their employing institution.
+and link this database to IPEDS for data on their university employer.
 The Illinois sample represents 16,932 professors in the year 2010 and 15,352 in the year 2021, with summary statistics presented in \autoref{tab:illinois-summary}.
-Additionally, further analysis using the first year of a professor's employment focuses on the subset of professors with observed year of hiring between the years 2011 and 2021, representing 1,778 professors in 2011, and 9,099 in 2021.
+Analysis of professors' in their first year on the job focuses on the subset of professors with observed year of hiring 2011--2021 (i.e., after the panel's first year), representing 1,778 professors in 2011, and 9,099 in 2021.
 
 \subsection{Trends in Finances, Enrolment, and Faculty Composition}
 \label{sec:trends}
 
-States vary largely in how much they fund their public university systems, thanks in part to the state-wide budgeting process.
+States vary largely in how much they fund their public university systems, thanks in part to the state-wide budgeting process \citep{NBERw23736}.
 Planning for an annual budget begins two years ahead of the fiscal year, and the legislature votes to approve or reject the governor office's budget request a number of months before the fiscal year begins.\footnote{
-    \cite{NBERw23736} present a full discussion of the decision-making process for state appropriations, drawing on administrative records originally analysed by \cite{parmley2009state}.
+    \cite{NBERw23736} present a full discussion of the decision-making process for state funding, drawing on administrative records originally analysed by \cite{parmley2009state}.
 }
-US state governments, by majority, are legally obligated to run a balanced-budget, so that yearly variation in tax revenues (caused by changing economic conditions or otherwise) necessarily affect state expenditures.
-Public universities have relatively lower lobbying power than other funding beneficiaries, so often bear the brunt of state government funding cuts \citep{delaney2011state}.\footnote{
+US state governments, by majority, are legally obligated to run a balanced-budget, so that yearly variation in tax revenues (e.g., caused by changing economic conditions) necessarily affect state expenditures.
+Public universities have lower lobbying power than other state institutions, so often bear the brunt of state government funding cuts \citep{delaney2011state}.\footnote{
     \cite{delaney2011state} fully describe the financial environment of state expenditures, and what makes spending on higher education an attractive area for state governments to expand funding during years of higher tax revenues, and retract funding in leaner years.
     An analysis of state expenditures for the years 1980-2004 (overlapping with the sample for this analysis) provides solid evidence for these trends, and \autoref{fig:funding} observes these same trends.
 }
 These features lead to yearly variation in state funding not seen in other revenues sources (such as federal funding), since US states differ in their support for higher education, and are subject to fiscal constraints.
 Additionally, the number of higher education students in each state varies thanks to the size of each birth cohort.
-For example, the birth cohort of 1971 was larger than for neighbouring years, leading to more student demand for limited public university places for students turning 18 in 1989 \citep{bound2007cohort}.
-This leads to variation in the amount of funding per student across years, showing that per student state funding varies on multiple dimensions.
+For example, the birth cohort of 1971 was larger than that of 1970 or 1972, leading to more student demand for limited public university places for students turning 18 in 1989 \citep{bound2007cohort}.
+This leads to yearly variation in the amount of funding per student across years, showing that per student state funding varies on multiple dimensions.
 
 Public university revenues on average stagnated over 1990--2021.
 \autoref{fig:funding} show the trends in revenues for the mean public university for the years 1990--2021.
@@ -79,8 +89,8 @@ Over the same time period, we see the rise in use of non-tenure track instructor
 \label{sec:trends-illinois}
 
 Illinois funding for higher education has stagnated, and has experienced serious declines in the decade 2010--2021 --- similar in magnitude to the nation-wide decline over 1990--2021.
-State funding among the seven Illinois public university campuses has fallen by over 50\% for the last decade, on both an absolute and per-student basis (see \autoref{fig:illinois-funding}).
-Similar to the figures for the rest of the country, there has been a corresponding substitution towards tuition revenue.
+State funding Illinois public universities fell by over 50\% over 2010--2021, in both absolute and per-student terms (see \autoref{fig:illinois-funding}).
+%Similar to the figures for the rest of the country, there has been a corresponding substitution towards tuition revenue.
 
 There was not only a stagnation in state funding in this time period, but also large annual rises and falls, particularly around 2016.
 In the calendar year 2015, partisan disagreements between the democratic legislature and republican governor led to the 2016 fiscal year starting with no state budget.

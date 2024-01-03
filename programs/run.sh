@@ -39,4 +39,4 @@ cd ..
 cd ../text
 latexmk -pdf paper.tex
 latexmk -c
-cp paper.pdf ../state-funding-faculty-2023.pdf
+cp paper.pdf ../state-funding-faculty-2024.pdf
