@@ -1,10 +1,22 @@
-# state-funding-faculty
+# Less Funding, More Lecturers, and Fewer Professors: Stagnating State Funding for Higher Education and its Effect on Faculty at US Universities (2024)
 
-Senan Hogan-Hennessy, first draft on 18 August 2022.
+Senan Hogan-Hennessy, latest revision: 3 January 2024
 
-Latest revision: 3 January 2024
+Public universities employ more lecturers and fewer professors than at any other point in the last thirty years, relative to student enrolment.
+At the same time, state funding for higher education has stagnated.
+This paper shows that the decline in state funding led to a substitution away from professors toward lecturers at US public universities.
+Using a shift-share approach to instrument for state funding, I find that universities employ 4.4\% more lecturers per student following a 10\% funding cut.
+This shift is accompanied by a reduction in assistant professors and full professors per student by 1.4\% and 1.2\%, respectively.
+Incumbent professors' salaries, promotion rates, and quit rates at Illinois universities remain unaffected by funding cuts, indicating that the substitution arose from limiting the hiring of new tenure-track/tenured professors.
+Stagnating state funding impacts public universities and faculty, likely contributing to the deterioration of student outcomes at public universities since the 1990s.
 
-This is the replication package for the economics research paper ``Less Funding, More Lecturers, and Fewer Professors: Stagnating State Funding for Higher Education and its Effect on Faculty at US Universities,'' with statistical analysis on IPEDS and public Illinois data using the programming language *R*, and associated packages.
+- [state-funding-faculty-2024.pdf](https://github.com/shoganhennessy/state-funding-faculty/blob/main/state-funding-faculty-2024.pdf) is the latest version of the working paper.
+
+
+## Replication
+
+This folder is the replication package for the economics research paper ``Less Funding, More Lecturers, and Fewer Professors: Stagnating State Funding for Higher Education and its Effect on Faculty at US Universities,'' with statistical analysis on IPEDS and public Illinois data using the programming language *R*, and associated packages.
+
 A master bash file calls all code to build analysis data from raw files, produce the analysis files, and compile the final paper in one-go.
 
 The replicator should expect the code to run for less than 10 minutes, using at maximum 4GB of RAM.
@@ -33,5 +45,3 @@ Folder "programs/" contains multiple analysis, all using the *R* language, to an
 ## Text
 
 Folder "text/" contains all files regarding the final report, and write-up, of the empirical analysis.
-
-- "state-funding-faculty-2023.pdf" is the latest version of the working paper.
