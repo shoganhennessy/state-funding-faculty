@@ -1,6 +1,8 @@
-# Less Funding, More Lecturers, and Fewer Professors: Stagnating State Funding for Higher Education and its Effect on Faculty at US Universities (2024)
+# Less Funding, More Lecturers, and Fewer Professors
 
 Senan Hogan-Hennessy, latest revision: 3 January 2024
+
+## Stagnating State Funding for Higher Education and its Effect on Faculty at US Universities
 
 Public universities employ more lecturers and fewer professors than at any other point in the last thirty years, relative to student enrolment.
 At the same time, state funding for higher education has stagnated.
