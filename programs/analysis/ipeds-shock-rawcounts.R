@@ -95,7 +95,7 @@ reg.data <- reg.data %>%
     filter(1990 <= year,
         !is.na(enrollment_reported), enrollment_reported > 0,
         !is.na(all_prof_count),
-        !is.na(stateappropriations_real),
+        stateappropriations_real > 0,
         !is.na(appropriationshock_perEnroll_real)) %>%
     # Restrict to uni-years with all professor counts.
     filter(!is.na(lecturer_prof_count), lecturer_prof_count > 0) %>%
@@ -313,8 +313,9 @@ stargazer(
     naive_all_count.reg, shiftshare_all_count.reg,
     add.lines = outcome.means,
     dep.var.caption =
-        "Dependent Variable: Total Employment Count by Professor Group",
-    dep.var.labels = c("Lecturer", "Assistant", "Full", "All"),
+        "Dependent Variable: Faculty Count per 100 Students, by Position",
+    dep.var.labels = c(
+        "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
     column.labels = rep(c("OLS", "2SLS"), 4),
     digits = digits.no,
     digits.extra = digits.no,
@@ -329,3 +330,61 @@ stargazer(
     omit.table.layout = "n", notes.append = FALSE,
     type = "text",
     out = "../../text/tables/facultycount-shock-reg-rawcount.tex")
+
+# Plot the results.
+# Estimate with separate names
+plot_lecturer_count.reg <- reg.data %>%
+    mutate(lect_funding = - (stateappropriations_real / (1000 * enrollment_reported))) %>%
+    felm(lecturer_prof_count ~ 1 |
+        unitid + year |
+        (lect_funding ~ I(-appropriationshock_perEnroll_real)) |
+        state + year,
+        data = .)
+plot_assistant_count.reg <- reg.data %>%
+    mutate(asst_funding = - (stateappropriations_real / (1000 * enrollment_reported))) %>%
+    felm(assistant_prof_count ~ 1 |
+        unitid + year |
+        (asst_funding ~ I(-appropriationshock_perEnroll_real)) |
+        state + year,
+        data = .)
+plot_full_count.reg <- reg.data %>%
+    mutate(full_funding = - (stateappropriations_real / (1000 * enrollment_reported))) %>%
+    felm(full_prof_count ~ 1 |
+        unitid + year |
+        (full_funding ~ I(-appropriationshock_perEnroll_real)) |
+        state + year,
+        data = .)
+plot_all_count.reg <- reg.data %>%
+    mutate(all_funding = - (stateappropriations_real / (1000 * enrollment_reported))) %>%
+    felm(all_prof_count ~ 1 |
+        unitid + year |
+        (all_funding ~ I(-appropriationshock_perEnroll_real)) |
+        state + year,
+        data = .)
+substitution_rawcount.plot <-
+    jtools::plot_summs(
+        plot_lecturer_count.reg,
+        plot_assistant_count.reg,
+        plot_full_count.reg,
+        plot_all_count.reg,
+        coefs = c(
+            "Lecturers" = "`lect_funding(fit)`",
+            "Asst. Professors" = "`asst_funding(fit)`",
+            "Full Professors" = "`full_funding(fit)`",
+            "All Faculty" = "`all_funding(fit)`"),
+        legend.title = "",
+        plot.distributions = TRUE,
+        inner_ci_level = 0.95) +
+    theme_bw() +
+    theme(
+        #plot.title = element_text(size = rel(1)),
+        plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
+        legend.position = "none",
+        legend.margin = margin(t = -10)) +
+    scale_x_continuous(expand = c(0, 0),
+        name = "IV Estimate",
+        breaks = seq(-14, 14, by = 2))
+# Save this plot
+ggsave("../../text/figures/substitution-rawcount-plot.png",
+    plot = substitution_rawcount.plot,
+    units = "cm", dpi = 300, width = 1.25 * fig.width, height = 0.85 * fig.height)

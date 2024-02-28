@@ -2,6 +2,7 @@
 ## Senan Hogan-Hennessy, 3 August 2022
 ## IV for Prof's salaries, using IPEDS data.
 print(Sys.time())
+library(jtools) # Plotting estimates.
 library(tidyverse) # Functions for data manipulation and visualization
 library(lfe) # Functions for fast linear models with IV + FEs
 library(plm) # Functions for panel data
@@ -19,7 +20,7 @@ digits.no <- 3
 
 # Size for figures
 fig.width <- 10
-fig.height <- fig.width * 0.85
+fig.height <- fig.width * 0.9
 
 # Define a function to standardise the dplyr lag function
 # --- negative numbers mean a lag of t time periods, positive a lead of t.
@@ -52,48 +53,54 @@ reg.data <- ipeds.data %>%
         # Appropriations to the uni
         totalrevenues_real,
         nonauxrevenues_real,
+        fedappropriations_real,
         stateappropriations_real,
+        localappropriations_real,
+        statelocal_funding_real,
         tuitionrev_real,
         # Uni spending.
         nonauxspending_real,
         # Uni enrollment
         enrollment_reported,
         enrollment_fte,
-        # Appropriation shocks Per student
+        acceptance_rate,
+        completion_rate_150pct,
+        # Shift-sahre shocks Per student
         appropriationshock_perEnroll_real,
-        appropriationshock_perFTE_real,
-        appropriationshock_peruni_real,
+        allstate_stateappropriations_real,
+        staterevenues_baseshare,
+        stateEnroll_count,
         # Count of full-time professors (tenured or not)
         lecturer_prof_count,
         assistant_prof_count,
         full_prof_count,
         all_prof_count,
-        # Count of professors by tenure-rate (only 1990-)
-        nontenured_tenure_count,
-        tenuretrack_tenure_count,
-        tenured_tenure_count,
-        all_tenure_count,
-        # Average faculty salary
-        full_profmeansalary_real,
-        assistant_profmeansalary_real,
-        lecturer_profmeansalary_real,
-        all_profmeansalary_real,
-        # Total paid on professor salaries
-        all_profoutlays_real,
-        # Research and instruction expenditures.
+        # Research and instruction and other expenditures.
         instructionspending_total_real,
         instructionspending_salaries_real,
         researchspending_total_real,
         researchspending_salaries_real,
-        nonauxspending_real)
+        exp_pub_serv_real,
+        exp_student_serv_real,
+        exp_acad_supp_real,
+        exp_inst_supp_real,
+        exp_opm_areal,
+        exp_net_grant_aid_real,
+        # Incomplete counts of full+ part time professors.
+        lecturer_parttime_count,
+        assistant_parttime_count,
+        full_parttime_count,
+        lecturer_fulltime_count,
+        assistant_fulltime_count,
+        full_fulltime_count)
 
 
 # Restrict data to unis + years with measured state appropriations & shocks
 reg.data <- reg.data %>%
-    filter(1990 <= year,
+    filter(1990 <= year, #year < 2019,
         !is.na(enrollment_reported), enrollment_reported > 0,
         !is.na(all_prof_count),
-        !is.na(stateappropriations_real),
+        stateappropriations_real > 0,
         !is.na(appropriationshock_perEnroll_real)) %>%
     # Restrict to uni-years with all professor counts.
     filter(!is.na(lecturer_prof_count), lecturer_prof_count > 0) %>%
@@ -130,7 +137,7 @@ reg.data %>%
             "Lecturers count",
             "Assistant professors count",
             "Full professors count",
-            "All professors count"),
+            "All faculty count"),
         omit.table.layout = "n",
         header = FALSE, float = FALSE, no.space = TRUE,
         type = "text",
@@ -139,8 +146,12 @@ reg.data %>%
 
 # Plot funding sources over time -----------------------------------------------
 
-# Plot total gov funding by state + year.
-mean_funding_fte.data <- reg.data %>%
+# SHow how much finding CA gets in 1990 and end
+reg.data %>%
+    filter(
+        nonauxrevenues_real > 0,
+        stateappropriations_real > 0,
+        tuitionrev_real > 0) %>%
     group_by(state, year) %>%
     summarise(
         totalrevenues_real =
@@ -150,16 +161,20 @@ mean_funding_fte.data <- reg.data %>%
         stateappropriations_real =
             mean(stateappropriations_real / enrollment_reported, na.rm = TRUE),
         tuitionrev_real =
-            mean(tuitionrev_real / enrollment_reported, na.rm = TRUE))
-
-# SHow how much finding MA gets in 1990 and 2021
-mean_funding_fte.data %>%
+            mean(tuitionrev_real / enrollment_reported, na.rm = TRUE),
+        statelocal_funding_real =
+            mean(statelocal_funding_real / enrollment_reported, na.rm = TRUE)) %>%
+    ungroup() %>%
     filter(state %in% c("CA", "IL")) %>%
-    filter(year %in% c(1990, 2021)) %>%
+    filter(year %in% c(1990, 2018:2021)) %>%
     print()
 
 # Plot total gov funding by year.
 mean_funding_fte.data <- reg.data %>%
+    filter(
+        nonauxrevenues_real > 0,
+        stateappropriations_real > 0,
+        tuitionrev_real > 0) %>%
     group_by(year) %>%
     summarise(
         totalrevenues_real =
@@ -169,7 +184,8 @@ mean_funding_fte.data <- reg.data %>%
         stateappropriations_real =
             mean(stateappropriations_real / enrollment_reported, na.rm = TRUE),
         tuitionrev_real =
-            mean(tuitionrev_real / enrollment_reported, na.rm = TRUE))
+            mean(tuitionrev_real / enrollment_reported, na.rm = TRUE)) %>%
+    ungroup()
 
 # Define the plot
 mean_funding_fte.graph <- mean_funding_fte.data %>%
@@ -182,19 +198,19 @@ mean_funding_fte.graph <- mean_funding_fte.data %>%
     scale_x_continuous(name = "Year",
         breaks = seq(1985, 2020, by = 5)) +
     scale_y_continuous(name = "",
-        limits = c(0, 21),
-        breaks = seq(0, 50, by = 2.5),
+        limits = c(0, 25),
+        breaks = seq(0, 50, by = 5),
         labels = scales::comma) +
     theme_bw() +
-    ggtitle("Funding, $ thousands") +
+    ggtitle("Mean Funding per Student, $ thousands") +
     theme(plot.title = element_text(size = rel(1)),
         plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
         legend.position = "bottom",
         legend.margin = margin(t = -10)) +
     scale_colour_discrete(name = "",
         breaks = c("totalrevenues_real", "nonauxrevenues_real",
-        "stateappropriations_real", "tuitionrev_real"),
-        labels = c("Total", "Non-inst.", "State", "Tuition"))
+            "stateappropriations_real", "tuitionrev_real"),
+        labels = c("Total", "Total Non-inst.", "State", "Tuition"))
 # Save this plot
 ggsave("../../text/figures/mean-funding-fte.png",
     plot = mean_funding_fte.graph,
@@ -202,6 +218,11 @@ ggsave("../../text/figures/mean-funding-fte.png",
 
 # Plot total gov funding by year.
 mean_funding.data <- reg.data %>%
+    filter(
+        totalrevenues_real > 0,
+        nonauxrevenues_real > 0,
+        stateappropriations_real > 0,
+        tuitionrev_real > 0) %>%
     group_by(year) %>%
     summarise(
         totalrevenues_real =
@@ -212,6 +233,7 @@ mean_funding.data <- reg.data %>%
             mean(stateappropriations_real, na.rm = TRUE) / (10^6),
         tuitionrev_real =
             mean(tuitionrev_real, na.rm = TRUE) / (10^6))
+
 # Define the plot
 mean_funding.graph <- mean_funding.data %>%
     select(-totalrevenues_real) %>%
@@ -223,19 +245,19 @@ mean_funding.graph <- mean_funding.data %>%
     scale_x_continuous(name = "Year",
         breaks = seq(1985, 2020, by = 5)) +
     scale_y_continuous(name = "",
-        limits = c(0, 300),
+        limits = c(0, 302),
         breaks = seq(0, 500, by = 50),
         labels = scales::comma) +
     theme_bw() +
-    ggtitle("Funding, $ millions") +
+    ggtitle("Mean Total Funding, $ millions") +
     theme(plot.title = element_text(size = rel(1)),
         plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
         legend.position = "bottom",
         legend.margin = margin(t = -10)) +
     scale_colour_discrete(name = "",
         breaks = c("totalrevenues_real", "nonauxrevenues_real",
-        "stateappropriations_real", "tuitionrev_real"),
-        labels = c("Total", "Non-inst.", "State", "Tuition"))
+            "stateappropriations_real", "tuitionrev_real"),
+        labels = c("Total", "Total Non-inst.", "State", "Tuition"))
 # Save this plot
 ggsave("../../text/figures/mean-funding-total.png",
     plot = mean_funding.graph,
@@ -273,7 +295,10 @@ print((
 # Repeat the analysis for Illinois
 # Plot total gov funding by year.
 illinois_funding_fte.data <- reg.data %>%
-    filter(state == "IL") %>%
+    filter(state == "IL",
+        nonauxrevenues_real > 0,
+        stateappropriations_real > 0,
+        tuitionrev_real > 0) %>%
     group_by(year) %>%
     summarise(
         totalrevenues_real =
@@ -299,7 +324,7 @@ illinois_funding_fte.graph <- illinois_funding_fte.data %>%
         breaks = seq(0, 50, by = 5),
         labels = scales::comma) +
     theme_bw() +
-    ggtitle("Funding, $ thousands per student") +
+    ggtitle("Mean Funding per Student, $ thousands") +
     theme(plot.title = element_text(size = rel(1)),
         plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
         legend.position = "bottom",
@@ -315,7 +340,10 @@ ggsave("../../text/figures/illinois-funding-fte.png",
 
 # Plot total gov funding by year.
 illinois_funding.data <- reg.data %>%
-    filter(state == "IL") %>%
+    filter(state == "IL",
+        nonauxrevenues_real > 0,
+        stateappropriations_real > 0,
+        tuitionrev_real > 0) %>%
     group_by(year) %>%
     summarise(
         totalrevenues_real =
@@ -341,7 +369,7 @@ illinois_funding.graph <- illinois_funding.data %>%
         breaks = seq(0, 1000, by = 50),
         labels = scales::comma) +
     theme_bw() +
-    ggtitle("Funding, $ millions") +
+    ggtitle("Total Funding, $ millions") +
     theme(plot.title = element_text(size = rel(1)),
         plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
         legend.position = "bottom",
@@ -354,6 +382,134 @@ illinois_funding.graph <- illinois_funding.data %>%
 ggsave("../../text/figures/illinois-funding-total.png",
     plot = illinois_funding.graph,
     units = "cm", dpi = 300, width = fig.width, height = fig.height)
+
+# Show the percent of spending going to instruction spending.
+percent_instruction.plot <- reg.data %>%
+    filter(instructionspending_salaries_real > 0,
+        nonauxspending_real > 0) %>%
+    group_by(year) %>%
+    summarise(
+        instructionspending_salaries_real =
+            sum(instructionspending_salaries_real, na.rm = TRUE),
+        nonauxspending_real =
+            sum(nonauxspending_real, na.rm = TRUE)) %>%
+    ungroup() %>%
+    mutate(instructionsalaries_percent =
+        instructionspending_salaries_real / nonauxspending_real) %>%
+    ggplot(aes(x = year, y = instructionsalaries_percent)) +
+    geom_bar(stat = "identity", fill = "blue") +
+    theme_bw() +
+    scale_x_continuous(expand = c(0.005, 0.005),
+        name = "Year",
+        breaks = seq(1990, 2022, by = 5)) +
+    scale_y_continuous(expand = c(0.01, 0),
+        name = "",
+        limits = c(0, 1),
+        breaks = seq(0, 1, by = 0.1)) +
+    ggtitle("Percent of Total Spending going to Instruction Salaries") +
+    theme(plot.title = element_text(size = rel(1), hjust = 0),
+        plot.title.position = "plot",
+        plot.margin = unit(c(0.5, 3, 0, 0), "mm"))
+# Save this plot
+ggsave("../../text/figures/percent-instruction.png",
+    plot = percent_instruction.plot,
+    units = "cm", dpi = 300, width = 1.25 * fig.width, height = fig.height)
+
+# Show the percent of spending going to instruction spending + everything else.
+percent_spending.plot <- reg.data %>%
+    filter(year != 2000) %>%
+    group_by(year) %>%
+    summarise(
+        # Instruction spending.
+        instructionspending_salaries = mean(instructionspending_salaries_real, na.rm = TRUE),
+        instructionspending_nonsalaries =
+            mean((instructionspending_total_real - instructionspending_salaries_real
+                ), na.rm = TRUE),
+        # Research spending.
+        researchspending_salaries = mean(researchspending_salaries_real, na.rm = TRUE),
+        researchspending_nonsalaries =
+            mean((researchspending_total_real - researchspending_salaries_real
+                ), na.rm = TRUE),
+        # Other areas.
+        exp_pub_serv_real = mean(exp_pub_serv_real, na.rm = TRUE),
+        exp_student_serv_real = mean(exp_student_serv_real, na.rm = TRUE),
+        exp_acad_supp_real = mean(exp_acad_supp_real, na.rm = TRUE),
+        exp_inst_supp_real = mean(exp_inst_supp_real, na.rm = TRUE),
+        exp_opm_areal = mean(exp_opm_areal, na.rm = TRUE),
+        exp_net_grant_aid_real = mean(exp_net_grant_aid_real, na.rm = TRUE),
+        nonauxspending_real = mean(nonauxspending_real, na.rm = TRUE)) %>%
+    ungroup() %>%
+    transmute(year = year,
+        instructionspending_salaries = instructionspending_salaries / nonauxspending_real,
+        instructionspending_nonsalaries = instructionspending_nonsalaries / nonauxspending_real,
+        researchspending_salaries = researchspending_salaries / nonauxspending_real,
+        researchspending_nonsalaries = researchspending_nonsalaries / nonauxspending_real,
+        exp_pub_serv_real = exp_pub_serv_real / nonauxspending_real,
+        exp_student_serv_real = exp_student_serv_real / nonauxspending_real,
+        exp_acad_supp_real = exp_acad_supp_real / nonauxspending_real,
+        exp_inst_supp_real = exp_inst_supp_real / nonauxspending_real,
+        exp_opm_areal = exp_opm_areal / nonauxspending_real,
+        exp_net_grant_aid_real = exp_net_grant_aid_real / nonauxspending_real,
+        #other = (1 - instructionspending_salaries +
+        #    instructionspending_nonsalaries +
+        #    researchspending_salaries +
+        #    researchspending_nonsalaries +
+        #    exp_pub_serv_real +
+        #    exp_student_serv_real +
+        #    exp_acad_supp_real +
+        #    exp_inst_supp_real +
+        #    exp_opm_areal +
+        #    exp_net_grant_aid_real)
+        ) %>%
+    pivot_longer(!year, names_to = "category", values_to = "percent") %>%
+    ggplot(aes(x = year, y = percent, fill = category)) +
+    geom_bar(stat = "identity") +
+    theme_bw() +
+    scale_x_continuous(expand = c(0.005, 0.005),
+        name = "Year",
+        breaks = seq(1990, 2022, by = 5)) +
+    scale_y_continuous(expand = c(0.01, 0),
+        name = "",
+        limits = c(0, 1.01),
+        breaks = seq(0, 1, by = 0.1)) +
+    scale_fill_manual(
+        values = viridis::plasma(10),
+        limits = c(
+            "instructionspending_salaries",
+            "instructionspending_nonsalaries",
+            "researchspending_salaries",
+            "researchspending_nonsalaries",
+            "exp_pub_serv_real",
+            "exp_student_serv_real",
+            "exp_acad_supp_real",
+            "exp_inst_supp_real",
+            "exp_opm_areal",
+            "exp_net_grant_aid_real"), #"other")
+        labels = c("Instruction, salaries",
+            "Instruction, general",
+            "Research, salaries",
+            "Research, general",
+            "Public service",
+            "Student services",
+            "Acad. support",
+            "Inst. support",
+            "Operations",
+            "Grant Aid")) + #"Other")
+    ggtitle("Percent of Total Spending going to Different Areas") +
+    theme(plot.title = element_text(size = rel(1), hjust = 0),
+        plot.title.position = "plot",
+        plot.margin = unit(c(0.5, 3, 0, 0), "mm"),
+        legend.position = "top",
+        legend.title = element_blank()) +
+    guides(fill = guide_legend(ncol = 4))
+#viridis::viridis(10)
+#viridis::magma(n)
+#viridis::inferno(n)
+#viridis::plasma(n)
+# Save this plot
+ggsave("../../text/figures/percent-spending.png",
+    plot = percent_spending.plot,
+    units = "cm", dpi = 300, width = 1.5 * fig.width, height = 1.25 * fig.height)
 
 
 # Tables for Instrument Exogeneity ---------------------------------------------
@@ -434,7 +590,7 @@ stargazer(
         "Lecturers",
         "Assistant professors",
         "Full professors",
-        "All professors"),
+        "All faculty"),
     covariate.labels = c("State Funding"),
     digits = digits.no,
     digits.extra = digits.no,
@@ -550,26 +706,33 @@ reg.data %>%
             appropriationshock_perEnroll_real))) %>%
     group_by(instrument_quantile) %>%
     summarise(
-        `State Funding Shock, \\$ per student`   = round(mean(appropriationshock_perEnroll_real, an.rm = TRUE)),
-        `State Funding, per student`             = round(mean(stateappropriations_real / enrollment_reported, na.rm = TRUE)),
-        `Total Full-time Enrolment`              = round(mean(enrollment_reported, na.rme = TRUE)),
-        `State Funding, \\$ millions`            = round(mean(stateappropriations_real / 10^6, na.rme = TRUE)),
-        `Total Revenues, \\$ millions`           = round(mean(totalrevenues_real / 10^6, na.rme = TRUE)),
-        `Total Revenues, \\$ per student`        = round(mean(totalrevenues_real / enrollment_reported, na.rm = TRUE)),
-        `Lecturer Count`                         = round(mean(lecturer_prof_count, na.rm = TRUE)),
-        `Assistant Professor Count`              = round(mean(assistant_prof_count, na.rm = TRUE)),
-        `Full Professor Count`                   = round(mean(full_prof_count, na.rm = TRUE)),
-        `Total Professor Count`                  = round(mean(all_prof_count, na.rm = TRUE)),
-        `Lecturers, per 100 students`            = mean(100 * lecturer_prof_count / enrollment_reported, na.rm = TRUE),
-        `Assistant Professors, per 100 students` = mean(100 * assistant_prof_count / enrollment_reported, na.rm = TRUE),
-        `Full Professors, per 100 students`      = mean(100 * full_prof_count / enrollment_reported, na.rm = TRUE),
-        `Total Professors, per 100 students`     = mean(100 * all_prof_count / enrollment_reported, na.rm = TRUE)
-            ) %>%
+        `IV Components, \\$ per student:` = NA,
+        `Funding shift--share`        = round(mean(- appropriationshock_perEnroll_real, na.rm = TRUE)),
+        `Shift in state--wide funding`   = round(mean(- allstate_stateappropriations_real / stateEnroll_count, na.rm = TRUE)),
+        `Share reliance on state funding, \\% in 1990--1993`    = round(mean(staterevenues_baseshare, na.rm = TRUE), 2),
+        `\\hline University Funding and Spending, \\$ millions:` = NA,
+        `State funding`               = round(mean(stateappropriations_real / 10^6, na.rm = TRUE)),
+        `Tuition revenue`             = round(mean(tuitionrev_real / 10^6, na.rm = TRUE)),
+        `Total non-inst. revenues`    = round(mean(nonauxrevenues_real / 10^6, na.rm = TRUE)),
+        `Instruction spending`        = round(mean(instructionspending_total_real / 10^6, na.rm = TRUE)),
+        `Research Spending`           = round(mean(researchspending_total_real / 10^6, na.rm = TRUE)),
+        `\\hline University Funding and Spending, \\$ per student` = NA,
+        `fte State funding`              = round(mean(stateappropriations_real / enrollment_reported, na.rm = TRUE)),
+        `fte Tuition revenue`            = round(mean(tuitionrev_real / enrollment_reported, na.rm = TRUE)),
+        `fte Total non-inst. revenues`   = round(mean(nonauxrevenues_real / enrollment_reported, na.rm = TRUE)),
+        `fte Instruction spending`       = round(mean(instructionspending_total_real / enrollment_reported, na.rm = TRUE)),
+        `fte Research spending`          = round(mean(researchspending_total_real / enrollment_reported, na.rm = TRUE)),
+        `\\hline Selectivity:` = NA,
+        `Reported enrolment`            = round(mean(enrollment_reported, na.rm = TRUE)),
+        `Full-time equivalent enrolment` = round(mean(enrollment_fte, na.rm = TRUE)),
+        `Acceptance rate, \\%`          = round(mean(acceptance_rate, na.rm = TRUE), 2),
+        `6 Year graduation rate, \\%`   = round(mean(completion_rate_150pct, na.rm = TRUE), 2)) %>%
     ungroup() %>%
     pivot_longer(!instrument_quantile,
         names_to = "variable", values_to = "value") %>%
     pivot_wider(names_from = "instrument_quantile",
         values_from = "value") %>%
+    mutate(variable = str_replace(variable, "fte ", "")) %>%
     transmute(`Instrument Quantile:` = variable,
         `1st` = `0`,
         `2nd` = `1`,
@@ -577,7 +740,6 @@ reg.data %>%
         `4th` = `3`,
         `5th` = `4`) %>%
     xtable(type = "latex",
-        digits = 2,
         align = "llccccc") %>%
     print(
         sanitize.colnames.function = identity,
@@ -726,7 +888,7 @@ lag.plot <- lag.data %>%
     geom_line(aes(y = estimate), colour = "blue") +
     geom_line(aes(y = conf.low), linetype = "dashed") +
     geom_line(aes(y = conf.high), linetype = "dashed") +
-    scale_x_continuous(name = "Years, Relative to Initital Shock",
+    scale_x_continuous(name = "Years, Relative to Funding Cut",
         breaks = lag.data$t, expand = c(0.01, 0.01)) +
     scale_y_continuous(name = "",
         #limits = c(-0.2, 0.75),
@@ -846,8 +1008,10 @@ stargazer(
     naive_full_count.reg, shiftshare_full_count.reg,
     naive_all_count.reg, shiftshare_all_count.reg,
     add.lines = outcome.means,
-    dep.var.caption = "Dependent Variable: Employment Count by Professor Group",
-    dep.var.labels = c("Lecturer", "Assistant", "Full", "All"),
+    dep.var.caption =
+        "Dependent Variable: Log Faculty Count per Students, by Position",
+    dep.var.labels = c(
+        "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
     column.labels = rep(c("OLS", "2SLS"), 4),
     digits = digits.no,
     digits.extra = digits.no,
@@ -864,31 +1028,30 @@ stargazer(
     out = "../../text/tables/facultycount-shock-reg-fte.tex")
 
 # Plot the results.
-library(jtools)
 # Estimate with separate names
 plot_lecturer_count.reg <- reg.data %>%
-    mutate(lect_funding = log(stateappropriations_real / enrollment_reported)) %>%
+    mutate(lect_funding = - log(stateappropriations_real / enrollment_reported)) %>%
     felm(log(lecturer_prof_count / enrollment_reported) ~ 1 |
         unitid + year |
         (lect_funding ~ I(-log(appropriationshock_perEnroll_real))) |
         state + year,
         data = .)
 plot_assistant_count.reg <- reg.data %>%
-    mutate(asst_funding = log(stateappropriations_real / enrollment_reported)) %>%
+    mutate(asst_funding = - log(stateappropriations_real / enrollment_reported)) %>%
     felm(log(assistant_prof_count / enrollment_reported) ~ 1 |
         unitid + year |
         (asst_funding ~ I(-log(appropriationshock_perEnroll_real))) |
         state + year,
         data = .)
 plot_full_count.reg <- reg.data %>%
-    mutate(full_funding = log(stateappropriations_real / enrollment_reported)) %>%
+    mutate(full_funding = - log(stateappropriations_real / enrollment_reported)) %>%
     felm(log(full_prof_count / enrollment_reported) ~ 1 |
         unitid + year |
         (full_funding ~ I(-log(appropriationshock_perEnroll_real))) |
         state + year,
         data = .)
 plot_all_count.reg <- reg.data %>%
-    mutate(all_funding = log(stateappropriations_real / enrollment_reported)) %>%
+    mutate(all_funding = - log(stateappropriations_real / enrollment_reported)) %>%
     felm(log(all_prof_count / enrollment_reported) ~ 1 |
         unitid + year |
         (all_funding ~ I(-log(appropriationshock_perEnroll_real))) |
@@ -901,9 +1064,9 @@ elasticity.plot <- plot_summs(
     plot_all_count.reg,
     coefs = c(
         "Lecturers" = "`lect_funding(fit)`",
-        "Assistant Professors" = "`asst_funding(fit)`",
+        "Asst. Professors" = "`asst_funding(fit)`",
         "Full Professors" = "`full_funding(fit)`",
-        "All Professors" = "`all_funding(fit)`"),
+        "All Faculty" = "`all_funding(fit)`"),
     legend.title = "",
     plot.distributions = TRUE,
     inner_ci_level = 0.95) +
@@ -912,14 +1075,78 @@ elasticity.plot <- plot_summs(
         #plot.title = element_text(size = rel(1)),
         plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
         legend.position = "none",
-        legend.margin = margin(t = -10))
+        legend.margin = margin(t = -10)) +
+    scale_x_continuous(expand = c(0, 0),
+        name = "IV Estimate",
+        breaks = seq(-1, 1, by = 0.1))
 # Save this plot
 ggsave("../../text/figures/elasticity-plot.png",
     plot = elasticity.plot,
-    units = "cm", dpi = 300, width = 1.3 * fig.width, height = 0.9 * fig.height)
+    units = "cm", dpi = 300, width = 1.25 * fig.width, height = 0.85 * fig.height)
 
 
-# Get the rates of susbtituion from the elasticity estimates -------------------
+################################################################################
+## exogenoeity of instrument relative to outcomes:
+# See if preceding faculty outcomes are related to funding shifts.
+all_coefficient.list <- c()
+all_upper_ci.list <- c()
+all_lower_ci.list <- c()
+
+# Loop across time periods, to estimate the correlation between years.
+lag.levels <- -7:5
+for (t in lag.levels){
+    print(t)
+    # All Faculty
+    lag.reg <- reg.data %>%
+        mutate(lag_log_outcome_fte = log(lag_lead(
+            all_prof_count / enrollment_fte, t))) %>%
+        felm(lag_log_outcome_fte ~ 1 +
+            I(-log(appropriationshock_perEnroll_real)) |
+            unitid + year |
+            0 |
+            state + year,
+            data = .) %>%
+        summary()
+    all_ci.halflength <- 1.96 * lag.reg$coefficients[2]
+    all_coefficient.list <- c(all_coefficient.list, lag.reg$coefficients[1])
+    all_upper_ci.list <- c(all_upper_ci.list, lag.reg$coefficients[1] + ci.halflength)
+    all_lower_ci.list <- c(all_lower_ci.list, lag.reg$coefficients[1] - ci.halflength)
+}
+# Collect together
+faculty_lag.data <- data.frame(
+    lag.levels,
+    all_coefficient.list,
+    all_upper_ci.list,
+    all_lower_ci.list)
+# Plot the lagged results.
+faculty_lag.plot <- faculty_lag.data %>%
+    ggplot(aes(x = lag.levels)) +
+    geom_vline(xintercept = 0, alpha = 0.5) +
+    geom_hline(yintercept = 0, alpha = 0.5) +
+    #  All prof
+    geom_ribbon(aes(ymin = all_lower_ci.list, ymax = all_upper_ci.list),
+        alpha = 0.4, fill = "grey70") +
+    geom_line(aes(y = all_lower_ci.list), linetype = "dashed") +
+    geom_line(aes(y = all_upper_ci.list), linetype = "dashed") +
+    geom_point(aes(y = all_coefficient.list), colour = "orange") +
+    geom_line(aes(y = all_coefficient.list), colour = "orange") +
+    scale_x_continuous(name = "Years, Relative to Funding Cut",
+        breaks = lag.data$t, expand = c(0.01, 0.01)) +
+    scale_y_continuous(name = "",
+        #limits = c(-0.2, 0.75),
+        breaks = seq(-5, 5, by = 0.1)) +
+    theme_bw() +
+    ggtitle("Estimate") +
+    theme(plot.title = element_text(size = rel(1)),
+        plot.margin = unit(c(0.5, 1, 0, 0), "mm"))
+# Save this plot.
+ggsave("../../text/figures/faculty-dynamic-balance.png",
+    plot = faculty_lag.plot,
+    units = "cm", dpi = 300, width = 1.5 * fig.width, height = fig.height)
+
+
+
+# Get the rates of substituion from the elasticity estimates -------------------
 
 # Plot the elasticities for profesorrs w.r.t state funding
 fixest::coefplot(list(
@@ -1339,3 +1566,91 @@ stargazer(
     omit.table.layout = "n", notes.append = FALSE,
     type = "text",
     out = "../../text/tables/expenditures-shock-reg-fte.tex")
+
+
+################################################################################
+## Show rate of part-time lecturers in the incomplete recent data.
+
+# Show which years these data are available for.
+reg.data %>%
+    filter(!is.na(lecturer_parttime_count),
+        !is.na(lecturer_fulltime_count)) %>%
+    group_by(year) %>%
+    summarise(count = n()) %>%
+    ungroup() %>%
+    print()
+
+# Look at the number of part time lecturers at UICHICAGO
+reg.data %>%
+    filter(unitid == 145600, year > 2004) %>%
+    select(unitid, year, state,
+        lecturer_parttime_count,
+        assistant_parttime_count,
+        full_parttime_count,
+        lecturer_fulltime_count,
+        assistant_fulltime_count,
+        full_fulltime_count) %>%
+    View()
+
+# Get the rate of part time lecturers in each year.
+count_lecturers.data <- reg.data %>%
+    filter(!is.na(lecturer_parttime_count), lecturer_parttime_count > 0,
+        !is.na(lecturer_fulltime_count), lecturer_fulltime_count > 0) %>%
+    group_by(year) %>%
+    summarise(
+        lecturer_parttime_count = sum(lecturer_parttime_count, na.rm = TRUE),
+        lecturer_fulltime_count = sum(lecturer_fulltime_count, na.rm = TRUE)) %>%
+    ungroup()
+
+# Show the percent who are part-time lecturers.
+count_lecturers.plot <- count_lecturers.data %>%
+    filter(year > 2004) %>%
+    mutate(lecturer_parttime_rate = lecturer_parttime_count / (
+            lecturer_parttime_count + lecturer_fulltime_count)) %>%
+    ggplot(aes(x = year, y = lecturer_parttime_rate)) +
+    geom_bar(stat = "identity", fill = "red") +
+    #annotate("text", colour = "red",
+    #    x = 1, y = 80,
+    #    label = expression("Mean" %~~% " +45%"),
+    #    size = 4.25, fontface = "bold") +
+    theme_bw() +
+    scale_x_continuous(expand = c(0.005, 0.005),
+        name = "Year",
+        breaks = seq(2000, 2022, by = 2)) +
+    scale_y_continuous(expand = c(0.01, 0),
+        name = "",
+        limits = c(0, 1),
+        breaks = seq(0, 1, by = 0.1)) +
+    ggtitle("Percent of Lecturers Working Part-time") +
+    theme(plot.title = element_text(size = rel(1), hjust = 0),
+        plot.title.position = "plot",
+        plot.margin = unit(c(0.5, 3, 0, 0), "mm"))
+# Save this plot
+ggsave("../../text/figures/partime-lecturers.png",
+    plot = count_lecturers.plot,
+    units = "cm", dpi = 300, width = fig.width, height = fig.height)
+
+# SHow the amount of spending that goes to instructional salaries (total).
+instruct_spending.plot <- reg.data %>%
+    filter(instructionspending_salaries_real > 0, nonauxspending_real > 0) %>%
+    group_by(year) %>%
+    summarise(instructionspending_salaries_fraction =
+        mean(instructionspending_salaries_real / nonauxspending_real)) %>%
+    ggplot(aes(x = year, y = instructionspending_salaries_fraction)) +
+    #geom_point(colour = "blue") +
+    geom_bar(stat = "identity", fill = "blue") +
+    theme_bw() +
+    scale_x_continuous(expand = c(0.005, 0.005),
+        name = "Year",
+        breaks = seq(1990, 2022, by = 5)) +
+    scale_y_continuous(expand = c(0.01, 0),
+        name = "",
+        limits = c(0, 0.35),
+        breaks = seq(0, 1, by = 0.05)) +
+    ggtitle("Spending on Faculty Salaries as a Percent of Total") +
+    theme(plot.title = element_text(size = rel(1), hjust = 0),
+        plot.title.position = "plot")
+# Save this plot
+ggsave("../../text/figures/instruct-spending.png",
+    plot = instruct_spending.plot,
+    units = "cm", dpi = 300, width = 1.25 * fig.width, height = fig.height)

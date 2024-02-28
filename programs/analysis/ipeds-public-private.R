@@ -13,7 +13,7 @@ digits.no <- 3
 
 # Size for figures
 fig.width <- 9
-fig.height <- fig.width * 0.85
+fig.height <- fig.width * 0.9
 
 
 # Load data sources ------------------------------------------------------------
@@ -68,6 +68,14 @@ gc()
 
 # Public vs private enrollment comparison --------------------------------------
 
+# How many public unis + students in 2020/2021?
+ipeds.data %>%
+    group_by(public, year) %>%
+    summarise(
+        total_count = n(),
+        enrollment_reported = sum(enrollment_reported, na.rm = TRUE)) %>%
+    ungroup() %>%
+    View() #print()
 
 # Show enrollment at public vs private over time: total + average
 enrollment.data <- ipeds.data %>%
@@ -184,28 +192,28 @@ prof_perfte.data <- ipeds.data %>%
     group_by(public, year) %>%
     summarise(
         full_fte_perprof     = sum(full_prof_count, na.rm = TRUE) /
-            sum(enrollment_reported, na.rm = TRUE),
+            sum(enrollment_reported / 100, na.rm = TRUE),
         assistant_fte_perprof = sum(assistant_prof_count, na.rm = TRUE) /
-            sum(enrollment_reported, na.rm = TRUE),
+            sum(enrollment_reported / 100, na.rm = TRUE),
         lecturer_fte_perprof  = sum(lecturer_prof_count, na.rm = TRUE) /
-            sum(enrollment_reported, na.rm = TRUE),
+            sum(enrollment_reported / 100, na.rm = TRUE),
         all_fte_perprof         = sum(all_prof_count, na.rm = TRUE) /
-            sum(enrollment_reported, na.rm = TRUE)) %>%
+            sum(enrollment_reported / 100, na.rm = TRUE)) %>%
     ungroup()
 
 # Draw the graph for lecturers Professors per student
 lecturer_fte_perprof.plot <- prof_perfte.data %>%
-    ggplot(aes(x = year, y = 1 / lecturer_fte_perprof, colour = factor(public))) +
+    ggplot(aes(x = year, y = lecturer_fte_perprof, colour = factor(public))) +
     geom_point() +
     geom_line() +
     scale_x_continuous(name = "Year",
         breaks = seq(1985, 2020, by = 5)) +
     scale_y_continuous(name = "",
-        limits = c(20, 350),
-        breaks = seq(0, 350, by = 25),
+        limits = c(0, 1),
+        breaks = seq(0, 1, by = 0.25),
         labels = scales::comma) +
     theme_bw() +
-    ggtitle("Students per Lecturer") +
+    ggtitle("Lecturer count / 100 students") +
     theme(plot.title = element_text(size = rel(1)),
         plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
         legend.position = "bottom",
@@ -217,17 +225,17 @@ ggsave("../../text/figures/lecturer-fte-perprof.png",
 
 # Draw the graph for TT Professors per student
 assistant_fte_perprof.plot <- prof_perfte.data %>%
-    ggplot(aes(x = year, y = 1 / assistant_fte_perprof, colour = factor(public))) +
+    ggplot(aes(x = year, y = assistant_fte_perprof, colour = factor(public))) +
     geom_point() +
     geom_line() +
     scale_x_continuous(name = "Year",
         breaks = seq(1985, 2020, by = 5)) +
     scale_y_continuous(name = "",
-        limits = c(20, 120),
-        breaks = seq(0, 350, by = 10),
+        limits = c(0.5, 1.5),
+        breaks = seq(0, 2, by = 0.25),
         labels = scales::comma) +
     theme_bw() +
-    ggtitle("Students per Assistant Professor") +
+    ggtitle("Asst. Professors / 100 students") +
     theme(plot.title = element_text(size = rel(1)),
         plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
         legend.position = "bottom",
@@ -239,17 +247,17 @@ ggsave("../../text/figures/assistant-fte-perprof.png",
 
 # Draw the graph for tenured Professors per student
 full_fte_perprof.plot <- prof_perfte.data %>%
-    ggplot(aes(x = year, y = 1 / full_fte_perprof, colour = factor(public))) +
+    ggplot(aes(x = year, y = full_fte_perprof, colour = factor(public))) +
     geom_point() +
     geom_line() +
     scale_x_continuous(name = "Year",
         breaks = seq(1985, 2020, by = 5)) +
     scale_y_continuous(name = "",
-        limits = c(20, 55),
-        breaks = seq(0, 350, by = 5),
+        limits = c(1.5, 3),
+        breaks = seq(1.5, 3, by = 0.25),
         labels = scales::comma) +
     theme_bw() +
-    ggtitle("Students per Full Professor") +
+    ggtitle("Tenured Professors / 100 students") +
     theme(plot.title = element_text(size = rel(1)),
         plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
         legend.position = "bottom",
@@ -261,17 +269,17 @@ ggsave("../../text/figures/full-fte-perprof.png",
 
 # Draw the graph for all Professors per student
 all_fte_perprof.plot <- prof_perfte.data %>%
-    ggplot(aes(x = year, y = 1 / all_fte_perprof, colour = factor(public))) +
+    ggplot(aes(x = year, y = all_fte_perprof, colour = factor(public))) +
     geom_point() +
     geom_line() +
     scale_x_continuous(name = "Year",
         breaks = seq(1985, 2020, by = 5)) +
     scale_y_continuous(name = "",
-        limits = c(20, 30),
-        breaks = seq(0, 35, by = 2),
+        limits = c(3, 5),
+        breaks = seq(0, 5, by = 0.25),
         labels = scales::comma) +
     theme_bw() +
-    ggtitle("Students per Total Faculty") +
+    ggtitle("All Faculty count / 100 students") +
     theme(plot.title = element_text(size = rel(1)),
         plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
         legend.position = "bottom",

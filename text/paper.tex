@@ -37,30 +37,8 @@
 \usepackage{centernot}                                                     % center \not usage
 \usepackage{siunitx} \sisetup{round-mode=places, round-precision=3}        % Formalise use of units and numbers among text
 \DeclareMathOperator{\eps}{\varepsilon}                                    % epsilon short hand shortcut
-\DeclareMathOperator{\st}{\text{ s.t. }}                                   % "such that" short hand shortcut
-\DeclareMathOperator{\then}{\text{ then }}                                 % "then" in equation shortcut
-\DeclareMathOperator{\ifeq}{\text{ if }}                                   % "if" in equation shortcut
-\DeclareMathOperator{\oreq}{\text{ or }}                                   % "or" in equation shortcut
-\DeclareMathOperator{\andeq}{\text{ and }}                                 % "and" in equation shortcut
-\DeclareMathOperator{\all}{,\; \forall}                                    % all (with spacing) in equation shortcut
-\DeclareMathOperator{\N}{\mathbb{N}}                                       % N, natural number, shortcut
-\DeclareMathOperator{\R}{\mathbb{R}}                                       % R, real number, shortcut
-\DeclareMathOperator{\Ll}{\mathcal{L}}                                     % L, Lagrangian, shortcut
 \renewcommand{\vec}[1]{\boldsymbol{\mathit{#1}}}                           % vector notation shortcut
 \newcommand{\mat}[1]{\boldsymbol{\mathit{#1}}}                             % matrix notation shortcut
-\DeclarePairedDelimiter\abs{\lvert}{\rvert}                                % absolute value notation shortcut
-\DeclarePairedDelimiter\norm{\lVert}{\rVert}                               % norm notation shortcut
-\newcommand{\Prob}[1]{\Pr\left( #1 \right)}                         % SHortcut for probability notation
-\newcommand{\Probgiven}[2]{\Pr\left( #1 \, \middle\vert \, #2 \right)} % SHortcut for probability notation, given
-\newcommand{\E}[2][]{\mathbb{E}_{#1} \left[ #2 \right]}                    % Expectation (with optional subscript) shortcut
-\newcommand{\Egiven}[3][]{\mathbb{E}_{#1} \left[ #2 \, \middle\vert \, #3 \right]} % Expectation given (with optional subscript) shortcut
-\newcommand{\Var}[2][]{\text{Var}_{#1} \left( #2 \right)}                  % Variation (with optional subscript) shortcut
-\newcommand{\Cov}[1]{\text{Cov} \left( #1 \right)}                         % Covariance (with optional subscript) shortcut
-\newcommand{\median}[1]{\text{median} \left( #1 \right)}                   % Median (with optional subscript) shortcut
-\newcommand{\indicator}[1]{\mathds{1}\left\{ #1 \right\}}                  % SHortcut for indicator function
-\newcommand{\diff}[2][]{\frac{d#1}{d#2}}                                   % SHortcut for differential fraction as a function
-\newcommand{\partialdiff}[2][]{\frac{\partial#1}{\partial#2}}              % SHortcut for partial differential fraction as a function
-\newcommand{\converge}[1]{\xrightarrow{ #1 \to\infty}}                     % SHortcut for convergence arrow
 \renewcommand{\hat}[1]{\widehat{#1}}                                       % Default estimator notation is widehat
 \renewcommand{\bar}[1]{\overline{#1}}                                      % Make over bar look nicer
 \renewcommand{\tilde}[1]{\widetilde{#1}}                                   % Make over tilde look better
@@ -68,7 +46,8 @@
 \usepackage[longnamesfirst]{natbib}                                        % Citation package, see https://en.wikibooks.org/wiki/LaTeX/Bibliography_Management#Natbib
 \usepackage[backref=page]{hyperref}                                        % Allow for links across the text, with colour options
 \hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, filecolor=magenta, urlcolor=blue}
-\def\sectionautorefname~#1\null{Section~#1\null}                       % Fix autoref for sections
+\def\sectionautorefname~#1\null{Section~#1\null}                           % Fix autoref for sections
+\def\subsectionautorefname~#1\null{Subsection~#1\null}                     % Fix autoref for sections
 \def\equationautorefname~#1\null{Equation~(#1)\null}                       % Fix autoref for equations
 % IMPORTANT: follow style guide here https://github.com/Wookai/paper-tips-and-tricks
 
@@ -80,13 +59,14 @@
         For helpful comments I thank
         Levon Barseghyan,
         Francine Blau,
+        Romain Campbell,
         Ryan Dycus,
         Ronald Ehrenberg,
         Michael Lovenheim,
         Jake Meyer,
         Douglas Miller,
         and Evan Riehl.
-        I thank seminar participants at Cornell University (2022, 2023) for helpful discussion.
+        I thank seminar participants at Cornell University (2023, 2024), the Eastern Economic Association Annual Meetings (2024) for helpful discussion.
         This project's repository, with all materials and anonymised data needed for replication, is available at 
         \url{https://github.com/shoganhennessy/state-funding-faculty}.
         Any comments or suggestions may be sent to me at \href{mailto:seh325@cornell.edu}{\nolinkurl{seh325@cornell.edu}}, or raised as an issue on the Github project.
@@ -103,7 +83,7 @@
     \href{https://github.com/shoganhennessy/state-funding-faculty/blob/main/state-funding-faculty-2024.pdf}{Newest version available here.}
 }
 \rhead{\today}
-\lhead{Stagnating State Funding for Higher Education and its Effect on Faculty.}
+\lhead{Less Funding, More Lecturers, and Fewer Professors.}
 % Begin
 \begin{document}
 \maketitle
@@ -144,7 +124,6 @@ As the only author on this paper, I am responsible for all contributions in this
 \subsubsection*{Declaration of Competing Interest}
 I have no competing interests to declare.
 % Separated Figures \& Tables
-\newpage
 \input{sections/09-figures-tables.tex}
 % Bibliography
 \singlespacing

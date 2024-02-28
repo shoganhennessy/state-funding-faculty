@@ -24,8 +24,9 @@ I use a shift-share instrument to address endogeneity concerns for the amount of
     \left( \frac{\text{State Funding}_{i,1990 + \tau}}{\text{Total Revenues}_{i,1990 + \tau}} \right) \right]
 \end{align}
 
-The system exploits the fact that institutions who rely on state funding more will be affected by shift-share instruments.
-$Z_{i,t}$ is the instrument for state funding for institution $i$ in year $t$, interacting the average funding for universities in state $s(i)$ with reliance on state funding relative to total revenues, averaged across the base years 1990--1993.\footnote{
+The system exploits the fact that institutions who rely more on state funding will be affected by state-wide funding cuts.
+$Z_{i,t}$ is the shift-share instrument for institution $i$ in year $t$.
+It is contructed by interacting the average funding for universities in state $s(i)$ with reliance on state funding relative to total revenues, averaged across the base years 1990--1993.\footnote{
     1990--1993 are defined as data for public university finance data are most comparable (i.e., without many missing values) beginning in 1990.
     \cite{NBERw23736} use the single year 1990 as the base year, though I use the four years to ameliorate missing values in the single year of 1990.
     Results are similar in either specification.
@@ -38,39 +39,39 @@ State funding has been falling, so that the instrument describes shocks to unive
     \cite{NBERw27885} note the tendency for public universities to respond to state funding cuts by increasing reliance on tuition, where \cite{NBERw23736} specifically instruments for tuition revenues with collected information on legislative tuition price controls.
     It may be argued that tuition revenues are confounder between the causal effect of changes in state funding on a university's total revenues, so that this analysis focuses on state support for higher education (not total revenue), as do \cite{NBERw27885}.
     On the other hand, rises in tuition revenues (per student) may arise as result of tuition hikes thanks declining state support, which would mean controlling for tuition would constitute a bad control.
-    Nonetheless, estimates including tuition revenues (per student) as a control in the second stage of the instrumental variables estimates produces results of very similar magnitude and direction, and so are omitted.
+    Nonetheless, estimates including tuition revenues (per student) as a control in the second stage of the IV estimates produce results of very similar magnitude and direction, and so are omitted.
 }
 
-The shift-share instrument is an instrument for state funding for each university in each year.  
 The first-stage is then as follows, including institution and year fixed effects, where $X_{i,t}$ represents the amount of state funding divided by the number of full-time students attending the university.
 \begin{equation}
     \label{eqn:firststage}
     X_{i,t} = \eta_i + \zeta_t + \delta Z_{i,t} + \epsilon_{i,t}
 \end{equation}
-The instrument must be conditionally independent of faculty outcomes for the instrumental variables results to be valid causal eestimates.
+The instrument must be conditionally independent of faculty outcomes for the IV results to be valid causal estimates.
 The instrument is conditionally independent if state policy decisions for funding of public universities are uncorrelated with unobserved institutional changes of any specific college or university in the state.
 This assumption is plausible given that the majority of states have multiple (i.e., more than five) public universities, without any single university campus receiving the majority of state funding within any single state.
 Secondly, the shift-share identification strategy requires exogeneity in either the base-line share or shift component of the instrument \citep{borusyak2022quasi}.
-We satisfy the second: faculty or universitiy institutional-level decisions are not correlated with contemporaneous (or upcoming shocks) to state funding, so that the shift-share approach yields causal estimates by instrumental variables \citep{NBERw27885}.\footnote{
+We satisfy the second: faculty or university institutional-level decisions are not correlated with contemporaneous (or upcoming shocks) to state funding, so that the shift-share approach yields causal estimates by IV \citep{NBERw27885}.\footnote{
     It would be plausible to consider the case that universities make institutional-level decisions in a consistently different manner to those with differing reliance on state funding in 1990, so that exogeneity by the base-line share is not plausible here.
 }
 Additionally, the shift-share approach assumes that shift-share instruments affect faculty outcomes only via affecting university funding (exclusion restriction).
+This means that state-wide changes in higher education funding are assumed to affect faculty at universities only by changing how much their university is funded.
 
 The conditional independence assumption for the shift-share instrument makes sense in theory for state funding, but is fundamentally untestable with data.
 However, the assumption is bolstered by the fact that universities with higher values of the shift-share instrument differ little in observed characteristics compared to those with lower values \citep{pei2019poorly}.
 Universities are by-in-large smaller (in terms of enrolment, total revenues, and professor count) at the top of the shift-share instrument distribution (see~\autoref{tab:summary-quantiles}).
 Though on a per student basis, there is little difference across the distribution (except in the outcomes under consideration).
-The shift-share instrument is positively associated with the total enrolment and total amount of state funding for each university, in both \$ and $\log$/percentage change terms, while other the other sources of university finances are not associated with the funding shock.
-So that the other sources of finances are not clear confounders for the instrumental variables strategy, as they exhibit balance with respect to the funding shock instrument \citep{pei2019poorly}.
+The shift-share instrument is positively associated with the total enrolment and total amount of state funding for each university, in both \$ and $\log$/percentage change terms, while other the other sources of university finances are not associated with the funding shift-share.
+So that the other sources of finances are not clear confounders for the IV strategy, as they exhibit balance with respect to the funding shift-share \citep{pei2019poorly}.
 Yearly and individual fixed effects are included in regressions throughout to implicitly condition on mean differences between universities and years.
 
-\subsection{Instrumental Variables Model}
+\subsection{Instrumental Variables (IV) Model}
 \label{sec:iv-model-uni}
 
-I use the instrument defined in \autoref{eqn:public-instrument} to overcome the endogeneity concerns for state funding to each public university, so the primary empirical model is an instrumental variables model.
+I use the instrument defined in \autoref{eqn:public-instrument} to overcome the endogeneity concerns for state funding to each public university, for an IV approach.
 \autoref{eqn:firststage} is the first stage for exogenous variation in the state funding for university $i$ in year $t$, and \autoref{eqn:secondstage} the second stage for the effect of state funding on faculty outcomes.\footnote{
-    It is important to note the treatment effect isolated here; the instrumental variables approach identifies the local average treatment effect, one weighted to level of exposure when treatment is continuous as is the case here.
-    So we interpret this treatment effect as a weighted average of effects on faculty at public universities to state funding changes, specific to shift-share instruments, among the complier group --- i.e., among universities who respond to funding shocks and would not have made faculty-outcome changes absent the funding shock.
+    The IV approach identifies the local average treatment effect, weighted towards larger values of the instrument in the continuous case.
+    So we interpret this treatment effect as a weighted average of causal effects on faculty at public universities to state funding changes, specific to shift-share instruments, among compliers --- i.e., among universities who respond to funding cut and would not have made faculty-outcome changes absent the funding cut.
     Also, we assume that no universities state funding increased in response to the negative shift-share instrument (monotonicity).
 }
 \begin{equation}
@@ -92,23 +93,24 @@ The instrument exogeneity and exclusion follows the same argument as above, wher
 
 It is not a priori clear which units are appropriate for this analysis;
 does it make sense to consider state funding in purely dollar amounts per student, or in percent change rate?
-The funding shock instrument is a strong predictor for the average university's level of state funding in either unit; a funding shock of \$1,000 per student in the entire state leads to around \$1,176 per student at the university, while a funding shock of $-10$\% leads to around 9.77\% less state funding per year.
+The funding shift-share is a strong predictor for the average university's level of state funding in either unit; a funding shift-share of \$1,000 per student in the entire state leads to around \$1,176 per student at the university, while a funding shift-share of $-10$\% leads to around 9.77\% less state funding per year.
 Yet, the level of state funding (and the outcome variables) vary greatly between states for the unit of analysis.
 For example, the average Illinois public university receives \$10,709 in state funding per student in 1990 and  \$6,713 in 2021 (a fall of over 30\%), while California went from \$19,224 per student to \$12,915 in the same time span (a fall of 37\%).
-While most states are not exactly the same to California and Illinois, this is example is telling for the phenomenon of stagnating state funding:
-states vary in their absolute funding for higher education in 1990, but most have experienced a decline of similar order to 30\%, so that the stagnation in state funding has been a percent change trend over this time period.
+While most states are not exactly the same as California or Illinois, this is example is telling for the phenomenon of stagnating state funding:
+states vary in their absolute funding for higher education in 1990, but most have experienced a decline of around 30\% in per student funding, so that the trend is a common phenomenon in percentage terms across the US.
 As such, I include regression specifications where the explanatory and outcome variables are $\log$ transformed, and refer to these when stating results in percent change terms.
 
-\subsection{Effects in Years After the Initial Funding Shock}
+\subsection{Effects in Years After the Initial Funding Cut}
 \label{sec:local-projections}
-The effects of a change in the universities funding may not be immediate, and faculty may be affected multiple years after a funding shock.
-Yet, the funding shock instrument is significantly auto-correlated year-on-year; a large state-level funding shock in year $t$ is also likely to experience a large funding shock in year $t-1$.
-Similarly, funding shocks to higher education in a year are highly correlated with state funding per student in the 5 years before and after the initial shock in IPEDS data (see \autoref{fig:lag-firststage}).
-Thus, a linear model correlated state funding in year $t$ with outcomes in year $t+k$ will suffer from time-series confounding.
+The effects of a change in the universities funding may not be immediate, and faculty may be affected multiple years after a funding cut.
+Yet, the funding shift-share instrument is significantly auto-correlated year-on-year; a large state-level funding cut in year $t$ is also likely to experience a large funding cut in year $t-1$.
+\autoref{fig:lag-firststage} shows that the shift-share instrument is correlated with state funding five years into the past and future.
+This level of time-series correlation would confound IV estimates of the effect of state funding in year $t$ on faculty outcomes in later years $t+k$, providing inconsistent estimates for the causal relationships.
 
 I employ a local projections approach to model how faculty outcomes in years $t+k$ are affected by state funding in year $t$, for future years $k > 0$ \citep{jorda2005}.
-The local projections method is an empirical model used to estimate dynamic treatment effects when the treatment is not binary, so that time-series confounding (i.e., treatment in time $t$ is correlated with treatment in time $t-1$) is present \citep{montiel2021local}.
-This method estimates the effect of state funding $X_{i,t}$ on faculty outcomes $Y_{i, t+ k}$ in follow-on years $k > 0$, while accounting for the auto-correlation between state funding in surrounding years.\footnote{
-    The funding shock has a persistent effect on state funding, multiple years after the initial funding shock, so that the instrument is similarly strong for the local projections method (see \autoref{fig:firststage-lp}).
+The local projections method is an empirical model used to estimate dynamic treatment effects when the treatment is not binary, when time-series confounding is present \citep{montiel2021local}.
+Faculty outcomes could be affected in only a transitory manner, where effects in later years are close to zero, or in a persistent manner, where the effects of state funding cuts linger for multiple years.
+This method allows me to estimate the effect of state funding $X_{i,t}$ on faculty outcomes $Y_{i, t+ k}$ in follow-on years $k > 0$, credibly testing whether effects are transitory or long-lasting.
+The approach accommodates the shift-share instrument for state funding \citep{olea2021inference}, so that I present results using the shift-share to instrument for state funding (as in the rest of the empirical analysis).\footnote{
+    The funding shift-share has a persistent effect on state funding, multiple years after the initial funding shift-share, so that the instrument is similarly strong for the local projections method --- see \autoref{sec:appendix-ipeds-firststage} further evidence on the strength of the first stage in local projections estimation.
 }
-Additionally, the approach accommodates the shift-share instrument for state funding \citep{olea2021inference}, so that I present instrumental variables estimates for this method as in the rest of the empirical analysis.

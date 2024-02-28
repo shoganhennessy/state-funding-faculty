@@ -62,25 +62,25 @@
     \caption{Trends in Mean Student Enrolment per Professor, by University Sector and Faculty level.}
     \begin{subfigure}[b]{0.495\textwidth}
         \centering
-        \caption{Lecturer.}
+        \caption{Lecturers.}
         \includegraphics[width=\textwidth]{figures/lecturer-fte-perprof.png}
         \label{fig:lecturer-fte-perprof}
     \end{subfigure}
     \begin{subfigure}[b]{0.495\textwidth}
         \centering
-        \caption{Assistant.}
+        \caption{Assistant Professors.}
         \includegraphics[width=\textwidth]{figures/assistant-fte-perprof.png}
         \label{fig:assistant-fte-perprof}
     \end{subfigure}
     \begin{subfigure}[b]{0.495\textwidth}
         \centering
-        \caption{Full.}
+        \caption{Full Professors.}
         \includegraphics[width=\textwidth]{figures/full-fte-perprof.png}
         \label{fig:full-fte-perprof}
     \end{subfigure}
     \begin{subfigure}[b]{0.495\textwidth}
         \centering
-        \caption{All.}
+        \caption{All Faculty.}
         \includegraphics[width=\textwidth]{figures/all-fte-perprof.png}
         \label{fig:all-fte-perprof}
     \end{subfigure}
@@ -90,7 +90,7 @@
     \footnotesize
     \textbf{Note}:
     This figure shows the average number of students per faculty member, by different faculty position, at US public universities.
-    E.g., panel A calculates the mean of (lecturer count) / (student enrolment) at US public universities, for each year of 1990--2017, to show the average trend in faculty composition compared to student enrolment.
+    E.g., panel A calculates the mean of (student enrolment) / (lecturer count) at US public universities, for each year of 1990--2017, to show the average trend in faculty composition compared to student enrolment.
     These figures are calculated with IPEDS data.
 \end{figure}
 
@@ -241,7 +241,7 @@
 \begin{table}[H]
     \singlespacing
     \centering
-    \caption{IBHED Summary Statistics, Professor Panel 2010--2021.}
+    \caption{IBHED Summary Statistics, Faculty Panel 2010--2021.}
     \makebox[\textwidth][c]{\input{tables/illinois-summary.tex}}
     \label{tab:illinois-summary}
     \justify
@@ -258,7 +258,7 @@
 \begin{table}[H]
     \singlespacing
     \centering
-    \caption{First Stage Estimates, for State Funding by state funding shift-share in IPEDS Data.}
+    \caption{First Stage Estimates, Predicting State Funding by Shift-Share shift-share in IPEDS Data.}
     \textbf{Panel A: units in \$ per student}
     
     \makebox[\textwidth][c]{\input{tables/firststage-reg-rawcount.tex}}
@@ -284,7 +284,7 @@
 \begin{table}[H]
     \singlespacing
     \centering
-    \caption{Effects of Changes in State Funding on University Faculty Composition, IPEDS 1990--2017, OLS and 2SLS Estimates.}
+    \caption{Effects of Changes in State Funding on University Faculty Composition, IPEDS 1990--2021, OLS and 2SLS Estimates.}
 
     \textbf{Panel A: units in \$ per student}
 
@@ -300,7 +300,7 @@
     \textbf{Note}:
     These tables show the second stage OLS and 2SLS estimates of regression specification \eqref{eqn:secondstage}, showing the effect of state funding changes on faculty outcomes, using the state funding shift-share to instrument for state funding in the columns labelled 2SLS.
     Each observation is a public university-year, in the IPEDS data.
-    Panel A shows the effect of a fall in state funding \$$-1,000$ per student in the state on the number of professors --- i.e.,
+    Panel A shows the effect of a fall in state funding \$$-1,000$ per student on the number of professors --- i.e.,
     an extra \$$1,000$ per student leads to 6 fewer lecturers according to column 2.
     Panel B shows the effect of a $10$\% change in state funding per student at the university on the 10\% change in the number of professors per students --- i.e.,
     an extra 10\% of state funding per student leads to 4.37\% fewer lecturers per student according to column 2.

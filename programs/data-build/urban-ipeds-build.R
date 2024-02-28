@@ -18,14 +18,23 @@ finance.data <- read_csv("../../data/urban-ipeds/raw-data/colleges_ipeds_finance
     # Include Supplementary finances for 2018-2020
     bind_rows(read_csv(
         "../../data/urban-ipeds/raw-data/finance/ipeds-finance-20182020.csv"))
+# Urban admissions data (available 2001--)
+admissions.data <- read_csv("../../data/urban-ipeds/raw-data/colleges_ipeds_admissions-enrollment.csv")
+# Urban data on graduation rates (available 1996--)
+graduation150.data <- read_csv("../../data/urban-ipeds/raw-data/colleges_ipeds_grad-rates.csv")
+
+# Urban data on faculty.
+urban_salaries.data <- read_csv("../../data/urban-ipeds/raw-data/colleges_ipeds_salaries_is.csv")
 
 # University enrollment (hand made from raw IPEDS values)
 enrollment.data <- read_csv("../../data/urban-ipeds/raw-data/enrollment/ipeds-enrollment.csv")
 
 # Professors' salaries (hand made from raw IPEDS values)
 salaries.data <- read_csv("../../data/urban-ipeds/raw-data/faculty/ipeds-salaries.csv")
-# Professors' faculty rate (hand made from raw IPEDS values)
+# Professors' faculty data (hand made from raw IPEDS values)
 tenure.data <- read_csv("../../data/urban-ipeds/raw-data/faculty/ipeds-tenure.csv")
+# Employee part- + full-time data (hand made from raw IPEDS values)
+parttime.data <- read_csv("../../data/urban-ipeds/raw-data/parttime-employees/ipeds-parttime.csv")
 
 # CPI-U from FREDS (since Urban provided cpi has missing years)
 # Yearly average, seasonally adjusted, base year 1982-1984=100
@@ -68,71 +77,106 @@ finance.data <- finance.data %>%
         cpi2021 = cpi2021,
         # Federal appropriations
         fedappropriations_real = replace(rev_appropriations_fed,
-            rev_appropriations_fed <= 0, NA) / cpi2021,
+            rev_appropriations_fed < 0, NA) / cpi2021,
         # State Gov. appropriations
         stateappropriations_real = replace(rev_appropriations_state,
-            rev_appropriations_state <= 0, NA) / cpi2021,
+            rev_appropriations_state < 0, NA) / cpi2021,
+        # State and local grants
+        statelocal_funding_real = replace(rev_state_local_approps_grants,
+            rev_state_local_approps_grants < 0, NA),
         # Local appropriations
-        localappropriations_real = replace(rev_appropriations_local,
-            rev_appropriations_local <= 0, NA) / cpi2021,
+        localappropriations_real = (
+            replace(rev_appropriations_local, is.na(rev_appropriations_local), 0) +
+            replace(rev_grants_contracts_local, is.na(rev_grants_contracts_local), 0)
+            ) / cpi2021,
         # Tuition (+ fees) revenue
         tuitionrev_real = replace(rev_tuition_fees_gross,
-            rev_tuition_fees_gross <= 0, NA) / cpi2021,
-        # Expenditures on instruction
-        instructionspending_total_real = replace(exp_instruc_total,
-            exp_instruc_total <= 0, NA) / cpi2021,
-        # Salary Expenditures on instruction
-        instructionspending_salaries_real = replace(exp_instruc_salaries,
-            exp_instruc_salaries <= 0, NA) / cpi2021,
-        # Expenditures on research
-        researchspending_total_real = replace(exp_research_total,
-            exp_research_total <= 0, NA) / cpi2021,
-        # Salary Expenditures on research
-        researchspending_salaries_real = replace(exp_research_salaries,
-            exp_research_salaries <= 0, NA) / cpi2021,
+            rev_tuition_fees_gross < 0, NA) / cpi2021,
         # All revenues (including tuition + appropriations)
         totalrevenues_real = replace(rev_total_current,
-            rev_total_current <= 0, NA) / cpi2021,
+            rev_total_current < 0, NA) / cpi2021,
         # Non-aux revenues (including tuition + appropriations)
         nonauxrevenues_real = (
-            replace(rev_appropriations_fed, is.na(rev_appropriations_fed) |
-                rev_appropriations_fed <= 0, 0) +
-            replace(rev_appropriations_state, is.na(rev_appropriations_state) |
-                rev_appropriations_state <= 0, 0) +
-            replace(rev_appropriations_local, is.na(rev_appropriations_local) |
-                rev_appropriations_local <= 0, 0) +
-            replace(rev_tuition_fees_gross, is.na(rev_tuition_fees_gross) |
-                rev_tuition_fees_gross <= 0, 0)
-            ) / cpi2021,
-        # Total non-aux spending, i.e. as DCost sum(instruction01, research01,
-        # pubserv01, acadsupp01, studserv01, instsupp01, opermain01, grants01)
-        # Possible there is double counting here, if spending used in analysis.
-        nonauxspending_real = (
-            replace(exp_instruc_total, is.na(exp_instruc_total) |
-                exp_instruc_total <= 0, 0) +
-            replace(exp_research_total, is.na(exp_research_total) |
-                exp_research_total <= 0, 0) +
-            replace(exp_pub_serv_total, is.na(exp_pub_serv_total) |
-                exp_pub_serv_total <= 0, 0) +
-            replace(exp_student_serv_total, is.na(exp_student_serv_total) |
-                exp_student_serv_total <= 0, 0) +
-            replace(exp_acad_supp_total, is.na(exp_acad_supp_total) |
-                exp_acad_supp_total <= 0, 0) +
-            replace(exp_inst_supp_total, is.na(exp_inst_supp_total) |
-                exp_inst_supp_total <= 0, 0) +
-            replace(exp_total_opm, is.na(exp_total_opm) |
-                exp_total_opm <= 0, 0) +
-            replace(exp_net_grant_aid_total, is.na(exp_net_grant_aid_total) |
-                exp_net_grant_aid_total <= 0, 0)
-                ) / cpi2021) %>%
+            ifelse(is.na(fedappropriations_real), 0, fedappropriations_real) +
+            ifelse(is.na(stateappropriations_real), 0, stateappropriations_real) +
+            ifelse(is.na(localappropriations_real), 0, localappropriations_real) +
+            ifelse(is.na(tuitionrev_real), 0, tuitionrev_real)),
+        # Revenues from gifts and philanthropy.
+        # Expenditures on research
+        researchspending_total_real = replace(exp_research_total,
+            exp_research_total < 0, NA) / cpi2021,
+        # Salary Expenditures on research
+        researchspending_salaries_real = replace(exp_research_salaries,
+            exp_research_salaries < 0, NA) / cpi2021,
+        # Expenditures on instruction
+        instructionspending_total_real = replace(exp_instruc_total,
+            exp_instruc_total < 0, NA) / cpi2021,
+        # Salary Expenditures on instruction
+        instructionspending_salaries_real = replace(exp_instruc_salaries,
+            exp_instruc_salaries < 0, NA) / cpi2021,
+        exp_instruc_real = replace(exp_instruc_total,
+            is.na(exp_instruc_total) | exp_instruc_total < 0, NA) / cpi2021,
+        exp_research_real = replace(exp_research_total,
+            is.na(exp_research_total) | exp_research_total < 0, NA) / cpi2021,
+        exp_pub_serv_real = replace(exp_pub_serv_total,
+            is.na(exp_pub_serv_total) | exp_pub_serv_total < 0, NA) / cpi2021,
+        exp_student_serv_real = replace(exp_student_serv_total,
+            is.na(exp_student_serv_total) | exp_student_serv_total < 0, NA) / cpi2021,
+        exp_acad_supp_real = replace(exp_acad_supp_total,
+            is.na(exp_acad_supp_total) | exp_acad_supp_total < 0, NA) / cpi2021,
+        exp_inst_supp_real = replace(exp_inst_supp_total,
+            is.na(exp_inst_supp_total) | exp_inst_supp_total < 0, NA) / cpi2021,
+        exp_opm_areal = replace(exp_total_opm,
+            is.na(exp_total_opm) | exp_total_opm < 0, NA) / cpi2021,
+        exp_net_grant_aid_real = replace(exp_net_grant_aid_total,
+            is.na(exp_net_grant_aid_total) | exp_net_grant_aid_total < 0, NA) / cpi2021,
+        nonauxspending_real = (exp_instruc_real +
+            exp_research_real +
+            exp_pub_serv_real +
+            exp_student_serv_real +
+            exp_acad_supp_real +
+            exp_inst_supp_real +
+            exp_opm_areal +
+            exp_net_grant_aid_real)) %>%
     # Replace missings
     mutate(
         nonauxrevenues_real =
-            replace(nonauxrevenues_real, nonauxrevenues_real <= 0, NA),
+            replace(nonauxrevenues_real, nonauxrevenues_real < 0, NA),
         nonauxspending_real =
-            replace(nonauxspending_real, nonauxspending_real <= 0, NA)) %>%
+            replace(nonauxspending_real, nonauxspending_real < 0, NA)) %>%
     # Finance data only reliable after 1987
     filter(year >= 1987)
+
+# Clean Urban faculty data, with the definition found above.
+urban_faculty.data <- urban_salaries.data %>%
+    filter(sex != 99, academic_rank != 99,
+        contract_length != 99, contract_length != 13) %>%
+    # SUmm num of professors
+    group_by(unitid, year) %>%
+    summarise(
+        urban_lecturer_prof_count  = sum(as.integer(academic_rank %in% 4:5) * instruc_staff_count, na.rm = TRUE),
+        urban_assistant_prof_count = sum(as.integer(academic_rank == 3) * instruc_staff_count, na.rm = TRUE),
+        urban_full_prof_count      = sum(as.integer(academic_rank %in% 1:2) * instruc_staff_count, na.rm = TRUE),
+        urban_all_prof_count       = sum(as.integer(academic_rank %in% 1:5) * instruc_staff_count, na.rm = TRUE))
+
+# Generate university-year data on the admissions rate, by collapsing
+admissions.data <- admissions.data %>%
+    filter(sex == 99, !is.na(number_applied)) %>%
+    transmute(unitid = unitid,
+        year = year,
+        acceptance_rate =
+            ifelse(number_admitted > 0, number_admitted / number_applied, NA))
+# Generate university-year data on the graduation rate
+graduation150.data <- graduation150.data %>%
+    filter(year == cohort_year + 5,
+        subcohort == 2,
+        race == 99,
+        sex == 99) %>%
+    select(unitid, year, completion_rate_150pct)
+
+# SHow that these data are only available for more recent years:
+admissions.data %>% pull(year) %>% table(exclude = NULL) %>% print()
+graduation150.data %>% pull(year) %>% table(exclude = NULL) %>% print()
 
 # Generate tenure data from hand-created file.
 tenure.data <- tenure.data %>%
@@ -149,7 +193,19 @@ tenure.data <- tenure.data %>%
         all_tenure_count =
             total9month_prof_count + total12month_prof_count)
 
-# Generate salaries data from hand-created file.
+# Add on part-time professor values, from hand-created file.
+parttime.data <- parttime.data %>%
+    # Generate part + full-time faculty counts.
+    transmute(unitid = unitid,
+        year = year,
+        lecturer_parttime_count  = parttime_lecturer_count,
+        assistant_parttime_count = parttime_tenuretrack_count,
+        full_parttime_count      = parttime_tenured_count,
+        lecturer_fulltime_count  = fulltime_lecturer_count,
+        assistant_fulltime_count = fulltime_tenuretrack_count,
+        full_fulltime_count      = fulltime_tenured_count)
+
+# Generate salaries data, from hand-created file.
 salaries.data <- salaries.data %>%
     # Generate professor count (regardless of contract length)
     transmute(unitid = unitid,
@@ -232,7 +288,10 @@ urban_ipeds.data <- directory.data %>%
     left_join(finance.data, by = c("unitid", "year")) %>%
     left_join(enrollment.data, by = c("unitid", "year")) %>%
     left_join(salaries.data, by = c("unitid", "year")) %>%
-    left_join(tenure.data, by = c("unitid", "year"))
+    left_join(tenure.data, by = c("unitid", "year")) %>%
+    left_join(admissions.data, by = c("unitid", "year")) %>%
+    left_join(graduation150.data, by = c("unitid", "year")) %>%
+    left_join(parttime.data, by = c("unitid", "year"))
 
 
 ## Calculate the shift-share instruments (see Deming Walters 2017, p.10)
@@ -250,7 +309,7 @@ urban_ipeds.data <- urban_ipeds.data %>%
     right_join(urban_ipeds.data, by = "unitid")
 
 # Total state uni appropriations + number of (public) unis in the state
-urban_ipeds.data <- urban_ipeds.data %>%
+shift_share.data <- urban_ipeds.data %>%
     # Restrict to public uni's
     filter(public == 1, forprofit == 0, fouryear == 1) %>%
     # Restrict to unis with financial info
@@ -265,8 +324,9 @@ urban_ipeds.data <- urban_ipeds.data %>%
         stateFTE_count = sum(enrollment_fte, na.rm = TRUE),
         stateprof_count = sum(all_prof_count, na.rm = TRUE),
         stateuni_count = n()) %>%
-    ungroup() %>%
-    # Put back to joined data.
+    ungroup()
+# Put back to joined data.
+urban_ipeds.data <- shift_share.data %>%
     right_join(urban_ipeds.data, by = c("state", "year"))
 
 # Combine for the base-year appropriations + tuition shift-share instruments
@@ -301,6 +361,14 @@ urban_ipeds.data <- urban_ipeds.data %>%
         tuitionrev_baseshare,
         totalrevenues_real,
         nonauxrevenues_real,
+        exp_instruc_real,
+        exp_research_real,
+        exp_pub_serv_real,
+        exp_student_serv_real,
+        exp_acad_supp_real,
+        exp_inst_supp_real,
+        exp_opm_areal,
+        exp_net_grant_aid_real,
         nonauxspending_real,
         instructionspending_total_real,
         instructionspending_salaries_real,
@@ -309,6 +377,7 @@ urban_ipeds.data <- urban_ipeds.data %>%
         fedappropriations_real,
         stateappropriations_real,
         localappropriations_real,
+        statelocal_funding_real,
         tuitionrev_real,
         appropriationshock_peruni_real,
         tuitionshock_peruni_real,
@@ -316,6 +385,8 @@ urban_ipeds.data <- urban_ipeds.data %>%
         tuitionshock_perEnroll_real,
         appropriationshock_perFTE_real,
         tuitionshock_perFTE_real,
+        acceptance_rate,
+        completion_rate_150pct,
         lecturer_prof_count,
         lecturer_profoutlays_real,
         lecturer_profmeansalary_real,
@@ -331,7 +402,13 @@ urban_ipeds.data <- urban_ipeds.data %>%
         nontenured_tenure_count,
         tenuretrack_tenure_count,
         tenured_tenure_count,
-        all_tenure_count) %>%
+        all_tenure_count,
+        lecturer_parttime_count,
+        assistant_parttime_count,
+        full_parttime_count,
+        lecturer_fulltime_count,
+        assistant_fulltime_count,
+        full_fulltime_count) %>%
     arrange(unitid, year)
 
 # Remove double observations created by the multiple merges.
@@ -354,3 +431,27 @@ urban_ipeds.data %>%
 urban_ipeds.data %>%
     filter(fouryear == 1, public == 1, forprofit == 0) %>%
     write_csv("../../data/urban-ipeds/urban-clean-publicunis.csv")
+
+quit("no")
+#! TEST: Compare data by different sources.
+urban_ipeds.data <- read_csv("../../data/urban-ipeds/urban-clean-allunis.csv")
+# Show data for highly attended unis
+urban_ipeds.data %>%
+    filter(fouryear == 1, public == 1, forprofit == 0, year >= 2002) %>%
+    select(unitid, year, #inst_name,
+        # State funding (from Urban + supplemented by hand)
+        #stateappropriations_real,
+        # Part-time faculty count (from hand collected IPEDS data 2001--)
+        lecturer_parttime_count,
+        lecturer_fulltime_count,
+        assistant_fulltime_count,
+        full_fulltime_count,
+        # Faculty counts, from hand collected IPEDS salary files
+        lecturer_prof_count, assistant_prof_count,
+        full_prof_count, all_prof_count) %>%
+    arrange(unitid, year) %>%
+    mutate(year = year - 1) %>%
+    filter(unitid %in% c(100663, 100654), year %in% 2009:2013) %>%
+    View()
+#!https://nces.ed.gov/ipeds/datacenter/FacsimileView.aspx?surveyNumber=9&unitId=100663&year=2009
+#!https://nces.ed.gov/ipeds/datacenter/FacsimileView.aspx?surveyNumber=9&unitId=100654&year=2009

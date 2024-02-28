@@ -2,76 +2,74 @@
 %% Introduction section
 \section{Introduction}
 \label{sec:intro}
-
-States fund their public universities with roughly the same amount today as they did in the 1990s, despite their enrolment rising by over 50\% on average.
+States fund their public universities with roughly the same amount today as they did in the 1990s, despite enrolment rising by over 50\%.
 At the same time, public universities have systematically substituted away from professors towards lecturers, who teach often work on contingent and lower-salaried contracts.
-Previous research shows declining in state funding led to worsening student outcomes \citep{NBERw23736,NBERw27885}, but there is little evidence on whether this funding decline has impacted faculty.
+Previous research shows state funding cuts led to worsening student outcomes \citep{NBERw23736,NBERw27885}, but there is little evidence on whether these funding cuts impacted faculty.
 In this paper, I show that falling state funding caused a change in the composition of faculty at US public universities, substituting professors for more lecturers.
 
 Per student state funding for higher education has stagnated the last thirty years.
 The average public university received around \$11,600 of state funding per student in 1990 and \$8,300 in 2021, while the number of lecturers per student increased by 109\% and professors per student decreased by $23$\% over 1990--2021.
 I use a shift-share instrumental variables approach to estimate how faculty are affected by these funding cuts.
-Universities employ $4.4$\% more lecturers per student following a $10$\% funding cut, and correspondingly rely less on tenure-track faculty by employing $1.4$\% fewer assistant professors and $1.2$\% fewer full professors per student.
+Universities employ $4.4$\% more lecturers per student following a $10$\% funding cut, and correspondingly rely less on tenure-track faculty by employing $1.4$\% fewer tenure-track professors and $1.2$\% fewer tenured professors per student.
 In a secondary analysis of all public university faculty in the state of Illinois, I show that incumbent faculty were unaffected, in terms of wages, promotion and quit rates.
-This implies that the faculty substitution arose by disrupting hiring of new tenure-track/tenured professors.
+This implies that the faculty substitution arose by disrupting hiring of new tenure-track/tenured professors, which is supported supplementary data on professor hiring at US public universities over 2010--2021.
 % Private universities were not exposed to similar financial constraints during this same time period, and do not exhibit the substitution away from tenure-track/tenured professors.
 This paper shows the institutional effects of stagnating state funding for higher education, and offers one possible mechanism for how funding cuts affected student outcomes.
 
 I use two different analyses to explore the causal effects of state funding on faculty composition and salaries.
-My first analysis uses data from the \cite{ipeds} to study the impact of changes in state funding for all US public universities 1990--2021.
-My second analysis uses panel data for every faculty member at Illinois public universities for 2010--2021 \citep{ibhed}, to measure how incumbent faculty (i.e., those already employed at the university) are affected by changes in state funding.
+My first analysis uses data from the \citet[IPEDS]{ipeds} to study the impact of changes in state funding for all US public universities 1990--2021.
+My second analysis uses panel data for every faculty member at Illinois public universities for 2010--2021 \citet[IBHED]{ibhed}, to measure how incumbent faculty (i.e., those already employed at the university) are affected by changes in state funding.
 These data allow me to answer the following research question: if a US public university receives an extra \$1,000 per student (or a 10\% increase), do they change how many faculty members they employ?
 If so, which positions do universities substitute away from, and do these funding cuts affect the faculty themselves?
 
 It is a priori unclear how faculty may be affected, as there are various margins that universities may to respond to funding cuts.
-For example, university administrations may directly cut salaries or lay-off incumbent staff.
-This happened in 2015 when the state of Illinois shut-down without setting a state budget, and the University of Illinois furloughed faculty unable to pay salaries \citep{furlough2010}.
+On one hand, faculty may be negatively affected by universities cutting salaries or laying-off incumbent faculty.
+This happened in 2010 when the University of Illinois System furloughed university staff following budget cuts after the Great Recession \citep{furlough2010}.
 Similarly, faculty hiring committees are often cancelled or disrupted in response to funding cuts, meaning there are fewer faculty entering a department to replace those leaving.
 On the other hand, lecturers could be hired to fill in teaching duties, on shorter and cheaper contracts with fewer employment protections.
 But it is not certain that universities would hire more lecturers in the face of budget cuts; they may not hire any more faculty at all.
-Similarly, the universities may be limited from hiring more lecturers by competitive pressures from peer institutions \citep{hoxby2009changing,urquiola2020markets}, and instead focus on filling the funding gap by courting private funding or raising tuition prices.
+It is possible that universities are be limited from hiring more lecturers by competitive pressures from peer institutions \citep{hoxby2009changing,urquiola2020markets}, leading university administrations to court private funding or raise tuition prices to fill funding gaps, leaving faculty unaffected.
 
+State funding for higher education is not decided randomly, so correlations between state funding and faculty outcomes do not necessarily represent causal relationships.
 State governments decide how to fund higher education by a complicated process, which could be influenced by lobbying, changing state priorities, or local economic conditions.
-As such, it would be na\"ive to think of state higher education funding as independent of public university faculty, so I employ a shift-share instrumental variable approach to identify causal effects of state funding cuts.
-The shift-share instrument identifies exogenous changes in state funding by exploiting differences in how much universities relied on that funding, interacted with state-wide changes in higher education funding --- following \cite{NBERw23736,NBERw27885}.
-Yearly state government budgets are decided without targetting individual universities for funding cuts, so more reliant universities will be more affected by state-wide changes in higher education funding, allowing the shift-share approach to estimate causal effects among more reliant unversities.
-Additionally, I estimate effect of state funding on faculty multiple years after the initial funding cuts, using the local projections method thanks to time-series confounding between the funding shock and later years' level of state funding.\footnote{
+As such, it would be na\"ive to think of state higher education funding as independent of public university faculty, so I employ a shift-share instrumental variables (IV) approach to identify causal effects of state funding cuts.
+The shift-share instrument identifies exogenous changes in state funding by exploiting differences in how much universities relied on state funding, interacted with state-wide shifts in higher education funding --- following the methods of \cite{NBERw23736,NBERw27885}.
+Yearly state government budgets are decided without targetting individual universities for funding cuts, so more reliant universities will be more affected by state-wide changes in higher education funding, allowing the shift-share approach to estimate causal effects among more reliant universities.
+Additionally, I estimate effect of state funding on faculty multiple years after the initial funding cuts, using the local projections method.\footnote{
     To the best of my knowledge, this is also the first paper to use the local projections method for a shift-share instrument, and to acknowledge the time-series confounding for shift-share IV models when the outcome is in future time periods.
 }
-This approach allows me to test whether universities recover in years following the funding cuts e.g., by resuming faculty hiring in later years. 
+This approach allows me to test whether the effects of funding cuts are persistent or universities recover quickly e.g., by quickly resuming faculty hiring in years following funding cuts.
 
 In my university-level analysis (IPEDS), I find that state funding cuts cause public universities to substitute away from tenured and tenure-track professors towards lecturers.
-A funding cut of \$1,000 per student leads to an average university employing 6 more lecturers;
-in percentage terms, a funding cut of 10\% per student leads to a fall of 1.4\% in the number of assistant professors per student at a university, a fall of 1.2\% for tenured professors, and an increase in 4.4\% the number of lecturers per student.
-Local projection estimates show that these effects linger for many years after the initial funding shock, showing that the effect is not isolated to the year of the funding cut. 
+A funding cut of 10\% per student leads to a fall of 1.4\% in the number of assistant professors per student at a university, a fall of 1.2\% for tenured professors, and an increase in 4.4\% the number of lecturers per student.
+Local projection estimates show that these effects linger for up to ten years after the initial funding cut, showing that effects are persistent and not transitory.
 Over the same time period, state funding per student fell by around 35\%, professors per student fell by 9\%, and lecturers per student increased by 99\%.
 These results show that falls in state funding explain around 53\% of the fall in professors per student,
 % i.e. -(35 * 0.137) / -9
 and 15.5\% of the rise in lecturers per student.
 % ie., (35 * 0.437) / 99
 In my analysis of all Illinois faculty (IBHED), I find that incumbent professors were not meaningfully affected, in terms of total salary, promotion rate, or rate of leaving the Illinois public university system.
-Yet the hiring rate for new professors at public universities was negatively impacted by state funding cuts.
 This implies that faculty substitution arose by limiting the hiring of new professors, and is supported by suggestive evidence on professor hiring counts.
-The substitution is persistent for up to ten years, meaning that universities did not resume professor hiring in years following the funding cut, making the substitution towards lecturers long-run.
 
 Mine is the first paper to provide causal evidence on the impact of state funding on faculty composition and wages.
 The closest related research on higher education funding examined how university spending affected graduation rates and levels of student debt \citep{NBERw23736,NBERw27885}, and university finances \citep{miller2022making,bound2019public,brown2014endowment}.
 For faculty outcomes, applied theory work models university decision-making and faculty hiring (see e.g., \citealt{abe2015implications,johnson2009jep,NBERc13879}).
-In addition, empirical papers measure how universities responded to endowment shocks \citep{brown2014endowment}, and trends in the academic job market following the 2008 recession \citep{turner2014impact}.
+Other papers measure university decision--making after endowment shocks \citep{brown2014endowment}, and trends in the academic job market following the 2008 recession \citep{turner2014impact}.
 These papers measure changes in state funding and university revenues, but do not measure effects on faculty composition or salaries, or other outcomes related to university instruction.
 My results provide evidence that the long term trends in higher education funding and faculty outcomes are causally related, contributing to the literature on faculty outcomes \citep{ehrenberg2003studying} and trends in US higher education and funding \citep{hoxby2009changing,ehrenberg2012american}.
 
 Another contribution of my paper is to provide evidence on possible mechanisms connecting state funding cuts for higher education and worsening student outcomes.
-Substitution towards lecturers is likely a cost-cutting measure for funding constrained universities, but universities that rely on more lecturers have persistently lower student retention graduation rates \citep{jaeger2011examining,ehrenberg2005tenured}.\footnote{
-    \cite{bettinger2010does} provide an alternative perspective, that adjunct lecturers improve subject retention for undergraduates, but do not consider graduation rate or any other student outcomes.
-    \cite{figlio2015tenure} have similar results at a highly-selective private university, a different sector to that studied in this paper.
+In 2021, around 65\% of lecturers at US public universities are employed part-time (IPEDS); this arrangement is often arranged as an adjunct contract, where faculty are paid based on how many courses they teach, without employment benefits \citep{aau2014Characteristics}.
+While funding cuts force universities to substitute towards lecturers, there is consistent evidence that students are worse off being taught by part-time lecturers than full-time faculty.
+Universities that rely on more lecturers have persistently lower student retention and graduation rates \citep{jaeger2011examining,ehrenberg2005tenured}
+Similarly, students at a large public university have consistently worse education outcomes if taught by adjunct lecturers than those taught by full-time faculty, largely thanks to the worse working conditions adjunct lecturers face \citep{zhu2021limited}.\footnote{
+    \cite{bettinger2010does,figlio2015tenure} study lecturers at a highly selective universities, finding that adjunct lecturers improve subject retention for undergraduates compared to professors.
+    This paper considers public universities, which are by-majority not selective, and where lecturers are more often employed part-time with less institutional support.
 }
-According to survey evidence, around 50\% of lecturers are employed full-time, with a guaranteed annual salary and university benefits, and the remaining 50\% are employed part-time on adjunct contracts, without university benefits and paid by the class \citep{aau2014Characteristics}.
-Adjunct lecturers consistently lead to worse students outcomes, compared to part-time lecturers, largely thanks to the worse working conditions for adjunct lecturers \citep{zhu2021limited}.
-Combining the evidence that adjunct lecturers lead to worse student outcomes with the trends in education finances and performance \citep{NBERw23736,NBERw27885}, implies that substituting towards lecturers contributed to deteriorating student outcomes at public universities \citep{NBERw23736,NBERw27885}.
+Combining the evidence that adjunct lecturers lead to worse student outcomes with the trends in education finances and performance \citep{NBERw23736,NBERw27885}, implies that substituting towards lecturers contributed to deteriorating student outcomes at public universities.
 
 This paper proceeds as follows.
-\autoref{sec:data} describes the data for university finances and faculty in Illinois, and trends in public university funding for the last three decades.
+\autoref{sec:data} describes the data for university funding, data on faculty in Illinois, and recent trends in higher education funding.
 \autoref{sec:conceptual} gives the conceptual framework for how state funding may affect faculty.
 \autoref{sec:empirics} draws the empirical framework for isolating the causal effects of state funding on faculty, with \autoref{sec:results} presenting the empirical results.
 \autoref{sec:discussion} discusses the context and implications for the findings.

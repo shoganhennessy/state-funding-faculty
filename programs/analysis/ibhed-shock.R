@@ -256,7 +256,58 @@ reg.data %>%
         out = "../../text/tables/illinois-summary.tex")
 
 
-# First stage Regressions -----------------------------------------------------
+# Density plot of wages --------------------------------------------------------
+
+# Draw a plot of the salary distributions.
+salary_density.plot <- reg.data %>%
+    filter(3000 < salary_real + extra_salary_real,
+        salary_real + extra_salary_real < 251000,
+        year %in% c(2010, 2021)) %>%
+    mutate(faculty =
+        ifelse(position %in% c("Instructor", "Lecturer"), "Lecturer",
+        ifelse(position == "Assistant Professor", "Tenure-Track",
+        ifelse(position %in% c("Associate Professor", "Professor"), "Tenured",
+        ifelse(position %in% c("Chancellor",
+            "Other Administrator", "President", "Senior Officer",
+            "Unit Director", "Vice Chancellor", "Vice President"), "Administrator",
+            ""))))) %>%
+    ggplot(aes(x = (salary_real + extra_salary_real) / 1000,
+        fill = faculty, colour = faculty)) +
+    geom_density(alpha = 1 / 3) +
+    theme_bw() +
+    scale_x_continuous(expand = c(0, 0),
+        name = "Annual Salary + Benefits, $ thousands",
+        breaks = seq(0, 250, by = 50),
+        limits = c(0, 265)) +
+    scale_y_continuous(expand = c(0, 0.0001),
+        name = "") +
+    ggtitle("Density") +
+    facet_grid(cols = vars(year)) +
+    theme(
+        legend.title = element_blank(),
+        plot.title = element_text(size = rel(1)),
+        plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
+        legend.position = "bottom",
+        legend.margin = margin(t = -5))
+# Save this plot
+presentation.width <- 17.5
+presentation.height <- presentation.width / 2
+ggsave("../../text/figures/salary-density.png",
+    plot = salary_density.plot,
+    units = "cm", dpi = 300,
+    width = presentation.width, height = presentation.height)
+
+# Show how many faculty in eah year, 2010 + 2021
+reg.data %>%
+    filter(3000 < salary_real + extra_salary_real,
+        salary_real + extra_salary_real < 251000,
+        year %in% c(2010, 2021)) %>%
+    group_by(year) %>%
+    count() %>%
+    print()
+
+
+# First stage Regressions ------------------------------------------------------
 
 # Explain Revenues with a shock to (only) state appropriations.
 firststage_approp.reg <- reg.data %>%
@@ -607,22 +658,6 @@ stargazer(
     omit.table.layout = "n", notes.append = FALSE,
     type = "text",
     out = "../../text/tables/facultyhires-illinois-reg-fte.tex")
-
-
-
-
-
-# Raw counts
-institutional.data %>%
-    filter(lecturer_prof_count > 0) %>%
-    felm(lecturer_prof_count ~ 1 |
-        unitid  |
-        (I(stateappropriations_real / (1000 * enrollment_reported)) ~
-            I(-appropriationshock_perEnroll_real)) |
-        unitid + year,
-        data = .) %>%
-    summary()
-
 
 
 # Faculty Salary Regressions ---------------------------------------------------
@@ -1033,7 +1068,7 @@ shiftshare_assistant_exit.reg <- reg.data %>%
 
 ## full faculty salaries
 # Shift-share IV Regression, explained by state appropriation shock
-shiftshare_full_exit.reg <-reg.data %>%
+shiftshare_full_exit.reg <- reg.data %>%
     filter(full == 1) %>%
     felm(notemployed_nextyear ~ 1 |
         unitid |

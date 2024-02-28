@@ -12,8 +12,8 @@ library(stargazer)
 # Define number of digits in tables and graphs
 digits.no <- 3
 # Size for figures
-fig.width <- 15
-fig.height <- fig.width * 1 / 2
+fig.width <- 12
+fig.height <- fig.width * 7 / 12
 
 
 # Load data sources ------------------------------------------------------------
@@ -108,6 +108,12 @@ reg.data <- ipeds_hiring.data %>%
 # Put togethe a visualisation of the rate of hiring between public + private
 # for 2010--2021
 quantile.count <- 20
+
+unitid.data <- read_csv("../../data/urban-ipeds/urban-clean-allunis.csv") %>%
+    filter(year == 2021) %>%
+    select(unitid, inst_name)
+
+
 # Viusalise how these two vary
 hiring_correlation.plot <- reg.data %>%
     # Create the per-student values
@@ -115,9 +121,10 @@ hiring_correlation.plot <- reg.data %>%
         stateappropriations_perEnroll =
             (stateappropriations_real / enrollment_reported),
         total_hired_perEnroll =
-            (total_hired / enrollment_reported)) %>%
+            (total_hired / (enrollment_reported / 100))) %>%
     # Take out outliers
-    filter(total_hired_perEnroll < 0.25,
+    filter(0.5 < total_hired_perEnroll, total_hired_perEnroll < 15,
+        stateappropriations_perEnroll < 15000,
         stateappropriations_perEnroll > 2000) %>%
     # Declare a plot to show the correlation.
     ggplot(aes(
@@ -125,18 +132,30 @@ hiring_correlation.plot <- reg.data %>%
         y = total_hired_perEnroll)) +
     geom_jitter() +
     geom_smooth(method = "lm") +
-    scale_x_continuous(name = "State Funding per Year, $ thousands per student",
-        breaks = 0:15, limits = c(2.5, 13), expand = c(0.01, 0.01)) +
+    scale_x_continuous(
+        name = "State Funding per Year, $ thousands per student",
+        expand = c(0, 0),
+        limits = c(2.5, 15),
+        breaks = seq(0, 15, by = 1)) +
     scale_y_continuous(name = "",
-        breaks = seq(0, 0.15, by = 0.025), limits = c(0, 0.15)) +
+        breaks = seq(0, 15, by = 2),
+        limits = c(0, 12)) +
     theme_bw() +
-    ggtitle("Faculty Hired, Total per student") +
+    ggtitle("Professors Hired, count / 100 students") +
     theme(plot.title = element_text(size = rel(1)),
         plot.margin = unit(c(0.5, 2, 0, 0), "mm"))
 # Save this plot
 ggsave("../../text/figures/hiring-correlation.png",
     plot = hiring_correlation.plot,
     units = "cm", dpi = 300, width = fig.width, height = fig.height)
+
+# Give the value of the correlation:
+reg.data %>%
+    lm(I(total_hired / (enrollment_reported / 1000)) ~ 1 +
+        I(stateappropriations_real / (1000 * enrollment_reported)),
+        data = .) %>%
+    summary() %>%
+    print()
 
 
 ################################################################################
@@ -217,7 +236,7 @@ stargazer(
     naive_menhiring.reg, shiftshare_menhiring.reg,
     naive_womenhiring.reg, shiftshare_womenhiring.reg,
     naive_hiring.reg, shiftshare_hiring.reg,
-    dep.var.caption = "Dependent Variable: Hiring Count",
+    dep.var.caption = "Dependent Variable: Professor Hiring Count",
     dep.var.labels = c("Men", "Women", "Total"),
     column.labels = rep(c("OLS", "2SLS"), 3),
     digits = digits.no,
