@@ -61,12 +61,11 @@ However, the assumption is bolstered by the fact that universities with higher v
 Universities are by-in-large smaller (in terms of enrolment, total revenues, and professor count) at the top of the shift-share instrument distribution (see~\autoref{tab:summary-quantiles}).
 Though on a per student basis, there is little difference across the distribution (except in the outcomes under consideration).
 The shift-share instrument is positively associated with the total enrolment and total amount of state funding for each university, in both \$ and $\log$/percentage change terms, while other the other sources of university finances are not associated with the funding shift-share.
-So that the other sources of finances are not clear confounders for the IV strategy, as they exhibit balance with respect to the funding shift-share \citep{pei2019poorly}.
-Yearly and individual fixed effects are included in regressions throughout to implicitly condition on mean differences between universities and years.
+So that the other sources of finances are not clear confounders for the IV strategy, as they exhibit balance with respect to the funding shift-share.
+Nonetheless, yearly and institution fixed effects are included in regressions throughout to implicitly condition on mean differences between universities and years.
 
 \subsection{Instrumental Variables (IV) Model}
 \label{sec:iv-model-uni}
-
 I use the instrument defined in \autoref{eqn:public-instrument} to overcome the endogeneity concerns for state funding to each public university, for an IV approach.
 \autoref{eqn:firststage} is the first stage for exogenous variation in the state funding for university $i$ in year $t$, and \autoref{eqn:secondstage} the second stage for the effect of state funding on faculty outcomes.\footnote{
     The IV approach identifies the local average treatment effect, weighted towards larger values of the instrument in the continuous case.
