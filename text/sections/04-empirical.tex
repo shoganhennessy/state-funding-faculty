@@ -13,9 +13,8 @@ Shifts in state for higher education, however, provide opportunity to address su
 
 \subsection{State Funding Shift-Share}
 \label{sec:approp-shocks}
-
-I use a shift-share instrument to address endogeneity concerns for the amount of funding a state allots to each of its public universities.
-\cite{NBERw23736,NBERw27885} develop the instrument for public university finances by exploiting a shift-share instrument for changes in state-level funding interacted with university reliance on state funding in a base period.
+I use a shift-share instrument to address endogeneity concerns for state governments' funding decisions, for their public universities.
+\cite{NBERw23736,NBERw27885} develop the shift-share approach for public university funding by exploiting shifts in yearly state-wide higher eduction funding, interacted with universities' reliance on state funding in a base period.
 \begin{align}
     \label{eqn:public-instrument}
     Z_{i,t} &\coloneqq - \left[
@@ -24,9 +23,9 @@ I use a shift-share instrument to address endogeneity concerns for the amount of
     \left( \frac{\text{State Funding}_{i,1990 + \tau}}{\text{Total Revenues}_{i,1990 + \tau}} \right) \right]
 \end{align}
 
-The system exploits the fact that institutions who rely more on state funding will be affected by state-wide funding cuts.
+The system exploits the fact that institutions who rely more on state funding will be affected by follow-on state-wide funding cuts.
 $Z_{i,t}$ is the shift-share instrument for institution $i$ in year $t$.
-It is contructed by interacting the average funding for universities in state $s(i)$ with reliance on state funding relative to total revenues, averaged across the base years 1990--1993.\footnote{
+It is constructed by interacting the average funding for universities in state $s(i)$ with reliance on state funding relative to total revenues, averaged across the base years 1990--1993.\footnote{
     1990--1993 are defined as data for public university finance data are most comparable (i.e., without many missing values) beginning in 1990.
     \cite{NBERw23736} use the single year 1990 as the base year, though I use the four years to ameliorate missing values in the single year of 1990.
     Results are similar in either specification.
@@ -89,7 +88,8 @@ Incumbent professors are faculty who are already employed at the university; sta
     This contrasts with \autoref{sec:iv-model-uni} and \cite{NBERw23736}, where the unit of analysis is the university-year, where base year 1990 is more appropriate.
     See \autoref{sec:iv-model-indiv} for the instrument and second-stage specification.
 }
-The instrument exogeneity and exclusion follows the same argument as above, where the Illinois legislature did not target any single campus for funding cuts and no single Illinois campus takes the majority of state funding.
+The instrument exogeneity and exclusion follows the same argument as above, where no single Illinois campus takes the majority of state funding, and so
+the Illinois state government's funding cuts are not majority aimed at any single campus.
 
 It is not a priori clear which units are appropriate for this analysis;
 does it make sense to consider state funding in purely dollar amounts per student, or in percent change rate?
