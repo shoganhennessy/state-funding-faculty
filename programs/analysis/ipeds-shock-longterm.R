@@ -19,6 +19,14 @@ digits.no <- 3
 fig.width <- 10
 fig.height <- fig.width * 0.85
 
+# Define default colours.
+colour.list <- c(
+    "#D62728", # Red  -> First-stage.
+    "#1f77b4", # Blue -> Lecturers
+    "#c9721c", # Orange -> Asst Professors
+    "#237e23", # Green -> Full Professors
+    "#cc2c9f") # Strong pink -> All faculty.
+
 
 # Load data sources ------------------------------------------------------------
 
@@ -80,8 +88,9 @@ reg.data <- reg.data %>%
     filter(1990 <= year,
         !is.na(enrollment_reported), enrollment_reported > 0,
         !is.na(all_prof_count),
-        !is.na(stateappropriations_real),
-        !is.na(appropriationshock_perEnroll_real))
+        !is.na(stateappropriations_real), stateappropriations_real > 0,
+        !is.na(appropriationshock_perEnroll_real),
+        appropriationshock_perEnroll_real > 0)
 
 # Define data sample, with releavnt transformations, for the LP estimation
 reg.data <- reg.data %>%
@@ -121,7 +130,7 @@ time.horizon <- 11
 limits.vector <- c(-0.1, 0.6)
 
 ## Define a function to nicely plot the LP results.
-lpreg.plot <- function(model.lpreg, limits.vector) {
+lpreg.plot <- function(model.lpreg, limits.vector, given.colour) {
     ## Input a LP-reg (estimates an elesticity \in [-1,1])
     ## And the time.hirozon for how far to plot LP model
     # Get the estimates
@@ -133,13 +142,13 @@ lpreg.plot <- function(model.lpreg, limits.vector) {
     # Plot the LP etsimation, with my own custom plot.
     model.plot <- model.lpdata %>%
         ggplot(aes(x = t)) +
-        geom_hline(yintercept = 0, alpha = 0.5) +
+        geom_hline(yintercept = 0, alpha = 0.25) +
         geom_ribbon(aes(ymin = conf.low, ymax = conf.high),
-            alpha = 0.4, fill = "grey70") +
-        geom_point(aes(y = estimate), colour = "blue") +
-        geom_line(aes(y = estimate), colour = "blue") +
-        geom_line(aes(y = conf.low), linetype = "dashed") +
-        geom_line(aes(y = conf.high), linetype = "dashed") +
+            alpha = 0.25, fill = given.colour) + #"grey70") +
+        geom_point(aes(y = estimate), colour = given.colour) +
+        geom_line(aes(y = estimate), colour = given.colour) +
+        geom_line(aes(y = conf.low), linetype = "dashed", colour = given.colour) +
+        geom_line(aes(y = conf.high), linetype = "dashed", colour = given.colour) +
         scale_x_continuous(name = "Years, Relative to Funding Cut",
             breaks = model.lpdata$t, expand = c(0.01, 0.01)) +
         scale_y_continuous(name = "",
@@ -173,10 +182,9 @@ firststage.lpreg <-
         robust_cluster = c("group", "time"),
         confint = 1.96,
         hor = time.horizon)
-plot(firststage.lpreg)
 # Save this plot
 ggsave("../../text/figures/firststage-lp.png",
-    plot = lpreg.plot(firststage.lpreg, c(-1.15, 0.2)),
+    plot = lpreg.plot(firststage.lpreg, c(-1.15, 0.2), colour.list[1]),
     units = "cm", dpi = 300, width = fig.width, height = fig.height)
 
 # Run the LP method for the second-stage, outcome count lecturers per student
@@ -202,7 +210,8 @@ lecturer_count.lpreg <-
 plot(lecturer_count.lpreg)
 # Save this plot
 ggsave("../../text/figures/lecturer-count-lp.png",
-    plot = lpreg.plot(lecturer_count.lpreg, - limits.vector[c(2, 1)]),
+    plot = lpreg.plot(lecturer_count.lpreg, - limits.vector[c(2, 1)],
+        colour.list[2]),
     units = "cm", dpi = 300, width = fig.width, height = fig.height)
 
 # Run the LP method for the second-stage, outcome count APs per student
@@ -228,7 +237,7 @@ assistant_count.lpreg <-
 plot(assistant_count.lpreg)
 # Save this plot
 ggsave("../../text/figures/assistant-count-lp.png",
-    plot = lpreg.plot(assistant_count.lpreg, limits.vector),
+    plot = lpreg.plot(assistant_count.lpreg, limits.vector, colour.list[3]),
     units = "cm", dpi = 300, width = fig.width, height = fig.height)
 
 # Run the LP method for the second-stage, outcome count APs per student
@@ -254,7 +263,7 @@ full_count.lpreg <-
 plot(full_count.lpreg)
 # Save this plot
 ggsave("../../text/figures/full-count-lp.png",
-    plot = lpreg.plot(full_count.lpreg, limits.vector),
+    plot = lpreg.plot(full_count.lpreg, limits.vector, colour.list[4]),
     units = "cm", dpi = 300, width = fig.width, height = fig.height)
 
 # Run the LP method for the second-stage, outcome count profs per student
@@ -280,5 +289,5 @@ all_count.lpreg <-
 plot(all_count.lpreg)
 # Save this plot
 ggsave("../../text/figures/all-count-lp.png",
-    plot = lpreg.plot(all_count.lpreg, limits.vector),
+    plot = lpreg.plot(all_count.lpreg, limits.vector, colour.list[5]),
     units = "cm", dpi = 300, width = fig.width, height = fig.height)

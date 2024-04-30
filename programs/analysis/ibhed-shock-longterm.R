@@ -24,6 +24,15 @@ digits.no <- 3
 fig.width <- 10
 fig.height <- fig.width * 0.85
 
+# Define default colours.
+colour.list <- c(
+    "#D62728", # Red  -> First-stage.
+    "#1f77b4", # Blue -> Lecturers
+    "#c9721c", # Orange -> Asst Professors
+    "#237e23", # Green -> Full Professors
+    "#8300c0", # Dark purple -> Administrator Professors
+    "#cc2c9f") # Strong pink -> All faculty.
+
 
 # Load data --------------------------------------------------------------------
 
@@ -208,7 +217,7 @@ lp.data <- reg.data %>%
     pdata.frame(index = c("name_unitid", "year"), drop.index = FALSE)
 
 ## Define a function to nicely plot the LP results.
-lpreg.plot <- function(model.lpreg) {
+lpreg.plot <- function(model.lpreg, given.colour) {
     ## Input a LP-reg (estimates an elesticity \in [-1,1])
     ## And the time.hirozon for how far to plot LP model
     # Get the estimates
@@ -220,18 +229,17 @@ lpreg.plot <- function(model.lpreg) {
     # Plot the LP etsimation, with my own custom plot.
     model.plot <- model.lpdata %>%
         ggplot(aes(x = t)) +
-        geom_hline(yintercept = 0, alpha = 0.5) +
+        geom_hline(yintercept = 0, alpha = 0.25) +
         geom_ribbon(aes(ymin = conf.low, ymax = conf.high),
-            alpha = 0.4, fill = "grey70") +
-        geom_point(aes(y = estimate), colour = "blue") +
-        geom_line(aes(y = estimate), colour = "blue") +
-        geom_line(aes(y = conf.low), linetype = "dashed") +
-        geom_line(aes(y = conf.high), linetype = "dashed") +
+            alpha = 0.25, fill = given.colour) + #"grey70") +
+        geom_point(aes(y = estimate), colour = given.colour) +
+        geom_line(aes(y = estimate), colour = given.colour) +
+        geom_line(aes(y = conf.low), linetype = "dashed", colour = given.colour) +
+        geom_line(aes(y = conf.high), linetype = "dashed", colour = given.colour) +
         scale_x_continuous(name = "Years, Relative to Funding Cut",
             breaks = model.lpdata$t, expand = c(0.01, 0.01)) +
         scale_y_continuous(name = "",
-            limits = c(-0.2, 0.2),
-            breaks = seq(-1, , by = 0.05)) +
+            breaks = seq(-5, 5, by = 0.1)) +
         theme_bw() +
         ggtitle("Estimate") +
         theme(plot.title = element_text(size = rel(1)),
@@ -239,6 +247,7 @@ lpreg.plot <- function(model.lpreg) {
     # Return the plot.
     return(model.plot)
 }
+
 
 # Run the LP method for the first-stage regression.
 firststage.lpreg <-
@@ -259,7 +268,7 @@ firststage.lpreg <-
         hor = time.horizon)
 # Save this plot of th first stage.
 ggsave("../../text/figures/firststage-illinois-lp-rolling.png",
-    plot = lpreg.plot(firststage.lpreg),
+    plot = lpreg.plot(firststage.lpreg, colour.list[1]),
     units = "cm", width = fig.width, height = fig.height)
 
 
@@ -288,7 +297,7 @@ lecturer_salaries.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/salaries-lecturer-illinois-lp-rolling.png",
-    plot = lpreg.plot(lecturer_salaries.lpreg),
+    plot = lpreg.plot(lecturer_salaries.lpreg, colour.list[2]),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for salaries of APs.
@@ -314,7 +323,7 @@ assistant_salaries.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/salaries-assistant-illinois-lp-rolling.png",
-    plot = lpreg.plot(assistant_salaries.lpreg),
+    plot = lpreg.plot(assistant_salaries.lpreg, colour.list[3]),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for salaries of full profs.
@@ -340,7 +349,7 @@ full_salaries.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/salaries-full-illinois-lp-rolling.png",
-    plot = lpreg.plot(full_salaries.lpreg),
+    plot = lpreg.plot(full_salaries.lpreg, colour.list[4]),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for salaries of administrator faculty.
@@ -366,7 +375,7 @@ administrator_salaries.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/salaries-administrator-illinois-lp-rolling.png",
-    plot = lpreg.plot(administrator_salaries.lpreg),
+    plot = lpreg.plot(administrator_salaries.lpreg, colour.list[5]),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for salaries of all faculty.
@@ -392,7 +401,7 @@ all_salaries.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/salaries-all-illinois-lp-rolling.png",
-    plot = lpreg.plot(all_salaries.lpreg),
+    plot = lpreg.plot(all_salaries.lpreg, colour.list[6]),
     units = "cm", width = fig.width, height = fig.height)
 
 
@@ -423,7 +432,7 @@ lecturer_promoted.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/promoted-lecturer-illinois-lp-rolling.png",
-    plot = lpreg.plot(lecturer_promoted.lpreg),
+    plot = lpreg.plot(lecturer_promoted.lpreg, colour.list[2]),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for promotion rate of APs.
@@ -451,7 +460,7 @@ assistant_promoted.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/promoted-assistant-illinois-lp-rolling.png",
-    plot = lpreg.plot(assistant_promoted.lpreg),
+    plot = lpreg.plot(assistant_promoted.lpreg, colour.list[3]),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for promotion rate of full profs.
@@ -479,7 +488,7 @@ full_promoted.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/promoted-full-illinois-lp-rolling.png",
-    plot = lpreg.plot(full_promoted.lpreg),
+    plot = lpreg.plot(full_promoted.lpreg, colour.list[4]),
     units = "cm", width = fig.width, height = fig.height)
 
 
@@ -508,7 +517,7 @@ lecturer_exit.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/exit-lecturer-illinois-lp-rolling.png",
-    plot = lpreg.plot(lecturer_exit.lpreg),
+    plot = lpreg.plot(lecturer_exit.lpreg, colour.list[2]),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for exit rate of APs.
@@ -534,7 +543,7 @@ assistant_exit.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/exit-assistant-illinois-lp-rolling.png",
-    plot = lpreg.plot(assistant_exit.lpreg),
+    plot = lpreg.plot(assistant_exit.lpreg, colour.list[3]),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for exit rate of full profs.
@@ -560,7 +569,7 @@ full_exit.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/exit-full-illinois-lp-rolling.png",
-    plot = lpreg.plot(full_exit.lpreg),
+    plot = lpreg.plot(full_exit.lpreg, colour.list[4]),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for exit rate of administrator faculty.
@@ -586,7 +595,7 @@ administrator_exit.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/exit-administrator-illinois-lp-rolling.png",
-    plot = lpreg.plot(administrator_exit.lpreg),
+    plot = lpreg.plot(administrator_exit.lpreg, colour.list[5]),
     units = "cm", width = fig.width, height = fig.height)
 
 # LP estimation for exit rate of all faculty.
@@ -612,5 +621,5 @@ all_exit.lpreg <-
         hor = time.horizon)
 # Save this plot
 ggsave("../../text/figures/exit-all-illinois-lp-rolling.png",
-    plot = lpreg.plot(all_exit.lpreg),
+    plot = lpreg.plot(all_exit.lpreg, colour.list[6]),
     units = "cm", width = fig.width, height = fig.height)

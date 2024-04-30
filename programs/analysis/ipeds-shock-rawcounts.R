@@ -193,7 +193,7 @@ stargazer(
     model.names = FALSE,
     omit = "factor|count|year",
     intercept.bottom = TRUE,
-    covariate.labels = c("Funding Shock", "Tuition Revenue", "Constant"),
+    covariate.labels = c("Funding Shift-Share", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq", "f"),
     add.lines = list(
         c("Uni. + Year fixed effects?", "Yes", "No", "Yes", "No"),
@@ -313,7 +313,7 @@ stargazer(
     naive_all_count.reg, shiftshare_all_count.reg,
     add.lines = outcome.means,
     dep.var.caption =
-        "Dependent Variable: Faculty Count per 100 Students, by Position",
+        "Dependent Variable: Faculty Count per 1,000 Students, by Position",
     dep.var.labels = c(
         "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
     column.labels = rep(c("OLS", "2SLS"), 4),
@@ -387,4 +387,4 @@ substitution_rawcount.plot <-
 # Save this plot
 ggsave("../../text/figures/substitution-rawcount-plot.png",
     plot = substitution_rawcount.plot,
-    units = "cm", dpi = 300, width = 1.25 * fig.width, height = 0.85 * fig.height)
+    units = "cm", dpi = 300, width = 1.25 * fig.width, height = 0.8 * fig.height)

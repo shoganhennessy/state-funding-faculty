@@ -21,10 +21,10 @@ Type 'q()' to quit R.
 > ## Senan Hogan-Hennessy, 21 December 2021
 > ## Build IPEDS data with the Urban Inst's package
 > print(Sys.time())
-[1] "2024-02-23 12:05:10 EST"
-> ## https://educationdata.urban.org/documentation/colleges.html
-> ## https://urbaninstitute.github.io/education-data-package-r/
-> library(tidyverse) ## functions for data manipulation and visualization
+[1] "2024-04-26 12:31:29 EDT"
+> # https://educationdata.urban.org/documentation/colleges.html
+> # Load functions for data manipulation and visualisation
+> library(tidyverse)
 ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 ✔ dplyr     1.1.2     ✔ readr     2.1.4
 ✔ forcats   1.0.0     ✔ stringr   1.5.0
@@ -138,6 +138,17 @@ Rows: 136923 Columns: 12
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 dbl (12): unitid, year, fulltime_tenured_count, fulltime_tenuretrack_count, ...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+> 
+> # Barrons (2009) selctivity rankings (if uni not in the list, then is rank 5)
+> barrons.data <- read_csv("../../data/rankings/barrons-2009.csv")
+Rows: 236 Columns: 3
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (2): inst_name, state
+dbl (1): barrons_rank_2009
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
@@ -419,6 +430,55 @@ date (1): DATE
 +     left_join(graduation150.data, by = c("unitid", "year")) %>%
 +     left_join(parttime.data, by = c("unitid", "year"))
 > 
+> ## connect the Barron's selectivity index by fuzy name match
+> library(fuzzyjoin)
+> # Get the connecting variables for IPEDs: unitid, uni name
+> ipeds.key <- urban_ipeds.data %>%
++     group_by(unitid, inst_name) %>%
++     summarise(count = n()) %>%
++     ungroup() %>%
++     select(unitid, inst_name)
+`summarise()` has grouped output by 'unitid'. You can override using the
+`.groups` argument.
+> # Fuzy match the names between IPEDS + Barron's measure, avoid string cleaning
+> fuzzy.data <- barrons.data %>%
++     select(inst_name, barrons_rank_2009) %>%
++     stringdist_join(ipeds.key,
++         by = "inst_name",
++         mode = "left",
++         method = "jw",
++         max_dist = 0.1,
++         distance_col = "dist")
+> # Take the best string match for each uni
+> fuzzy.key <- fuzzy.data %>%
++     rename(inst_name = inst_name.x) %>%
++     group_by(inst_name) %>%
++     mutate(best_match = as.integer(dist == min(dist, na.rm = FALSE))) %>%
++     ungroup() %>%
++     filter(best_match == 1)
+> # Inspect the matchs: are there any bad matches?  Answer: no.
+> fuzzy.key %>%
++     filter(dist > 0) %>%
++     print()
+# A tibble: 2 × 6
+  inst_name               barrons_rank_2009 unitid inst_name.y   dist best_match
+  <chr>                               <dbl>  <dbl> <chr>        <dbl>      <int>
+1 Indiana University Blo…                 4 151351 Indiana Un… 0.0222          1
+2 University of South Ca…                 4 218663 University… 0.0794          1
+> # Connect the Barron's + IPEDS data.
+> urban_ipeds.data <- fuzzy.key %>%
++     select(unitid, barrons_rank_2009) %>%
++     right_join(urban_ipeds.data, by = "unitid") %>%
++     mutate(barrons_rank_2009 =
++         ifelse(!is.na(barrons_rank_2009), barrons_rank_2009, 5))
+Warning message:
+In right_join(., urban_ipeds.data, by = "unitid") :
+  Detected an unexpected many-to-many relationship between `x` and `y`.
+ℹ Row 1 of `x` matches multiple rows in `y`.
+ℹ Row 96100 of `y` matches multiple rows in `x`.
+ℹ If a many-to-many relationship is expected, set `relationship =
+  "many-to-many"` to silence this warning.
+> 
 > 
 > ## Calculate the shift-share instruments (see Deming Walters 2017, p.10)
 > 
@@ -536,7 +596,8 @@ date (1): DATE
 +         full_parttime_count,
 +         lecturer_fulltime_count,
 +         assistant_fulltime_count,
-+         full_fulltime_count) %>%
++         full_fulltime_count,
++         barrons_rank_2009) %>%
 +     arrange(unitid, year)
 > 
 > # Remove double observations created by the multiple merges.
@@ -563,4 +624,4 @@ date (1): DATE
 > quit("no")
 > proc.time()
    user  system elapsed 
- 50.224   2.426  24.263 
+ 72.390   3.475  43.905 

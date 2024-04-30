@@ -14,6 +14,14 @@ set.seed(47)
 # This file follows an adjusted Deming Walters (2017, p.10) approach to
 # appropriations shock instrument.
 
+# Define default colours.
+colour.list <- c(
+    "#D62728", # Red  -> First-stage.
+    "#1f77b4", # Blue -> Lecturers
+    "#c9721c", # Orange -> Asst Professors
+    "#237e23", # Green -> Full Professors
+    "#cc2c9f") # Strong pink -> All faculty.
+
 # Define number of digits in tables and graphs
 digits.no <- 3
 
@@ -265,8 +273,8 @@ salary_density.plot <- reg.data %>%
         year %in% c(2010, 2021)) %>%
     mutate(faculty =
         ifelse(position %in% c("Instructor", "Lecturer"), "Lecturer",
-        ifelse(position == "Assistant Professor", "Tenure-Track",
-        ifelse(position %in% c("Associate Professor", "Professor"), "Tenured",
+        ifelse(position == "Assistant Professor", "Asst. Professor",
+        ifelse(position %in% c("Associate Professor", "Professor"), "Full Professor",
         ifelse(position %in% c("Chancellor",
             "Other Administrator", "President", "Senior Officer",
             "Unit Director", "Vice Chancellor", "Vice President"), "Administrator",
@@ -288,7 +296,10 @@ salary_density.plot <- reg.data %>%
         plot.title = element_text(size = rel(1)),
         plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
         legend.position = "bottom",
-        legend.margin = margin(t = -5))
+        legend.margin = margin(t = -5)) +
+    scale_fill_manual(values = colour.list) +
+    scale_colour_manual(values = colour.list)
+
 # Save this plot
 presentation.width <- 17.5
 presentation.height <- presentation.width / 2

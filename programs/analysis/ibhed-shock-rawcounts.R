@@ -21,6 +21,14 @@ digits.no <- 3
 fig.width <- 10
 fig.height <- fig.width * 0.85
 
+# Define default colours.
+colour.list <- c(
+    "#D62728", # Red  -> First-stage.
+    "#1f77b4", # Blue -> Lecturers
+    "#c9721c", # Orange -> Asst Professors
+    "#237e23", # Green -> Full Professors
+    "#cc2c9f") # Strong pink -> All faculty.
+
 
 # Load data --------------------------------------------------------------------
 

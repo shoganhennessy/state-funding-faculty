@@ -21,6 +21,8 @@ R CMD BATCH --no-save ipeds-public-private.R
 R CMD BATCH --no-save ipeds-shock.R
 # Analysis and regressions at the institution-level, IPEDS, with count outcomes.
 R CMD BATCH --no-save ipeds-shock-rawcounts.R
+# Robustness checks at the institution-level, IPEDS
+R CMD BATCH --no-save ipeds-robustness-checks.R
 # Analysis and regressions at the institution-level, IPEDS, local porjections.
 R CMD BATCH --no-save ipeds-shock-longterm.R
 # Analysis and regressions at the individual-level, IBHED, base-year shock IV.

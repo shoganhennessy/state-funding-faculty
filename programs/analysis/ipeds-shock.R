@@ -1,6 +1,6 @@
 #!/usr/bin/R
 ## Senan Hogan-Hennessy, 3 August 2022
-## IV for Prof's salaries, using IPEDS data.
+## IV for faculty counts, using IPEDS data.
 print(Sys.time())
 library(jtools) # Plotting estimates.
 library(tidyverse) # Functions for data manipulation and visualization
@@ -32,6 +32,14 @@ lag_lead <- function(column, t) {
     }
     return(lag_column)
 }
+
+# Define default colours.
+colour.list <- c(
+    "#D62728", # Red  -> First-stage.
+    "#1f77b4", # Blue -> Lecturers
+    "#c9721c", # Orange -> Asst Professors
+    "#237e23", # Green -> Full Professors
+    "#cc2c9f") # Strong pink -> All faculty.
 
 
 # Load data sources ------------------------------------------------------------
@@ -836,7 +844,7 @@ stargazer(
     model.names = FALSE,
     omit = "factor|count|year",
     intercept.bottom = TRUE,
-    covariate.labels = c("Funding Shock", "Tuition Revenue", "Constant"),
+    covariate.labels = c("Funding Shift-Share", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq", "f"),
     add.lines = list(
         c("Uni. + Year fixed effects?", "Yes", "No", "Yes", "No"),
@@ -884,8 +892,8 @@ lag.plot <- lag.data %>%
     geom_hline(yintercept = 0, alpha = 0.5) +
     geom_ribbon(aes(ymin = conf.low, ymax = conf.high),
         alpha = 0.4, fill = "grey70") +
-    geom_point(aes(y = estimate), colour = "blue") +
-    geom_line(aes(y = estimate), colour = "blue") +
+    geom_point(aes(y = estimate), colour = colour.list[1]) +
+    geom_line(aes(y = estimate), colour = colour.list[1]) +
     geom_line(aes(y = conf.low), linetype = "dashed") +
     geom_line(aes(y = conf.high), linetype = "dashed") +
     scale_x_continuous(name = "Years, Relative to Funding Cut",
@@ -1082,7 +1090,7 @@ elasticity.plot <- plot_summs(
 # Save this plot
 ggsave("../../text/figures/elasticity-plot.png",
     plot = elasticity.plot,
-    units = "cm", dpi = 300, width = 1.25 * fig.width, height = 0.85 * fig.height)
+    units = "cm", dpi = 300, width = 1.25 * fig.width, height = 0.8 * fig.height)
 
 
 ################################################################################
@@ -1155,7 +1163,7 @@ fixest::coefplot(list(
 # https://cran.r-project.org/web/packages/jtools/vignettes/summ.html#plot_summs()_and_plot_coefs()
 
 # Calculate the elasticities of susbtituion, with SEs bootstrapped.
-boot.count <- 10000
+boot.count <- 10
 
 ## write a function to calculate the lecturer <-> assistant prof elasticity
 lecturer_assistant.fun <- function(data, inds){
@@ -1270,122 +1278,6 @@ boot.calc$t %>%
 print(c("Calculated point est for substitution between ast + full profs",
     boot.mean, "with SEs", boot.se,
     "and 95 % CI", boot.ci))
-
-
-# Faculty Count (per student) Regressions, by tenured vs non-tenured -----------
-
-## Non-tenured faculty Count
-# Naive OLS Regression
-naive_nontenured_count.reg <- reg.data %>%
-    filter(!is.na(nontenured_tenure_count), nontenured_tenure_count > 0) %>%
-    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
-        log(stateappropriations_real / enrollment_reported)) %>%
-    felm(log(nontenured_tenure_count / enrollment_reported) ~ 1 +
-        `log(stateappropriations_real/enrollment_reported)(fit)` |
-        unitid + year |
-        0 |
-        state + year,
-        data = .)
-# Shift-share IV Regression, explained by state appropriation shock
-shiftshare_nontenured_count.reg <- reg.data %>%
-    filter(!is.na(nontenured_tenure_count), nontenured_tenure_count > 0) %>%
-    felm(log(nontenured_tenure_count / enrollment_reported) ~ 1 |
-        unitid + year |
-        (log(stateappropriations_real / enrollment_reported) ~
-            I(-log(appropriationshock_perEnroll_real))) |
-        state + year,
-        data = .)
-
-## Tenure-track faculty Count
-# Naive OLS Regression
-naive_tenuretrack_count.reg <- reg.data %>%
-    filter(!is.na(tenuretrack_tenure_count), tenuretrack_tenure_count > 0) %>%
-    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
-        log(stateappropriations_real / enrollment_reported)) %>%
-    felm(log(tenuretrack_tenure_count / enrollment_reported) ~ 1 +
-        `log(stateappropriations_real/enrollment_reported)(fit)` |
-        unitid + year |
-        0 |
-        state + year,
-        data = .)
-# Shift-share IV Regression, explained by state appropriation shock
-shiftshare_tenuretrack_count.reg <- reg.data %>%
-    filter(!is.na(tenuretrack_tenure_count), tenuretrack_tenure_count > 0) %>%
-    felm(log(tenuretrack_tenure_count / enrollment_reported) ~ 1 |
-        unitid + year |
-        (log(stateappropriations_real / enrollment_reported) ~
-            I(-log(appropriationshock_perEnroll_real))) |
-        state + year,
-        data = .)
-
-## Tenured faculty Count
-# Naive OLS Regression
-naive_tenured_count.reg <- reg.data %>%
-    filter(!is.na(tenured_tenure_count), tenured_tenure_count > 0) %>%
-    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
-        log(stateappropriations_real / enrollment_reported)) %>%
-    felm(log(tenured_tenure_count / enrollment_reported) ~ 1 +
-        `log(stateappropriations_real/enrollment_reported)(fit)` |
-        unitid + year |
-        0 |
-        state + year,
-        data = .)
-# Shift-share IV Regression, explained by state appropriation shock
-shiftshare_tenured_count.reg <- reg.data %>%
-    filter(!is.na(tenured_tenure_count), tenured_tenure_count > 0) %>%
-    felm(log(tenured_tenure_count / enrollment_reported) ~ 1 |
-        unitid + year |
-        (log(stateappropriations_real / enrollment_reported) ~
-            I(-log(appropriationshock_perEnroll_real))) |
-        state + year,
-        data = .)
-
-## All faculty Count
-
-# Naive OLS Regression
-naive_alltenure_count.reg <- reg.data %>%
-    filter(!is.na(all_tenure_count), all_tenure_count > 0) %>%
-    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
-        log(stateappropriations_real / enrollment_reported)) %>%
-    felm(log(all_tenure_count / enrollment_reported) ~ 1 +
-        `log(stateappropriations_real/enrollment_reported)(fit)` |
-        unitid + year |
-        0 |
-        state + year,
-        data = .)
-
-# Shift-share IV Regression, explained by state appropriation shock
-shiftshare_alltenure_count.reg <- reg.data %>%
-    filter(!is.na(all_tenure_count), all_tenure_count > 0) %>%
-    felm(log(all_tenure_count / enrollment_reported) ~ 1 |
-        unitid + year |
-        (log(stateappropriations_real / enrollment_reported) ~
-            I(-log(appropriationshock_perEnroll_real))) |
-        state + year,
-        data = .)
-
-# Collate the results to a LaTeX table
-stargazer(
-    naive_nontenured_count.reg, shiftshare_nontenured_count.reg,
-    naive_tenuretrack_count.reg, shiftshare_tenuretrack_count.reg,
-    naive_tenured_count.reg, shiftshare_tenured_count.reg,
-    naive_alltenure_count.reg, shiftshare_alltenure_count.reg,
-    dep.var.caption = "Dependent Variable: Employment Count by Tenure Group",
-    dep.var.labels = c("Non-tenure", "Tenure-Track", "Tenured", "All"),
-    column.labels = rep(c("OLS", "2SLS"), 4),
-    digits = digits.no,
-    digits.extra = digits.no,
-    model.names = FALSE,
-    omit = "factor|count|year",
-    intercept.bottom = TRUE,
-    order = c(2, 1, 3),
-    covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
-    omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
-    star.cutoffs = NA,
-    header = FALSE, float = FALSE, no.space = TRUE,
-    omit.table.layout = "n", notes.append = FALSE,
-    type = "text",
-    out = "../../text/tables/tenurecount-shock-reg-fte.tex")
 
 
 # Research + Instruction Spending Regressions ----------------------------------
@@ -1525,31 +1417,10 @@ shiftshare_research_salaries.reg <- research_instruct.data %>%
         state + year,
         data = .)
 
-## Total salaries spending.
-# Naive OLS Regression
-naive_nonaux_salaries.reg <- research_instruct.data %>%
-    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
-        log(stateappropriations_real / enrollment_reported)) %>%
-    felm(log(all_profoutlays_real / enrollment_reported) ~ 1 +
-        `log(stateappropriations_real/enrollment_reported)(fit)` |
-        unitid + year |
-        0 |
-        state + year,
-        data = .)
-# Shift-share IV Regression, explained by state appropriation shock
-shiftshare_nonaux_salaries.reg <- research_instruct.data %>%
-    felm(log(all_profoutlays_real / enrollment_reported) ~ 1 |
-        unitid + year |
-        (log(stateappropriations_real / enrollment_reported) ~
-            I(-log(appropriationshock_perEnroll_real))) |
-        state + year,
-        data = .)
-
 # Collate the results to a LaTeX table
 stargazer(
     naive_instruction_salaries.reg, shiftshare_instruction_salaries.reg,
     naive_research_salaries.reg, shiftshare_research_salaries.reg,
-    naive_nonaux_salaries.reg, shiftshare_nonaux_salaries.reg,
     dep.var.caption = "Dependent Variable: Salary Expenditures",
     dep.var.labels = c("Instruction", "Research", "All"),
     column.labels = rep(c("OLS", "2SLS"), 3),

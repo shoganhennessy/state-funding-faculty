@@ -2,9 +2,9 @@
 ## Senan Hogan-Hennessy, 21 December 2021
 ## Build IPEDS data with the Urban Inst's package
 print(Sys.time())
-## https://educationdata.urban.org/documentation/colleges.html
-## https://urbaninstitute.github.io/education-data-package-r/
-library(tidyverse) ## functions for data manipulation and visualization
+# https://educationdata.urban.org/documentation/colleges.html
+# Load functions for data manipulation and visualisation
+library(tidyverse)
 set.seed(47)
 
 
@@ -35,6 +35,9 @@ salaries.data <- read_csv("../../data/urban-ipeds/raw-data/faculty/ipeds-salarie
 tenure.data <- read_csv("../../data/urban-ipeds/raw-data/faculty/ipeds-tenure.csv")
 # Employee part- + full-time data (hand made from raw IPEDS values)
 parttime.data <- read_csv("../../data/urban-ipeds/raw-data/parttime-employees/ipeds-parttime.csv")
+
+# Barrons (2009) selctivity rankings (if uni not in the list, then is rank 5)
+barrons.data <- read_csv("../../data/rankings/barrons-2009.csv")
 
 # CPI-U from FREDS (since Urban provided cpi has missing years)
 # Yearly average, seasonally adjusted, base year 1982-1984=100
@@ -293,6 +296,41 @@ urban_ipeds.data <- directory.data %>%
     left_join(graduation150.data, by = c("unitid", "year")) %>%
     left_join(parttime.data, by = c("unitid", "year"))
 
+## connect the Barron's selectivity index by fuzy name match
+library(fuzzyjoin)
+# Get the connecting variables for IPEDs: unitid, uni name
+ipeds.key <- urban_ipeds.data %>%
+    group_by(unitid, inst_name) %>%
+    summarise(count = n()) %>%
+    ungroup() %>%
+    select(unitid, inst_name)
+# Fuzy match the names between IPEDS + Barron's measure, avoid string cleaning
+fuzzy.data <- barrons.data %>%
+    select(inst_name, barrons_rank_2009) %>%
+    stringdist_join(ipeds.key,
+        by = "inst_name",
+        mode = "left",
+        method = "jw",
+        max_dist = 0.1,
+        distance_col = "dist")
+# Take the best string match for each uni
+fuzzy.key <- fuzzy.data %>%
+    rename(inst_name = inst_name.x) %>%
+    group_by(inst_name) %>%
+    mutate(best_match = as.integer(dist == min(dist, na.rm = FALSE))) %>%
+    ungroup() %>%
+    filter(best_match == 1)
+# Inspect the matchs: are there any bad matches?  Answer: no.
+fuzzy.key %>%
+    filter(dist > 0) %>%
+    print()
+# Connect the Barron's + IPEDS data.
+urban_ipeds.data <- fuzzy.key %>%
+    select(unitid, barrons_rank_2009) %>%
+    right_join(urban_ipeds.data, by = "unitid") %>%
+    mutate(barrons_rank_2009 =
+        ifelse(!is.na(barrons_rank_2009), barrons_rank_2009, 5))
+
 
 ## Calculate the shift-share instruments (see Deming Walters 2017, p.10)
 
@@ -408,7 +446,8 @@ urban_ipeds.data <- urban_ipeds.data %>%
         full_parttime_count,
         lecturer_fulltime_count,
         assistant_fulltime_count,
-        full_fulltime_count) %>%
+        full_fulltime_count,
+        barrons_rank_2009) %>%
     arrange(unitid, year)
 
 # Remove double observations created by the multiple merges.
@@ -439,7 +478,7 @@ urban_ipeds.data <- read_csv("../../data/urban-ipeds/urban-clean-allunis.csv")
 urban_ipeds.data %>%
     filter(fouryear == 1, public == 1, forprofit == 0, year >= 2002) %>%
     select(unitid, year, #inst_name,
-        # State funding (from Urban + supplemented by hand)
+        # State funding (from Urban + supplemented by collection later years)
         #stateappropriations_real,
         # Part-time faculty count (from hand collected IPEDS data 2001--)
         lecturer_parttime_count,
