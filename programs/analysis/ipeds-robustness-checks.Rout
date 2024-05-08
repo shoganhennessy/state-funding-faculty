@@ -1,0 +1,1681 @@
+
+R version 4.3.1 (2023-06-16) -- "Beagle Scouts"
+Copyright (C) 2023 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> #!/usr/bin/R
+> ## Senan Hogan-Hennessy, 24 April 2024
+> ## IV for Prof's salaries, using IPEDS data.
+> print(Sys.time())
+[1] "2024-04-30 17:22:48 EDT"
+> library(jtools) # Plotting estimates.
+> library(tidyverse) # Functions for data manipulation and visualization
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.2     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.0
+✔ ggplot2   3.4.2     ✔ tibble    3.2.1
+✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+✔ purrr     1.0.1     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+> library(lfe) # Functions for fast linear models with IV + FEs
+Loading required package: Matrix
+
+Attaching package: ‘Matrix’
+
+The following objects are masked from ‘package:tidyr’:
+
+    expand, pack, unpack
+
+> library(plm) # Functions for panel data
+
+Attaching package: ‘plm’
+
+The following object is masked from ‘package:lfe’:
+
+    sargan
+
+The following objects are masked from ‘package:dplyr’:
+
+    between, lag, lead
+
+> library(car) # Function for F stat regarding IV models
+Loading required package: carData
+
+Attaching package: ‘car’
+
+The following object is masked from ‘package:dplyr’:
+
+    recode
+
+The following object is masked from ‘package:purrr’:
+
+    some
+
+> # My custom flavour of Stargazer TeX tables:
+> # devtools::install_github("shoganhennessy/stargazer")
+> library(stargazer) # TeX tables
+
+Please cite as: 
+
+ Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+ R package version 5.2.3. https://CRAN.R-project.org/package=stargazer 
+
+> library(xtable)
+> set.seed(47)
+> # This file follows an adjusted Deming Walters (2017, p.10) approach to
+> # appropriations shock instrument.
+> 
+> # Define number of digits in tables and graphs
+> digits.no <- 3
+> 
+> # Size for figures
+> fig.width <- 10
+> fig.height <- fig.width * 0.9
+> 
+> # Define default colours.
+> colour.list <- c(
++     "#D62728", # Red  -> First-stage.
++     "#1f77b4", # Blue -> Lecturers
++     "#c9721c", # Orange -> Asst Professors
++     "#237e23", # Green -> Full Professors
++     "#cc2c9f") # Strong pink -> All faculty.
+> 
+> # Define a function to standardise the dplyr lag function
+> # --- negative numbers mean a lag of t time periods, positive a lead of t.
+> lag_lead <- function(column, t) {
++     if (t < 0) {
++         lag_column <- dplyr::lag(column, -t)
++     } else if (t >= 0) {
++         lag_column <- dplyr::lead(column, t)
++     }
++     return(lag_column)
++ }
+> 
+> 
+> # Load data sources ------------------------------------------------------------
+> 
+> # Load IPEDS data, for only the public unis
+> ipeds_public.data <- read_csv("../../data/urban-ipeds/urban-clean-publicunis.csv")
+Rows: 26168 Columns: 70
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (2): inst_name, state
+dbl (68): unitid, year, public, forprofit, fouryear, associatescollege, cpi2...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+> 
+> # Load IPEDS data, for all the unis
+> ipeds_all.data <- read_csv("../../data/urban-ipeds/urban-clean-allunis.csv")
+Rows: 318274 Columns: 70
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (2): inst_name, state
+dbl (68): unitid, year, public, forprofit, fouryear, associatescollege, cpi2...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+> 
+> 
+> ################################################################################
+> ## Robustness check: effect on faculty with extra controls for selectivity.
+> 
+> # Select IPEDS variables, and define the panel at the university level
+> reg.data <- ipeds_public.data %>%
++     # Create independent columns and rows.
++     select(
++         # Identifiers and controls
++         unitid,
++         inst_name,
++         year,
++         state,
++         # Appropriations to the uni
++         totalrevenues_real,
++         stateappropriations_real,
++         tuitionrev_real,
++         # Uni spending.
++         nonauxspending_real,
++         # Uni enrollment
++         enrollment_reported,
++         enrollment_fte,
++         acceptance_rate,
++         completion_rate_150pct,
++         # Shift-sahre shocks Per student
++         appropriationshock_perEnroll_real,
++         allstate_stateappropriations_real,
++         staterevenues_baseshare,
++         stateEnroll_count,
++         # Count of full-time professors (tenured or not)
++         lecturer_prof_count,
++         assistant_prof_count,
++         full_prof_count,
++         all_prof_count,
++         # Barron's ranking 2009
++         barrons_rank_2009)
+> 
+> # Restrict data to unis + years with measured state appropriations & shocks
+> reg.data <- reg.data %>%
++     filter(1990 <= year, #year < 2019,
++         !is.na(enrollment_fte), enrollment_fte > 0,
++         !is.na(all_prof_count),
++         stateappropriations_real > 0,
++         appropriationshock_perEnroll_real > 0,
++         !is.na(appropriationshock_perEnroll_real)) %>%
++     # Restrict to uni-years with all professor counts.
++     filter(!is.na(lecturer_prof_count), lecturer_prof_count > 0) %>%
++     filter(!is.na(assistant_prof_count), assistant_prof_count > 0) %>%
++     filter(!is.na(full_prof_count), full_prof_count > 0)
+> 
+> ## Get admission rate in the mid-2000s
+> reg.data <- reg.data %>%
++     filter(year %in% c(2004:2006)) %>%
++     group_by(unitid) %>%
++     summarise(
++         acceptance_rate_2000s = mean(acceptance_rate, na.rm = TRUE),
++         completion_rate_150pct_2000s =
++             mean(completion_rate_150pct, na.rm = TRUE)) %>%
++     ungroup() %>%
++     right_join(reg.data, by = "unitid")
+> 
+> 
+> ## First-stage with Further Controls
+> # Raw version
+> firststage_raw.reg <- reg.data %>%
++     mutate(
++         stateappropriations_real = stateappropriations_real,
++         appropriationshock_perEnroll_real =
++             -appropriationshock_perEnroll_real,
++         staterevenues_baseshare = staterevenues_baseshare * 100,
++         acceptance_rate_2000s = acceptance_rate_2000s * 100,
++         completion_rate_150pct_2000s = completion_rate_150pct_2000s * 100,
++         tuitionrev_real = I(tuitionrev_real / 10^6),
++         enrollment_fte = enrollment_fte,
++         enrollment_fte_thousands = I(enrollment_fte / 10^3),
++         stateEnroll_count = I(stateEnroll_count / 10^3),
++         enrollment_state_percent = I(enrollment_fte / stateEnroll_count)) %>%
++     felm(I(stateappropriations_real / enrollment_fte) ~ 1 +
++         staterevenues_baseshare +
++         acceptance_rate_2000s +
++         completion_rate_150pct_2000s +
++         tuitionrev_real +
++         enrollment_fte_thousands +
++         stateEnroll_count +
++         enrollment_state_percent +
++         appropriationshock_perEnroll_real |
++         state + year |
++         0 |
++         state + year,
++         data = .)
+> summary(firststage_raw.reg)
+
+Call:
+   felm(formula = I(stateappropriations_real/enrollment_fte) ~ 1 +      staterevenues_baseshare + acceptance_rate_2000s + completion_rate_150pct_2000s +      tuitionrev_real + enrollment_fte_thousands + stateEnroll_count +      enrollment_state_percent + appropriationshock_perEnroll_real |      state + year | 0 | state + year, data = .) 
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+-18056  -2016   -585   1302  79066 
+
+Coefficients:
+                                  Estimate Cluster s.e. t value Pr(>|t|)    
+staterevenues_baseshare           -95.4886      40.9405  -2.332  0.02658 *  
+acceptance_rate_2000s             -13.5396      15.2080  -0.890  0.38039    
+completion_rate_150pct_2000s       69.3406      23.7182   2.924  0.00653 ** 
+tuitionrev_real                     1.2228       1.4327   0.853  0.40016    
+enrollment_fte_thousands           -4.7483      58.1294  -0.082  0.93544    
+stateEnroll_count                   2.2150       1.2355   1.793  0.08309 .  
+enrollment_state_percent            0.8025       3.3564   0.239  0.81265    
+appropriationshock_perEnroll_real  -1.2994       0.1716  -7.573 1.91e-08 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 3699 on 13598 degrees of freedom
+  (3325 observations deleted due to missingness)
+Multiple R-squared(full model): 0.3821   Adjusted R-squared: 0.3781 
+Multiple R-squared(proj model): 0.1075   Adjusted R-squared: 0.1017 
+F-statistic(full model, *iid*):95.54 on 88 and 13598 DF, p-value: < 2.2e-16 
+F-statistic(proj model): 12.53 on 8 and 30 DF, p-value: 1.073e-07 
+
+
+> # Get the F.Stat
+> firststage_raw.fstat <-
++     linearHypothesis(firststage_raw.reg, test = "F",
++         c("appropriationshock_perEnroll_real"))["F"] %>%
++     unlist() %>%
++     nth(2) %>%
++     as.numeric() %>%
++     round(digits.no)
+> 
+> # Log Version
+> firststage_approp.reg <- reg.data %>%
++     mutate(
++         acceptance_rate_2000s = log(acceptance_rate_2000s),
++         completion_rate_150pct_2000s = log(completion_rate_150pct_2000s),
++         tuitionrev_real = log(tuitionrev_real),
++         enrollment_fte = enrollment_fte,
++         enrollment_fte_thousands = log(enrollment_fte),
++         staterevenues_baseshare = log(staterevenues_baseshare),
++         stateEnroll_count = log(stateEnroll_count),
++         enrollment_state_percent = I(enrollment_fte / stateEnroll_count),
++         appropriationshock_perEnroll_real =
++             -log(appropriationshock_perEnroll_real)) %>%
++     felm(log(stateappropriations_real / enrollment_fte) ~ 1 +
++         staterevenues_baseshare +
++         acceptance_rate_2000s +
++         completion_rate_150pct_2000s +
++         tuitionrev_real +
++         enrollment_fte_thousands +
++         stateEnroll_count +
++         enrollment_state_percent +
++         appropriationshock_perEnroll_real |
++         state + year |
++         0 |
++         state + year,
++         data = .)
+> summary(firststage_approp.reg)
+
+Call:
+   felm(formula = log(stateappropriations_real/enrollment_fte) ~      1 + staterevenues_baseshare + acceptance_rate_2000s + completion_rate_150pct_2000s +          tuitionrev_real + enrollment_fte_thousands + stateEnroll_count +          enrollment_state_percent + appropriationshock_perEnroll_real |          state + year | 0 | state + year, data = .) 
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-11.5853  -0.1717  -0.0091   0.1710   1.8903 
+
+Coefficients:
+                                    Estimate Cluster s.e. t value Pr(>|t|)    
+staterevenues_baseshare           -0.8945650    0.1410859  -6.341 5.40e-07 ***
+acceptance_rate_2000s             -0.0117465    0.0456672  -0.257   0.7988    
+completion_rate_150pct_2000s       0.1475611    0.0741484   1.990   0.0558 .  
+tuitionrev_real                    0.3501064    0.0402563   8.697 1.06e-09 ***
+enrollment_fte_thousands          -0.6686152    0.0548028 -12.200 3.69e-13 ***
+stateEnroll_count                  0.2578374    0.0532699   4.840 3.66e-05 ***
+enrollment_state_percent           0.0003114    0.0000630   4.944 2.73e-05 ***
+appropriationshock_perEnroll_real -1.0499355    0.0408415 -25.708  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.4208 on 13598 degrees of freedom
+  (3325 observations deleted due to missingness)
+Multiple R-squared(full model): 0.4534   Adjusted R-squared: 0.4498 
+Multiple R-squared(proj model): 0.2504   Adjusted R-squared: 0.2455 
+F-statistic(full model, *iid*):128.2 on 88 and 13598 DF, p-value: < 2.2e-16 
+F-statistic(proj model): 153.8 on 8 and 30 DF, p-value: < 2.2e-16 
+
+
+> # Get the F.Stat
+> firststage_approp.fstat <-
++     linearHypothesis(firststage_approp.reg, test = "F",
++         c("appropriationshock_perEnroll_real"))["F"] %>%
++     unlist() %>%
++     nth(2) %>%
++     as.numeric() %>%
++     round(digits.no)
+> 
+> # Collate the results to a LaTeX table
+> X.labels <- c(
++         "State Funding, Base Share \\%",
++         "Acceptance Rate, \\%",
++         "6--Year Completion Rate, \\%",
++         "Tuition Revenue, \\$ millions",
++         "Enrolment, FTE thousands",
++         "State Enrolment, thousands",
++         "Percent of State Enrolment",
++         "State Funding")
+> stargazer(
++     firststage_raw.reg, firststage_approp.reg,
++     dep.var.caption = "Dependent Variable: State Funding",
++     column.labels = c("Raw Count Units", "Log Units"),
++     dep.var.labels.include = FALSE,
++     digits = digits.no,
++     digits.extra = digits.no,
++     model.names = FALSE,
++     order = c(8, 1:7),
++     covariate.labels = X.labels[c(8, 1:7)],
++     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq", "f"),
++     add.lines = list(
++         c("Units ", "Raw counts", "Log, \\% terms"),
++         c("F stat.", firststage_raw.fstat, firststage_approp.fstat),
++         c("State + Year fixed effects?", "Yes", "Yes")),
++     star.cutoffs = NA,
++     header = FALSE, float = FALSE, no.space = TRUE,
++     omit.table.layout = "n", notes.append = FALSE,
++     type = "text",
++     out = "../../text/tables/firststage-robustness-checks.tex")
+
+==============================================================
+                            Dependent Variable: State Funding 
+                            ----------------------------------
+                             Raw Count Units      Log Units   
+                                   (1)               (2)      
+--------------------------------------------------------------
+State Funding                     -1.299           -1.050     
+                                 (0.172)           (0.041)    
+State Funding, Base Share %      -95.489           -0.895     
+                                 (40.941)          (0.141)    
+Acceptance Rate, %               -13.540           -0.012     
+                                 (15.208)          (0.046)    
+6--Year Completion Rate, %        69.341            0.148     
+                                 (23.718)          (0.074)    
+Tuition Revenue, millions         1.223             0.350     
+                                 (1.433)           (0.040)    
+Enrolment, FTE thousands          -4.748           -0.669     
+                                 (58.129)          (0.055)    
+State Enrolment, thousands        2.215             0.258     
+                                 (1.236)           (0.053)    
+Percent of State Enrolment        0.803            0.0003     
+                                 (3.356)          (0.0001)    
+--------------------------------------------------------------
+Units                           Raw counts      Log, % terms  
+F stat.                           57.356           660.878    
+State + Year fixed effects?        Yes               Yes      
+Observations                      13,687           13,687     
+R2                                0.382             0.453     
+==============================================================
+> 
+> 
+> ## Log Faculty Count Regressions with Further Controls
+> 
+> ## Lecturer faculty Count
+> # Naive OLS Regression
+> naive_lecturer_count.reg <- reg.data %>%
++     mutate(`log(stateappropriations_real/enrollment_fte)(fit)` =
++         log(stateappropriations_real / enrollment_fte)) %>%
++     felm(log(lecturer_prof_count / enrollment_fte) ~ 1 +
++         log(staterevenues_baseshare) +
++         log(acceptance_rate_2000s) +
++         log(completion_rate_150pct_2000s) +
++         log(tuitionrev_real) +
++         log(enrollment_fte) +
++         log(stateEnroll_count) +
++         I(enrollment_fte / stateEnroll_count) +
++         `log(stateappropriations_real/enrollment_fte)(fit)` |
++         state + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_lecturer_count.reg <- reg.data %>%
++     felm(log(lecturer_prof_count / enrollment_fte) ~ 1 +
++         log(staterevenues_baseshare) +
++         log(acceptance_rate_2000s) +
++         log(completion_rate_150pct_2000s) +
++         log(staterevenues_baseshare) +
++         log(tuitionrev_real) +
++         log(enrollment_fte) +
++         log(stateEnroll_count) +
++         I(enrollment_fte / stateEnroll_count) |
++         state + year |
++         (log(stateappropriations_real / enrollment_fte) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> 
+> ## Asst faculty Count
+> # Naive OLS Regression
+> naive_assistant_count.reg <- reg.data %>%
++     mutate(`log(stateappropriations_real/enrollment_fte)(fit)` =
++         log(stateappropriations_real / enrollment_fte)) %>%
++     felm(log(assistant_prof_count / enrollment_fte) ~ 1 +
++         log(staterevenues_baseshare) +
++         log(acceptance_rate_2000s) +
++         log(completion_rate_150pct_2000s) +
++         log(tuitionrev_real) +
++         log(enrollment_fte) +
++         log(stateEnroll_count) +
++         I(enrollment_fte / stateEnroll_count) +
++         `log(stateappropriations_real/enrollment_fte)(fit)` |
++         state + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_assistant_count.reg <- reg.data %>%
++     felm(log(assistant_prof_count / enrollment_fte) ~ 1 +
++         log(staterevenues_baseshare) +
++         log(acceptance_rate_2000s) +
++         log(completion_rate_150pct_2000s) +
++         log(staterevenues_baseshare) +
++         log(tuitionrev_real) +
++         log(enrollment_fte) +
++         log(stateEnroll_count) +
++         I(enrollment_fte / stateEnroll_count) |
++         state + year |
++         (log(stateappropriations_real / enrollment_fte) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> 
+> ## Full faculty Count
+> # Naive OLS Regression
+> naive_full_count.reg <- reg.data %>%
++     mutate(`log(stateappropriations_real/enrollment_fte)(fit)` =
++         log(stateappropriations_real / enrollment_fte)) %>%
++     felm(log(full_prof_count / enrollment_fte) ~ 1 +
++         log(staterevenues_baseshare) +
++         log(acceptance_rate_2000s) +
++         log(completion_rate_150pct_2000s) +
++         log(tuitionrev_real) +
++         log(enrollment_fte) +
++         log(stateEnroll_count) +
++         I(enrollment_fte / stateEnroll_count) +
++         `log(stateappropriations_real/enrollment_fte)(fit)` |
++         state + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_full_count.reg <- reg.data %>%
++     felm(log(full_prof_count / enrollment_fte) ~ 1 +
++         log(staterevenues_baseshare) +
++         log(acceptance_rate_2000s) +
++         log(completion_rate_150pct_2000s) +
++         log(staterevenues_baseshare) +
++         log(tuitionrev_real) +
++         log(enrollment_fte) +
++         log(stateEnroll_count) +
++         I(enrollment_fte / stateEnroll_count) |
++         state + year |
++         (log(stateappropriations_real / enrollment_fte) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> 
+> ## All faculty Count
+> # Naive OLS Regression
+> naive_all_count.reg <- reg.data %>%
++     mutate(`log(stateappropriations_real/enrollment_fte)(fit)` =
++         log(stateappropriations_real / enrollment_fte)) %>%
++     felm(log(all_prof_count / enrollment_fte) ~ 1 +
++         log(staterevenues_baseshare) +
++         log(acceptance_rate_2000s) +
++         log(completion_rate_150pct_2000s) +
++         log(tuitionrev_real) +
++         log(enrollment_fte) +
++         log(stateEnroll_count) +
++         I(enrollment_fte / stateEnroll_count) +
++         `log(stateappropriations_real/enrollment_fte)(fit)` |
++         state + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_all_count.reg <- reg.data %>%
++     felm(log(all_prof_count / enrollment_fte) ~ 1 +
++         log(staterevenues_baseshare) +
++         log(acceptance_rate_2000s) +
++         log(completion_rate_150pct_2000s) +
++         log(staterevenues_baseshare) +
++         log(tuitionrev_real) +
++         log(enrollment_fte) +
++         log(stateEnroll_count) +
++         I(enrollment_fte / stateEnroll_count) |
++         state + year |
++         (log(stateappropriations_real / enrollment_fte) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> 
+> # Collate the outcome means
+> outcome.means <- list(c("Outcome Mean",
++     # Lecturers
++     reg.data %>% mutate(outcome = lecturer_prof_count / (enrollment_fte / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     reg.data %>% mutate(outcome = lecturer_prof_count / (enrollment_fte / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     # naive_assistant_count.reg
++     reg.data %>% mutate(outcome = assistant_prof_count / (enrollment_fte / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     reg.data %>% mutate(outcome = assistant_prof_count / (enrollment_fte / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     # naive_full_count.reg
++     reg.data %>% mutate(outcome = full_prof_count / (enrollment_fte / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     reg.data %>% mutate(outcome = full_prof_count / (enrollment_fte / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     # naive_all_count.reg
++     reg.data %>% mutate(outcome = all_prof_count / (enrollment_fte / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     reg.data %>% mutate(outcome = all_prof_count / (enrollment_fte / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no)
++ ))
+>         
+> # Collate the results to a LaTeX table
+> stargazer(
++     naive_lecturer_count.reg, shiftshare_lecturer_count.reg,
++     naive_assistant_count.reg, shiftshare_assistant_count.reg,
++     naive_full_count.reg, shiftshare_full_count.reg,
++     naive_all_count.reg, shiftshare_all_count.reg,
++     add.lines = outcome.means,
++     dep.var.caption =
++         "Dependent Variable: Log Faculty Count per Students, by Position",
++     dep.var.labels = c(
++         "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
++     column.labels = rep(c("OLS", "2SLS"), 4),
++     digits = digits.no,
++     digits.extra = digits.no,
++     model.names = FALSE,
++     intercept.bottom = TRUE,
++     order = c(8, 1:7),
++     covariate.labels = X.labels[c(8, 1:7)],
++     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
++     star.cutoffs = NA,
++     header = FALSE, float = FALSE, no.space = TRUE,
++     omit.table.layout = "n", notes.append = FALSE,
++     type = "text",
++     out = "../../text/tables/facultycount-robustness-checks.tex")
+
+==================================================================================================
+                               Dependent Variable: Log Faculty Count per Students, by Position    
+                            ----------------------------------------------------------------------
+                                Lecturers     Asst. Professors   Full Professors    All Faculty   
+                              OLS      2SLS     OLS      2SLS     OLS      2SLS     OLS     2SLS  
+                              (1)      (2)      (3)      (4)      (5)      (6)      (7)      (8)  
+--------------------------------------------------------------------------------------------------
+State Funding                -0.116   -0.352   0.072    0.069    0.147    0.104    0.095    0.038 
+                            (0.042)  (0.088)  (0.026)  (0.048)  (0.050)  (0.022)  (0.038)  (0.023)
+State Funding, Base Share %  -0.053   -0.042   -0.022   -0.022   0.075    0.077    0.025    0.028 
+                            (0.160)  (0.172)  (0.049)  (0.049)  (0.047)  (0.047)  (0.037)  (0.038)
+Acceptance Rate, %           0.015   0.00004   0.004    0.004    -0.012   -0.015   -0.013  -0.016 
+                            (0.077)  (0.082)  (0.043)  (0.044)  (0.038)  (0.039)  (0.029)  (0.031)
+6--Year Completion Rate, %   -0.029   0.023    0.130    0.130    0.241    0.250    0.156    0.169 
+                            (0.112)  (0.125)  (0.034)  (0.033)  (0.036)  (0.034)  (0.021)  (0.024)
+Tuition Revenue, millions    0.347    0.421    0.046    0.046    0.235    0.248    0.215    0.233 
+                            (0.153)  (0.163)  (0.053)  (0.055)  (0.033)  (0.033)  (0.038)  (0.033)
+Enrolment, FTE thousands     -0.580   -0.698   -0.223   -0.224   -0.278   -0.300   -0.336  -0.364 
+                            (0.179)  (0.198)  (0.062)  (0.065)  (0.039)  (0.036)  (0.048)  (0.037)
+State Enrolment, thousands   0.232    0.331    -0.112   -0.111   -0.196   -0.178   -0.102  -0.079 
+                            (0.189)  (0.177)  (0.068)  (0.069)  (0.061)  (0.050)  (0.046)  (0.032)
+Percent of State Enrolment   0.150    0.417    0.021    0.024    -0.021   0.027    0.095    0.159 
+                            (0.591)  (0.595)  (0.177)  (0.183)  (0.168)  (0.130)  (0.158)  (0.135)
+--------------------------------------------------------------------------------------------------
+Outcome Mean                 0.681    0.681    1.394    1.394    2.666    2.666    4.816    4.816 
+Observations                 13,687   13,687   13,687   13,687   13,687   13,687   13,687  13,687 
+R2                           0.341    0.327    0.440    0.440    0.438    0.433    0.543    0.529 
+==================================================================================================
+> 
+> 
+> ## Raw Faculty Count Regressions with Further Controls
+> 
+> ## Lecturer faculty Count
+> # Naive OLS Regression
+> naive_lecturer_count.reg <- reg.data %>%
++     mutate(`I(stateappropriations_real/(1000 * enrollment_fte))(fit)` =
++         I(stateappropriations_real/(1000 * enrollment_fte))) %>%
++     felm(lecturer_prof_count ~ 1 +
++         staterevenues_baseshare +
++         acceptance_rate_2000s +
++         completion_rate_150pct_2000s +
++         I(tuitionrev_real / 10^6) +
++         I(enrollment_fte / 10^3) +
++         I(stateEnroll_count / 10^3) +
++         I(enrollment_fte / stateEnroll_count) +
++         `I(stateappropriations_real/(1000 * enrollment_fte))(fit)` |
++         state + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_lecturer_count.reg <- reg.data %>%
++     felm(lecturer_prof_count ~ 1 +
++         staterevenues_baseshare +
++         acceptance_rate_2000s +
++         completion_rate_150pct_2000s +
++         I(tuitionrev_real / 10^6) +
++         I(enrollment_fte / 10^3) +
++         I(stateEnroll_count / 10^3) +
++         I(enrollment_fte / stateEnroll_count) |
++         state + year |
++         (I(stateappropriations_real/(1000 * enrollment_fte)) ~
++             I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> 
+> ## Asst faculty Count
+> # Naive OLS Regression
+> naive_assistant_count.reg <- reg.data %>%
++     mutate(`I(stateappropriations_real/(1000 * enrollment_fte))(fit)` =
++         I(stateappropriations_real/(1000 * enrollment_fte))) %>%
++     felm(assistant_prof_count ~ 1 +
++         staterevenues_baseshare +
++         acceptance_rate_2000s +
++         completion_rate_150pct_2000s +
++         I(tuitionrev_real / 10^6) +
++         I(enrollment_fte / 10^3) +
++         I(stateEnroll_count / 10^3) +
++         I(enrollment_fte / stateEnroll_count) +
++         `I(stateappropriations_real/(1000 * enrollment_fte))(fit)` |
++         state + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_assistant_count.reg <- reg.data %>%
++     felm(assistant_prof_count ~ 1 +
++         staterevenues_baseshare +
++         acceptance_rate_2000s +
++         completion_rate_150pct_2000s +
++         I(tuitionrev_real / 10^6) +
++         I(enrollment_fte / 10^3) +
++         I(stateEnroll_count / 10^3) +
++         I(enrollment_fte / stateEnroll_count) |
++         state + year |
++         (I(stateappropriations_real/(1000 * enrollment_fte)) ~
++             I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> 
+> ## Full faculty Count
+> # Naive OLS Regression
+> naive_full_count.reg <- reg.data %>%
++     mutate(`I(stateappropriations_real/(1000 * enrollment_fte))(fit)` =
++         I(stateappropriations_real/(1000 * enrollment_fte))) %>%
++     felm(full_prof_count ~ 1 +
++         staterevenues_baseshare +
++         acceptance_rate_2000s +
++         completion_rate_150pct_2000s +
++         I(tuitionrev_real / 10^6) +
++         I(enrollment_fte / 10^3) +
++         I(stateEnroll_count / 10^3) +
++         I(enrollment_fte / stateEnroll_count) +
++         `I(stateappropriations_real/(1000 * enrollment_fte))(fit)` |
++         state + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_full_count.reg <- reg.data %>%
++     felm(full_prof_count ~ 1 +
++         staterevenues_baseshare +
++         acceptance_rate_2000s +
++         completion_rate_150pct_2000s +
++         I(tuitionrev_real / 10^6) +
++         I(enrollment_fte / 10^3) +
++         I(stateEnroll_count / 10^3) +
++         I(enrollment_fte / stateEnroll_count) |
++         state + year |
++         (I(stateappropriations_real/(1000 * enrollment_fte)) ~
++             I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> 
+> ## All faculty Count
+> # Naive OLS Regression
+> naive_all_count.reg <- reg.data %>%
++     mutate(`I(stateappropriations_real/(1000 * enrollment_fte))(fit)` =
++         I(stateappropriations_real/(1000 * enrollment_fte))) %>%
++     felm(all_prof_count ~ 1 +
++         staterevenues_baseshare +
++         acceptance_rate_2000s +
++         completion_rate_150pct_2000s +
++         I(tuitionrev_real / 10^6) +
++         I(enrollment_fte / 10^3) +
++         I(stateEnroll_count / 10^3) +
++         I(enrollment_fte / stateEnroll_count) +
++         `I(stateappropriations_real/(1000 * enrollment_fte))(fit)` |
++         state + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_all_count.reg <- reg.data %>%
++     felm(all_prof_count ~ 1 +
++         staterevenues_baseshare +
++         acceptance_rate_2000s +
++         completion_rate_150pct_2000s +
++         I(tuitionrev_real / 10^6) +
++         I(enrollment_fte / 10^3) +
++         I(stateEnroll_count / 10^3) +
++         I(enrollment_fte / stateEnroll_count) |
++         state + year |
++         (I(stateappropriations_real/(1000 * enrollment_fte)) ~
++             I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> 
+> # Collate the outcome means
+> outcome.means <- list(c("Outcome Mean",
++     # Lecturers
++     reg.data %>% pull(lecturer_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     reg.data %>% pull(lecturer_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     # naive_assistant_count.reg
++     reg.data %>% pull(assistant_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     reg.data %>% pull(assistant_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     # naive_full_count.reg
++     reg.data %>% pull(full_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     reg.data %>% pull(full_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     # naive_all_count.reg
++     reg.data %>% pull(all_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     reg.data %>% pull(all_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no)
++ ))
+> 
+> # Collate the results to a LaTeX table
+> stargazer(
++     naive_lecturer_count.reg, shiftshare_lecturer_count.reg,
++     naive_assistant_count.reg, shiftshare_assistant_count.reg,
++     naive_full_count.reg, shiftshare_full_count.reg,
++     naive_all_count.reg, shiftshare_all_count.reg,
++     add.lines = outcome.means,
++     dep.var.caption =
++         "Dependent Variable: Faculty Count per 1,000 Students, by Position",
++     dep.var.labels = c(
++         "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
++     column.labels = rep(c("OLS", "2SLS"), 4),
++     digits = digits.no,
++     digits.extra = digits.no,
++     model.names = FALSE,
++     intercept.bottom = TRUE,
++     order = c(8, 1:7),
++     covariate.labels = X.labels[c(8, 1:7)],
++     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
++     star.cutoffs = NA,
++     header = FALSE, float = FALSE, no.space = TRUE,
++     omit.table.layout = "n", notes.append = FALSE,
++     type = "text",
++     out = "../../text/tables/facultycount-rawcount-robustness-checks.tex")
+
+=====================================================================================================
+                                Dependent Variable: Faculty Count per 1,000 Students, by Position    
+                            -------------------------------------------------------------------------
+                                Lecturers     Asst. Professors   Full Professors      All Faculty    
+                              OLS      2SLS     OLS      2SLS     OLS      2SLS      OLS      2SLS   
+                              (1)      (2)      (3)      (4)      (5)      (6)       (7)       (8)   
+-----------------------------------------------------------------------------------------------------
+State Funding                -1.001   -1.641   1.032    4.573    7.128    6.836     7.213    10.746  
+                            (0.461)  (1.345)  (0.397)  (2.094)  (1.212)  (3.097)   (1.396)   (5.276) 
+State Funding, Base Share %  55.056   57.126   15.654   4.200   -38.543  -37.598   18.057     6.627  
+                            (24.373) (25.604) (35.625) (37.658) (53.606) (51.900) (95.185)  (95.017) 
+Acceptance Rate, %           -7.862   -8.694   6.849    11.450  -41.508  -41.888   -53.375   -48.783 
+                            (10.581) (9.949)  (9.243)  (14.230) (21.648) (20.581) (26.159)  (29.083) 
+6--Year Completion Rate, %   8.357    12.754   21.899   -2.429  169.846  171.853   202.607   178.329 
+                            (18.767) (21.069) (13.444) (23.497) (42.483) (45.635) (39.685)  (47.031) 
+Tuition Revenue, millions    0.185    0.186    0.123    0.118    0.215    0.216     0.622     0.617  
+                            (0.035)  (0.035)  (0.027)  (0.028)  (0.064)  (0.064)   (0.137)   (0.137) 
+Enrolment, FTE thousands     2.580    2.575    7.029    7.060    22.975   22.972   32.420    32.450  
+                            (0.858)  (0.848)  (0.595)  (0.554)  (1.272)  (1.276)   (1.925)   (1.900) 
+State Enrolment, thousands   0.088    0.086    -0.061   -0.054   -0.218   -0.218   -0.188    -0.182  
+                            (0.021)  (0.021)  (0.020)  (0.020)  (0.069)  (0.067)   (0.098)   (0.098) 
+Percent of State Enrolment   -7.625   -6.651  126.755  121.370  168.080  168.525   255.309   249.936 
+                            (48.023) (48.705) (42.249) (37.381) (72.631) (72.682) (105.737) (102.570)
+-----------------------------------------------------------------------------------------------------
+Outcome Mean                 59.253   59.253  116.121  116.121  269.103  269.103   452.507   452.507 
+Observations                 13,687   13,687   13,687   13,687   13,687   13,687   13,687    13,687  
+R2                           0.647    0.646    0.861    0.845    0.942    0.942     0.954     0.954  
+=====================================================================================================
+> 
+> 
+> ################################################################################
+> ## Falsification test: effect among the private unis.
+> 
+> # Take the private universities, and assign them a base share of state funding to the average of public unis of their same Barron's selectivity ranking, and then use this as an instrument for state funding (or total funding) in the IV analysis.
+> 
+> # Get the data of all private unis in IPEDS
+> ipeds_private.data <- ipeds_all.data %>%
++     filter(fouryear == 1, public == 0, forprofit == 0)  %>%
++     # Create independent columns and rows.
++     select(
++         # Identifiers and controls
++         unitid,
++         inst_name,
++         year,
++         state,
++         # Appropriations to the uni
++         totalrevenues_real,
++         stateappropriations_real,
++         tuitionrev_real,
++         # Uni spending.
++         nonauxspending_real,
++         # Uni enrollment
++         enrollment_reported,
++         enrollment_fte,
++         acceptance_rate,
++         completion_rate_150pct,
++         # Shift-sahre shocks Per student
++         appropriationshock_perEnroll_real,
++         allstate_stateappropriations_real,
++         staterevenues_baseshare,
++         stateEnroll_count,
++         # Count of full-time professors (tenured or not)
++         lecturer_prof_count,
++         assistant_prof_count,
++         full_prof_count,
++         all_prof_count,
++         # Barron's ranking 2009
++         barrons_rank_2009)
+> 
+> # Get the average abse share, by state-barrons-year, from public unis
+> base.data <- ipeds_public.data %>%
++     filter(staterevenues_baseshare > 0) %>%
++     group_by(state, year, barrons_rank_2009) %>%
++     summarise(staterevenues_baseshare =
++         mean(staterevenues_baseshare, na.rm = TRUE)) %>%
++     ungroup()
+`summarise()` has grouped output by 'state', 'year'. You can override using the
+`.groups` argument.
+> 
+> # Calculate the instrument for the private unis based on these base shares.
+> ipeds_private.data <- ipeds_private.data %>%
++     select(-staterevenues_baseshare) %>%
++     left_join(base.data, by = c("state", "year", "barrons_rank_2009")) %>%
++     mutate(appropriationshock_perEnroll_real = staterevenues_baseshare * (
++             allstate_stateappropriations_real / stateEnroll_count)) %>%
++     filter(enrollment_reported > 0,
++         totalrevenues_real > 0, appropriationshock_perEnroll_real > 0,
++         lecturer_prof_count > 0,
++         assistant_prof_count > 0,
++         full_prof_count > 0,
++         all_prof_count > 0)
+> 
+> # First stage test, which is referenced in the text (don't bother TeX table)
+> ipeds_private.data %>%
++     felm(log(totalrevenues_real / enrollment_reported) ~ 1 +
++         I(-log(appropriationshock_perEnroll_real)) |
++         unitid + year |
++         0 |
++         state + year,
++         data = .) %>%
++     summary()
+
+Call:
+   felm(formula = log(totalrevenues_real/enrollment_reported) ~      1 + I(-log(appropriationshock_perEnroll_real)) | unitid +          year | 0 | state + year, data = .) 
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-4.3386 -0.1217 -0.0024  0.1155  5.9807 
+
+Coefficients:
+                                           Estimate Cluster s.e. t value
+I(-log(appropriationshock_perEnroll_real)) -0.01911      0.02939   -0.65
+                                           Pr(>|t|)
+I(-log(appropriationshock_perEnroll_real))     0.52
+
+Residual standard error: 0.2885 on 23897 degrees of freedom
+Multiple R-squared(full model): 0.8109   Adjusted R-squared: 0.7997 
+Multiple R-squared(proj model): 0.0001191   Adjusted R-squared: -0.05892 
+F-statistic(full model, *iid*):72.61 on 1411 and 23897 DF, p-value: < 2.2e-16 
+F-statistic(proj model): 0.4229 on 1 and 31 DF, p-value: 0.5203 
+
+
+> 
+> ### Faculty Count Regression
+> ## Lecturer faculty Count
+> # Naive OLS Regression
+> naive_lecturer_count.reg <- ipeds_private.data %>%
++     mutate(`log(totalrevenues_real/enrollment_reported)(fit)` =
++         log(totalrevenues_real / enrollment_reported)) %>%
++     felm(log(lecturer_prof_count / enrollment_reported) ~ 1 +
++         `log(totalrevenues_real/enrollment_reported)(fit)` |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_lecturer_count.reg <- ipeds_private.data %>%
++     felm(log(lecturer_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (log(totalrevenues_real / enrollment_reported) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> 
+> ## assistant professor Count
+> # Naive OLS Regression
+> naive_assistant_count.reg <- ipeds_private.data %>%
++     mutate(`log(totalrevenues_real/enrollment_reported)(fit)` =
++         log(totalrevenues_real / enrollment_reported)) %>%
++     felm(log(assistant_prof_count / enrollment_reported) ~ 1 +
++         `log(totalrevenues_real/enrollment_reported)(fit)` |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_assistant_count.reg <- ipeds_private.data %>%
++     felm(log(assistant_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (log(totalrevenues_real / enrollment_reported) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> 
+> ## Full professor faculty Count
+> # Naive OLS Regression
+> naive_full_count.reg <- ipeds_private.data %>%
++     mutate(`log(totalrevenues_real/enrollment_reported)(fit)` =
++         log(totalrevenues_real / enrollment_reported)) %>%
++     felm(log(full_prof_count / enrollment_reported) ~ 1 +
++         `log(totalrevenues_real/enrollment_reported)(fit)` |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_full_count.reg <- ipeds_private.data %>%
++     felm(log(full_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (log(totalrevenues_real / enrollment_reported) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> 
+> ## All faculty Count
+> # Naive OLS Regression
+> naive_all_count.reg <- ipeds_private.data %>%
++     mutate(`log(totalrevenues_real/enrollment_reported)(fit)` =
++         log(totalrevenues_real / enrollment_reported)) %>%
++     felm(log(all_prof_count / enrollment_reported) ~ 1 +
++         `log(totalrevenues_real/enrollment_reported)(fit)` |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_all_count.reg <- ipeds_private.data %>%
++     felm(log(all_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (log(totalrevenues_real / enrollment_reported) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> 
+> # Collate the outcome means
+> outcome.means <- list(c("Outcome Mean",
++     # Lecturers
++     ipeds_private.data %>% mutate(outcome = lecturer_prof_count / (enrollment_reported / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     ipeds_private.data %>% mutate(outcome = lecturer_prof_count / (enrollment_reported / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     # naive_assistant_count.reg
++     ipeds_private.data %>% mutate(outcome = assistant_prof_count / (enrollment_reported / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     ipeds_private.data %>% mutate(outcome = assistant_prof_count / (enrollment_reported / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     # naive_full_count.reg
++     ipeds_private.data %>% mutate(outcome = full_prof_count / (enrollment_reported / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     ipeds_private.data %>% mutate(outcome = full_prof_count / (enrollment_reported / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     # naive_all_count.reg
++     ipeds_private.data %>% mutate(outcome = all_prof_count / (enrollment_reported / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     ipeds_private.data %>% mutate(outcome = all_prof_count / (enrollment_reported / 100)) %>% pull(outcome) %>% mean(na.rm = TRUE) %>% round(digits.no)
++ ))
+> 
+> # Collate the results to a LaTeX table
+> stargazer(
++     naive_lecturer_count.reg, shiftshare_lecturer_count.reg,
++     naive_assistant_count.reg, shiftshare_assistant_count.reg,
++     naive_full_count.reg, shiftshare_full_count.reg,
++     naive_all_count.reg, shiftshare_all_count.reg,
++     add.lines = outcome.means,
++     dep.var.caption =
++         "Dependent Variable: Log Faculty Count per Students, by Position",
++     dep.var.labels = c(
++         "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
++     column.labels = rep(c("OLS", "2SLS"), 4),
++     digits = digits.no,
++     digits.extra = digits.no,
++     model.names = FALSE,
++     omit = "factor|count|year",
++     intercept.bottom = TRUE,
++     order = c(2, 1, 3),
++     covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
++     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
++     star.cutoffs = NA,
++     header = FALSE, float = FALSE, no.space = TRUE,
++     omit.table.layout = "n", notes.append = FALSE,
++     type = "text",
++     out = "../../text/tables/facultycount-shock-private-robustness.tex")
+
+====================================================================================
+                 Dependent Variable: Log Faculty Count per Students, by Position    
+              ----------------------------------------------------------------------
+                  Lecturers     Asst. Professors   Full Professors    All Faculty   
+                OLS      2SLS     OLS      2SLS     OLS      2SLS     OLS     2SLS  
+                (1)      (2)      (3)      (4)      (5)      (6)      (7)      (8)  
+------------------------------------------------------------------------------------
+State Funding  0.412    -0.728   0.366    -1.716   0.394    -0.331   0.381   -1.563 
+              (0.079)  (6.354)  (0.058)  (4.346)  (0.063)  (1.819)  (0.060)  (3.969)
+------------------------------------------------------------------------------------
+Outcome Mean   0.744    0.744    1.935    1.935    3.075    3.075    5.824    5.824 
+Observations   25,309   25,309   25,309   25,309   25,309   25,309   25,309  25,309 
+R2             0.639    0.549    0.741    0.002    0.819    0.734    0.845   -0.125 
+====================================================================================
+> 
+> 
+> # Faculty Count Regressions, in raw counts -------------------------------------
+> 
+> ## Lecturer faculty Count
+> # Naive OLS Regression
+> naive_lecturer_count.reg <- ipeds_private.data %>%
++     mutate(`I(totalrevenues_real/(1000 * enrollment_reported))(fit)` =
++         I(totalrevenues_real/(1000 * enrollment_reported))) %>%
++     felm(lecturer_prof_count ~ 1 +
++         `I(totalrevenues_real/(1000 * enrollment_reported))(fit)` |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_lecturer_count.reg <- ipeds_private.data %>%
++     felm(lecturer_prof_count ~ 1 |
++         unitid + year |
++         (I(totalrevenues_real / (1000 * enrollment_reported)) ~
++             I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> 
+> ## assistant professor Count
+> # Naive OLS Regression
+> naive_assistant_count.reg <- ipeds_private.data %>%
++     mutate(`I(totalrevenues_real/(1000 * enrollment_reported))(fit)` =
++         I(totalrevenues_real/(1000 * enrollment_reported))) %>%
++     felm(assistant_prof_count ~ 1 +
++         `I(totalrevenues_real/(1000 * enrollment_reported))(fit)` |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_assistant_count.reg <- ipeds_private.data %>%
++     felm(assistant_prof_count ~ 1 |
++         unitid + year |
++         (I(totalrevenues_real / (1000 * enrollment_reported)) ~
++             I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> 
+> ## Full professor faculty Count
+> # Naive OLS Regression
+> naive_full_count.reg <- ipeds_private.data %>%
++     mutate(`I(totalrevenues_real/(1000 * enrollment_reported))(fit)` =
++         I(totalrevenues_real/(1000 * enrollment_reported))) %>%
++     felm(full_prof_count ~ 1 +
++         `I(totalrevenues_real/(1000 * enrollment_reported))(fit)` |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_full_count.reg <- ipeds_private.data %>%
++     felm(full_prof_count ~ 1 |
++         unitid + year |
++         (I(totalrevenues_real / (1000 * enrollment_reported)) ~
++             I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> 
+> ## All faculty Count
+> # Naive OLS Regression
+> naive_all_count.reg <- ipeds_private.data %>%
++     mutate(`I(totalrevenues_real/(1000 * enrollment_reported))(fit)` =
++         I(totalrevenues_real/(1000 * enrollment_reported))) %>%
++     felm(all_prof_count ~ 1 +
++         `I(totalrevenues_real/(1000 * enrollment_reported))(fit)` |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_all_count.reg <- ipeds_private.data %>%
++     felm(all_prof_count ~ 1 |
++         unitid + year |
++         (I(totalrevenues_real / (1000 * enrollment_reported)) ~
++             I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> 
+> # Collate the outcome means
+> outcome.means <- list(c("Outcome Mean",
++     # Lecturers
++     ipeds_private.data %>% pull(lecturer_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     ipeds_private.data %>% pull(lecturer_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     # naive_assistant_count.reg
++     ipeds_private.data %>% pull(assistant_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     ipeds_private.data %>% pull(assistant_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     # naive_full_count.reg
++     ipeds_private.data %>% pull(full_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     ipeds_private.data %>% pull(full_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     # naive_all_count.reg
++     ipeds_private.data %>% pull(all_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     ipeds_private.data %>% pull(all_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no)
++ ))
+> 
+> # Collate the results to a LaTeX table
+> stargazer(
++     naive_lecturer_count.reg, shiftshare_lecturer_count.reg,
++     naive_assistant_count.reg, shiftshare_assistant_count.reg,
++     naive_full_count.reg, shiftshare_full_count.reg,
++     naive_all_count.reg, shiftshare_all_count.reg,
++     add.lines = outcome.means,
++     dep.var.caption =
++         "Dependent Variable: Faculty Count per 1,000 Students, by Position",
++     dep.var.labels = c(
++         "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
++     column.labels = rep(c("OLS", "2SLS"), 4),
++     digits = digits.no,
++     digits.extra = digits.no,
++     model.names = FALSE,
++     omit = "factor|count|year",
++     intercept.bottom = TRUE,
++     order = c(2, 1, 3),
++     covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
++     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
++     star.cutoffs = NA,
++     header = FALSE, float = FALSE, no.space = TRUE,
++     omit.table.layout = "n", notes.append = FALSE,
++     type = "text",
++     out = "../../text/tables/facultycount-shock-private-robustness-rawcount.tex")
+
+======================================================================================
+                 Dependent Variable: Faculty Count per 1,000 Students, by Position    
+              ------------------------------------------------------------------------
+                  Lecturers      Asst. Professors   Full Professors     All Faculty   
+                 OLS      2SLS     OLS      2SLS     OLS      2SLS     OLS      2SLS  
+                 (1)      (2)      (3)      (4)      (5)      (6)      (7)      (8)   
+--------------------------------------------------------------------------------------
+State Funding   0.002    -0.099   0.003    0.037    0.005    -0.060   0.011    -0.099 
+               (0.002)  (0.193)  (0.001)  (0.190)  (0.003)  (0.176)  (0.006)  (0.406) 
+--------------------------------------------------------------------------------------
+Outcome Mean   12.392    12.392   35.058   35.058   62.593   62.593  111.495  111.495 
+Observations   25,309    25,309   25,309   25,309   25,309   25,309   25,309   25,309 
+R2              0.617    0.415    0.788    0.778    0.944    0.937    0.904    0.897  
+======================================================================================
+> 
+> 
+> ################################################################################
+> ## Heterogeneity analysis, in log terms.
+> 
+> # Define an empty table to add to.
+> heterogeneity.table <- matrix("", nrow = 10, ncol = 7)
+> 
+> ## Most selective institutions.
+> selective.data <- reg.data %>%
++     filter(barrons_rank_2009 < 3)
+> # First-Stage
+> firststage_approp.reg <- selective.data %>%
++     felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
++         I(-log(appropriationshock_perEnroll_real)) |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Lecturer
+> shiftshare_lecturer_count.reg <- selective.data %>%
++     felm(log(lecturer_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (log(stateappropriations_real / enrollment_reported) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # Asst. Prof Count
+> shiftshare_assistant_count.reg <- selective.data %>%
++     felm(log(assistant_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (log(stateappropriations_real / enrollment_reported) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # Full professor Count
+> shiftshare_full_count.reg <- selective.data %>%
++     felm(log(full_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (log(stateappropriations_real / enrollment_reported) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # All faculty Count
+> shiftshare_all_count.reg <- selective.data %>%
++     felm(log(all_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (log(stateappropriations_real / enrollment_reported) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # Put results into the table.
+> heterogeneity.table[2, 1] <- "Most Selective:"
+> # First-stage
+> heterogeneity.table[2, 2] <- firststage_approp.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[3, 2] <- firststage_approp.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[4, 2] <- selective.data %>% mutate(outcome = stateappropriations_real / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Lecturers
+> heterogeneity.table[2, 3] <- shiftshare_lecturer_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[3, 3] <- shiftshare_lecturer_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[4, 3] <- selective.data %>% mutate(outcome = lecturer_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Asst. Professors
+> heterogeneity.table[2, 4] <- shiftshare_assistant_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[3, 4] <- shiftshare_assistant_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[4, 4] <- selective.data %>% mutate(outcome = assistant_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Full Professors
+> heterogeneity.table[2, 5] <- shiftshare_full_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[3, 5] <- shiftshare_full_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[4, 5] <- selective.data %>% mutate(outcome = full_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # All Faculty.
+> heterogeneity.table[2, 6] <- shiftshare_all_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[3, 6] <- shiftshare_all_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[4, 6] <- selective.data %>% mutate(outcome = all_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Observation count
+> heterogeneity.table[2, 7] <- selective.data %>% nrow() %>% as.character()
+> 
+> ## Selective institutions.
+> selective.data <- reg.data %>%
++     filter(barrons_rank_2009 %in% 3:4)
+> # First-Stage
+> firststage_approp.reg <- selective.data %>%
++     felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
++         I(-log(appropriationshock_perEnroll_real)) |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Lecturer
+> shiftshare_lecturer_count.reg <- selective.data %>%
++     felm(log(lecturer_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (log(stateappropriations_real / enrollment_reported) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # Asst. Prof Count
+> shiftshare_assistant_count.reg <- selective.data %>%
++     felm(log(assistant_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (log(stateappropriations_real / enrollment_reported) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # Full professor Count
+> shiftshare_full_count.reg <- selective.data %>%
++     felm(log(full_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (log(stateappropriations_real / enrollment_reported) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # All faculty Count
+> shiftshare_all_count.reg <- selective.data %>%
++     felm(log(all_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (log(stateappropriations_real / enrollment_reported) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # Put results into the table.
+> heterogeneity.table[5, 1] <- "Selective:"
+> # First-stage
+> heterogeneity.table[5, 2] <- firststage_approp.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[6, 2] <- firststage_approp.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[7, 2] <- selective.data %>% mutate(outcome = stateappropriations_real / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Lecturers
+> heterogeneity.table[5, 3] <- shiftshare_lecturer_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[6, 3] <- shiftshare_lecturer_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[7, 3] <- selective.data %>% mutate(outcome = lecturer_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Asst. Professors
+> heterogeneity.table[5, 4] <- shiftshare_assistant_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[6, 4] <- shiftshare_assistant_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[7, 4] <- selective.data %>% mutate(outcome = assistant_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Full Professors
+> heterogeneity.table[5, 5] <- shiftshare_full_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[6, 5] <- shiftshare_full_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[7, 5] <- selective.data %>% mutate(outcome = full_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # All Faculty.
+> heterogeneity.table[5, 6] <- shiftshare_all_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[6, 6] <- shiftshare_all_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[7, 6] <- selective.data %>% mutate(outcome = all_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Observation count
+> heterogeneity.table[5, 7] <- selective.data %>% nrow() %>% as.character()
+> 
+> ## Unranked institutions.
+> selective.data <- reg.data %>%
++     filter(barrons_rank_2009 > 4)
+> # First-Stage
+> firststage_approp.reg <- selective.data %>%
++     felm(log(stateappropriations_real / enrollment_reported) ~ 1 +
++         I(-log(appropriationshock_perEnroll_real)) |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Lecturer
+> shiftshare_lecturer_count.reg <- selective.data %>%
++     felm(log(lecturer_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (log(stateappropriations_real / enrollment_reported) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # Asst. Prof Count
+> shiftshare_assistant_count.reg <- selective.data %>%
++     felm(log(assistant_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (log(stateappropriations_real / enrollment_reported) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # Full professor Count
+> shiftshare_full_count.reg <- selective.data %>%
++     felm(log(full_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (log(stateappropriations_real / enrollment_reported) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # All faculty Count
+> shiftshare_all_count.reg <- selective.data %>%
++     felm(log(all_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (log(stateappropriations_real / enrollment_reported) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # Put results into the table.
+> heterogeneity.table[8, 1] <- "Unranked:"
+> # First-stage
+> heterogeneity.table[8, 2] <- firststage_approp.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[9, 2] <- firststage_approp.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[10, 2] <- selective.data %>% mutate(outcome = stateappropriations_real / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Lecturers
+> heterogeneity.table[8, 3] <- shiftshare_lecturer_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[9, 3] <- shiftshare_lecturer_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[10, 3] <- selective.data %>% mutate(outcome = lecturer_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Asst. Professors
+> heterogeneity.table[8, 4] <- shiftshare_assistant_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[9, 4] <- shiftshare_assistant_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[10, 4] <- selective.data %>% mutate(outcome = assistant_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Full Professors
+> heterogeneity.table[8, 5] <- shiftshare_full_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[9, 5] <- shiftshare_full_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[10, 5] <- selective.data %>% mutate(outcome = full_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # All Faculty.
+> heterogeneity.table[8, 6] <- shiftshare_all_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[9, 6] <- shiftshare_all_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[10, 6] <- selective.data %>% mutate(outcome = all_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Observation count
+> heterogeneity.table[8, 7] <- selective.data %>% nrow() %>% as.character()
+> 
+> # Put brackets around the SE rows.
+> heterogeneity.table[3, 2:6] <- paste0("(", heterogeneity.table[3, 2:6], ")")
+> heterogeneity.table[6, 2:6] <- paste0("(", heterogeneity.table[6, 2:6], ")")
+> heterogeneity.table[9, 2:6] <- paste0("(", heterogeneity.table[9, 2:6], ")")
+> # Put square brackets around the outcome mean rows.
+> heterogeneity.table[4, 2:6] <- paste0("[", heterogeneity.table[4, 2:6], "]")
+> heterogeneity.table[7, 2:6] <- paste0("[", heterogeneity.table[7, 2:6], "]")
+> heterogeneity.table[10, 2:6] <- paste0("[", heterogeneity.table[10, 2:6], "]")
+> 
+> 
+> # Write the outcome to TeX.
+> library(xtable)
+> print(xtable(heterogeneity.table),
++     include.colnames = FALSE,
++     include.rownames = FALSE,
++     only.contents = TRUE,
++     hline.after = NULL,
++     file = "../../text/tables/facultycount-heterogeneity.tex")
+> 
+> 
+> ################################################################################
+> ## Heterogeneity analysis, in raw counts.
+> 
+> # Define an empty table to add to.
+> heterogeneity.table <- matrix("", nrow = 10, ncol = 7)
+> 
+> ## Most selective institutions.
+> selective.data <- reg.data %>%
++     filter(barrons_rank_2009 < 3)
+> # First-Stage
+> firststage_approp.reg <- selective.data %>%
++     felm(I(stateappropriations_real / enrollment_reported) ~ 1 +
++         I(-appropriationshock_perEnroll_real) |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Lecturer
+> shiftshare_lecturer_count.reg <- selective.data %>%
++     felm(lecturer_prof_count ~ 1 |
++         unitid + year |
++         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
++             I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> # Asst. Prof Count
+> shiftshare_assistant_count.reg <- selective.data %>%
++     felm(assistant_prof_count ~ 1 |
++         unitid + year |
++         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
++             I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> # Full professor Count
+> shiftshare_full_count.reg <- selective.data %>%
++     felm(full_prof_count ~ 1 |
++         unitid + year |
++         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
++             I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> # All faculty Count
+> shiftshare_all_count.reg <- selective.data %>%
++     felm(all_prof_count ~ 1 |
++         unitid + year |
++         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
++             I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> # Put results into the table.
+> heterogeneity.table[2, 1] <- "Most Selective:"
+> # First-stage
+> heterogeneity.table[2, 2] <- firststage_approp.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[3, 2] <- firststage_approp.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[4, 2] <- selective.data %>% mutate(outcome = stateappropriations_real / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Lecturers
+> heterogeneity.table[2, 3] <- shiftshare_lecturer_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[3, 3] <- shiftshare_lecturer_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[4, 3] <- selective.data %>% mutate(outcome = lecturer_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Asst. Professors
+> heterogeneity.table[2, 4] <- shiftshare_assistant_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[3, 4] <- shiftshare_assistant_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[4, 4] <- selective.data %>% mutate(outcome = assistant_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Full Professors
+> heterogeneity.table[2, 5] <- shiftshare_full_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[3, 5] <- shiftshare_full_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[4, 5] <- selective.data %>% mutate(outcome = full_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # All Faculty.
+> heterogeneity.table[2, 6] <- shiftshare_all_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[3, 6] <- shiftshare_all_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[4, 6] <- selective.data %>% mutate(outcome = all_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Observation count
+> heterogeneity.table[2, 7] <- selective.data %>% nrow() %>% as.character()
+> 
+> ## Selective institutions.
+> selective.data <- reg.data %>%
++     filter(barrons_rank_2009 %in% 3:4)
+> # First-Stage
+> firststage_approp.reg <- selective.data %>%
++     felm(I(stateappropriations_real / (1000 * enrollment_reported)) ~ 1 +
++         I(-log(appropriationshock_perEnroll_real)) |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Lecturer
+> shiftshare_lecturer_count.reg <- selective.data %>%
++     felm(log(lecturer_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # Asst. Prof Count
+> shiftshare_assistant_count.reg <- selective.data %>%
++     felm(log(assistant_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # Full professor Count
+> shiftshare_full_count.reg <- selective.data %>%
++     felm(log(full_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # All faculty Count
+> shiftshare_all_count.reg <- selective.data %>%
++     felm(log(all_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # Put results into the table.
+> heterogeneity.table[5, 1] <- "Selective:"
+> # First-stage
+> heterogeneity.table[5, 2] <- firststage_approp.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[6, 2] <- firststage_approp.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[7, 2] <- selective.data %>% mutate(outcome = stateappropriations_real / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Lecturers
+> heterogeneity.table[5, 3] <- shiftshare_lecturer_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[6, 3] <- shiftshare_lecturer_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[7, 3] <- selective.data %>% mutate(outcome = lecturer_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Asst. Professors
+> heterogeneity.table[5, 4] <- shiftshare_assistant_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[6, 4] <- shiftshare_assistant_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[7, 4] <- selective.data %>% mutate(outcome = assistant_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Full Professors
+> heterogeneity.table[5, 5] <- shiftshare_full_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[6, 5] <- shiftshare_full_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[7, 5] <- selective.data %>% mutate(outcome = full_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # All Faculty.
+> heterogeneity.table[5, 6] <- shiftshare_all_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[6, 6] <- shiftshare_all_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[7, 6] <- selective.data %>% mutate(outcome = all_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Observation count
+> heterogeneity.table[5, 7] <- selective.data %>% nrow() %>% as.character()
+> 
+> ## Unranked institutions.
+> selective.data <- reg.data %>%
++     filter(barrons_rank_2009 > 4)
+> # First-Stage
+> firststage_approp.reg <- selective.data %>%
++     felm(I(stateappropriations_real / (1000 * enrollment_reported)) ~ 1 +
++         I(-log(appropriationshock_perEnroll_real)) |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Lecturer
+> shiftshare_lecturer_count.reg <- selective.data %>%
++     felm(log(lecturer_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # Asst. Prof Count
+> shiftshare_assistant_count.reg <- selective.data %>%
++     felm(log(assistant_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # Full professor Count
+> shiftshare_full_count.reg <- selective.data %>%
++     felm(log(full_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # All faculty Count
+> shiftshare_all_count.reg <- selective.data %>%
++     felm(log(all_prof_count / enrollment_reported) ~ 1 |
++         unitid + year |
++         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
++             I(-log(appropriationshock_perEnroll_real))) |
++         state + year,
++         data = .)
+> # Put results into the table.
+> heterogeneity.table[8, 1] <- "Unranked:"
+> # First-stage
+> heterogeneity.table[8, 2] <- firststage_approp.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[9, 2] <- firststage_approp.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[10, 2] <- selective.data %>% mutate(outcome = stateappropriations_real / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Lecturers
+> heterogeneity.table[8, 3] <- shiftshare_lecturer_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[9, 3] <- shiftshare_lecturer_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[10, 3] <- selective.data %>% mutate(outcome = lecturer_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Asst. Professors
+> heterogeneity.table[8, 4] <- shiftshare_assistant_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[9, 4] <- shiftshare_assistant_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[10, 4] <- selective.data %>% mutate(outcome = assistant_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Full Professors
+> heterogeneity.table[8, 5] <- shiftshare_full_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[9, 5] <- shiftshare_full_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[10, 5] <- selective.data %>% mutate(outcome = full_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # All Faculty.
+> heterogeneity.table[8, 6] <- shiftshare_all_count.reg$coefficients[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[9, 6] <- shiftshare_all_count.reg$se[1] %>% round(digits.no) %>% as.character()
+> heterogeneity.table[10, 6] <- selective.data %>% mutate(outcome = all_prof_count / enrollment_reported) %>% pull(outcome) %>% mean() %>% round(digits.no) %>% as.character()
+> # Observation count
+> heterogeneity.table[8, 7] <- selective.data %>% nrow() %>% as.character()
+> 
+> # Put brackets around the SE rows.
+> heterogeneity.table[3, 2:6] <- paste0("(", heterogeneity.table[3, 2:6], ")")
+> heterogeneity.table[6, 2:6] <- paste0("(", heterogeneity.table[6, 2:6], ")")
+> heterogeneity.table[9, 2:6] <- paste0("(", heterogeneity.table[9, 2:6], ")")
+> # Put square brackets around the outcome mean rows.
+> heterogeneity.table[4, 2:6] <- paste0("[", heterogeneity.table[4, 2:6], "]")
+> heterogeneity.table[7, 2:6] <- paste0("[", heterogeneity.table[7, 2:6], "]")
+> heterogeneity.table[10, 2:6] <- paste0("[", heterogeneity.table[10, 2:6], "]")
+> 
+> 
+> # Write the outcome to TeX.
+> library(xtable)
+> print(xtable(heterogeneity.table),
++     include.colnames = FALSE,
++     include.rownames = FALSE,
++     only.contents = TRUE,
++     hline.after = NULL,
++     file = "../../text/tables/facultycount-rawcounts-heterogeneity.tex")
+> 
+> 
+> ################################################################################
+> ## Scatter plots of the IV analysis.
+> 
+> 
+> # First-stage scatter.
+> firststage.plot <- reg.data %>%
++     ggplot(aes(x = - appropriationshock_perEnroll_real / 1000,
++         y = stateappropriations_real / (1000 * enrollment_reported))) +
++     geom_jitter(alpha = 0.075) +
++     geom_smooth(method = "lm",
++         colour = colour.list[1], fill = colour.list[1]) +
++     #annotate("text", colour = colour.list[1],
++     #    x = 0, y = 17.72,
++     #    label = expression("Slope" %~~% " 0.67 Edyears"),
++     #    size = 4.25, fontface = "bold") +
++     theme_bw() +
++     scale_x_continuous(expand = c(0, 0),
++         name = "Funding Shift-share") +
++         #breaks = seq(-5, 5, by = 1)
++     scale_y_continuous(expand = c(0, 0.1),
++         name = "",
++         limits = c(0, 100)) +
++         #breaks = seq(0, 20, by = 1)
++     ggtitle("State Funding") +
++     theme(plot.title = element_text(size = rel(1), hjust = 0),
++         plot.title.position = "plot",
++         plot.margin = unit(c(0.5, 3, 0, 0), "mm"))
+> firststage.plot
+`geom_smooth()` using formula = 'y ~ x'
+Warning messages:
+1: Removed 111 rows containing non-finite values (`stat_smooth()`). 
+2: Removed 111 rows containing missing values (`geom_point()`). 
+> 
+> proc.time()
+   user  system elapsed 
+ 21.804   0.528  17.286 

@@ -1,0 +1,210 @@
+
+R version 4.2.2 Patched (2022-11-10 r83330) -- "Innocent and Trusting"
+Copyright (C) 2022 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> #!/usr/bin/R
+> ## Senan Hogan-Hennessy, 3 February 2023
+> print(Sys.time())
+[1] "2023-02-03 10:53:52 PST"
+> set.seed(47)
+> ## Take faculty hiring network data from Scince (2022) article,
+> # As a measure for uni hiring for the time period 2010--2021
+> # functions for data manipulation and visualisation
+> library(tidyverse)
+── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+✔ ggplot2 3.3.6     ✔ purrr   0.3.4
+✔ tibble  3.1.8     ✔ dplyr   1.0.9
+✔ tidyr   1.2.0     ✔ stringr 1.4.0
+✔ readr   2.1.2     ✔ forcats 0.5.1
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+> # Fuzzy matching
+> library(fuzzyjoin)
+> 
+> 
+> ################################################################################
+> ## Load raw data, open source from Scieence article
+> #! PUT CITATION HERE.
+> 
+> # Load the academic hiring network (edges) data.
+> hiring_edges.data <-
++     read_csv("../../data/us-faculty-hiring-networks/data/edge_lists.csv")
+Rows: 51842 Columns: 9
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (4): DegreeInstitutionName, InstitutionName, TaxonomyValue, TaxonomyLevel
+dbl (5): Total, Women, Men, DegreeInstitutionId, InstitutionId
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+> 
+> 
+> ################################################################################
+> ## Clean data
+> 
+> hiring_edges.data %>% head(100)
+# A tibble: 100 × 9
+   Total Women   Men DegreeInstitutionId DegreeInstitutionName     InstitutionId
+   <dbl> <dbl> <dbl>               <dbl> <chr>                             <dbl>
+ 1     3     2     1                   1 Adelphi University                   49
+ 2     8     7     1                   1 Adelphi University                  205
+ 3    65     4    59                   2 Air Force Institute of T…             2
+ 4     2     1     1                   2 Air Force Institute of T…            71
+ 5    12     4     4                   3 Alabama A&M University                3
+ 6     2     1     1                   4 Albany Medical College                5
+ 7     2     1     1                   4 Albany Medical College              102
+ 8     3     1     2                   4 Albany Medical College              128
+ 9     4     1     3                   4 Albany Medical College              239
+10     3     2     1                   4 Albany Medical College              202
+# … with 90 more rows, and 3 more variables: InstitutionName <chr>,
+#   TaxonomyValue <chr>, TaxonomyLevel <chr>
+> hiring_edges.data %>% names()
+[1] "Total"                 "Women"                 "Men"                  
+[4] "DegreeInstitutionId"   "DegreeInstitutionName" "InstitutionId"        
+[7] "InstitutionName"       "TaxonomyValue"         "TaxonomyLevel"        
+> # 1. Count the sum of hires, by each uni 2010--2021, from the edge data
+> hiring.data <- hiring_edges.data %>%
++     transmute(
++         # This inst_id is not the same as the one for IPEDS
++         inst_id = InstitutionId,
++         inst_name = InstitutionName,
++         men_hired = Men,
++         women_hired = Women,
++         total_hired = Total) %>%
++     group_by(inst_id, inst_name) %>%
++     summarise(
++         men_hired = sum(men_hired, na.rm = TRUE),
++         women_hired = sum(women_hired, na.rm = TRUE),
++         total_hired = sum(total_hired, na.rm = TRUE)) %>%
++     ungroup()
+`summarise()` has grouped output by 'inst_id'. You can override using the
+`.groups` argument.
+> 
+> 
+> ################################################################################
+> ## Connect to IPEDS finance data.
+> 
+> # Load constructed IPEDS data, for Illinois, 2010 onwards
+> ipeds.data <- read_csv("../../data/urban-ipeds/urban-clean-allunis.csv") %>%
++     filter(year >= 2010)
+Rows: 318274 Columns: 52
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (2): inst_name, state
+dbl (50): unitid, year, public, forprofit, fouryear, associatescollege, cpi2...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+> gc()
+          used (Mb) gc trigger  (Mb) max used  (Mb)
+Ncells 1078545 57.7    2330915 124.5  1520568  81.3
+Vcells 6908936 52.8   23126925 176.5 23841116 181.9
+> 
+> # Get the connecting variables for IPEDs: unitid, college name
+> ipeds.key <- ipeds.data %>%
++     #mutate(inst_name = str_sub(inst_name, end = 30)) %>%
++     group_by(unitid, inst_name) %>%
++     summarise(count = n()) %>%
++     ungroup() %>%
++     select(unitid, inst_name)
+`summarise()` has grouped output by 'unitid'. You can override using the
+`.groups` argument.
+> 
+> ipeds.key %>% arrange(unitid, inst_name)
+# A tibble: 12,820 × 2
+   unitid inst_name                          
+    <dbl> <chr>                              
+ 1 100636 Community College of the Air Force 
+ 2 100654 Alabama A & M University           
+ 3 100663 University of Alabama at Birmingham
+ 4 100690 Amridge University                 
+ 5 100706 University of Alabama at Huntsville
+ 6 100706 University of Alabama in Huntsville
+ 7 100724 Alabama State University           
+ 8 100733 University of Alabama System Office
+ 9 100751 The University of Alabama          
+10 100760 Central Alabama Community College  
+# … with 12,810 more rows
+> hiring.data %>% arrange(inst_id, inst_name)
+# A tibble: 355 × 5
+   inst_id inst_name                           men_hired women_hired total_hired
+     <dbl> <chr>                                   <dbl>       <dbl>       <dbl>
+ 1       2 Air Force Institute of Technology         167          26         197
+ 2       3 Alabama A&M University                     27          30          81
+ 3       5 Albert Einstein College of Medicin…       265         176         472
+ 4       6 Alfred University                           8           4          12
+ 5       7 Alliant International University           84          88         190
+ 6       8 American University                       268         189         469
+ 7       9 Andrews University                         96          35         137
+ 8      12 Arizona State University                 2281        1436        4122
+ 9      13 Arkansas State University                   4           4           8
+10      15 Auburn University                        1076         738        2016
+# … with 345 more rows
+> 
+> 
+> # Get the connecting variable for hiring data: college name
+> hiring.key <- hiring.data %>%
++     #mutate(inst_name = str_sub(inst_name, end = 30)) %>%
++     group_by(inst_name) %>%
++     summarise(inst_count = n()) %>%
++     ungroup() %>%
++     select(inst_name) #%>%
+>     # Make a manual adjustment for "U of I" matching
+>     #mutate(inst_name = str_replace(inst_name, "U of I",
+>     #    "University of Illinois"))
+> 
+> ## Connect the IPEDS unitid back to Hiring data by fuzzy name match
+> hiring.data <- hiring.data %>%
++     stringdist_join(ipeds.key,
++         by = "inst_name",
++         mode = "left",
++         method = "jw",
++         max_dist = 0.1,
++         distance_col = "dist") %>%
++     rename(inst_name = inst_name.x) %>%
++     group_by(inst_name) %>%
++     mutate(best_match = as.integer(dist == min(dist, na.rm = FALSE))) %>%
++     ungroup() %>%
++     filter(best_match == 1 | is.na(best_match))
+> 
+> # If there are multiple matches (i.e. multiple campuses have gone to the IPEDS
+> # central campus), then go to the first one.
+> hiring.data <- hiring.data %>%
++     group_by(inst_name, unitid) %>%
++     mutate(
++         inst_count = n(),
++         inst_no = 1:n()) %>%
++     ungroup() %>%
++     filter(inst_no == 1) %>%
++     select(-inst_count, -inst_no)
+> 
+> # Restrict the hiring data to IPEDS relevant data.
+> hiring.data <- hiring.data %>%
++     select(unitid, inst_name,
++         men_hired, women_hired, total_hired)
+> 
+> 
+> ################################################################################
+> ## Save the constructed data file of hiring data + IPEDS key connecter.
+> hiring.data %>%
++     write_csv("../../data/states/hiring-count.csv")
+> 
+> proc.time()
+   user  system elapsed 
+ 19.934   0.407  11.359 

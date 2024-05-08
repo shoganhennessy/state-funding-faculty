@@ -403,7 +403,7 @@ stargazer(
     model.names = FALSE,
     omit = "factor|count|year",
     intercept.bottom = TRUE,
-    covariate.labels = c("Appropriations Shock", "Tuition Revenue", "Constant"),
+    covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq", "f"),
     add.lines = list(
         c("Fixed effects?", "Yes", "No", "Yes", "No"),
@@ -523,7 +523,8 @@ stargazer(
     naive_all_count.reg, shiftshare_all_count.reg,
     add.lines = outcome.means,
     dep.var.caption = "Dependent Variable: Employment Count by Professor Group",
-    dep.var.labels = c("Lecturer", "Assistant", "Full", "All"),
+    dep.var.labels = c(
+        "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
     column.labels = rep(c("OLS", "2SLS"), 4),
     digits = digits.no,
     digits.extra = digits.no,
@@ -654,7 +655,8 @@ stargazer(
     naive_all_hires.reg, shiftshare_all_hires.reg,
     add.lines = outcome.means,
     dep.var.caption = "Dependent Variable: Employment Count by Professor Group",
-    dep.var.labels = c("Lecturer", "Assistant", "Full", "All"),
+    dep.var.labels = c(
+        "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
     column.labels = rep(c("OLS", "2SLS"), 4),
     digits = digits.no,
     digits.extra = digits.no,

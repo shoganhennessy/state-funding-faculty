@@ -17,7 +17,7 @@ Column (1) represents the estimates for \autoref{eqn:firststage} with fixed effe
 I use the same empirical strategy in the analysis of Illinois faculty, and \autoref{tab:firststage-illinois} presents first-stage estimates among the IBHED data; results are similar to those calculated in IPEDS data.
 These results, show the funding shift-share instrument strongly predicts university revenues in the first-stage estimation.
 
-The first stage is strong in both IPEDS and IBHED data, and the argument in \autoref{sec:empirics} for exogeneity comes from independence of the state funding mechanism to any individual public university campus.
+The first stage is strong in both IPEDS and IBHED data, and the argument for exogeneity comes from independence of the state funding mechanism to any individual public university campus (as in \autoref{sec:empirics}).
 The IV approach also assumes that shifts in state-wide funding for higher education (the instrument) affect outcomes only via affecting state funding for the university (exclusion restriction).
 This assumption is fundamentally untestable, but is bolstered by the lack of relationship with university characteristics.
 \autoref{tab:summary-quantiles} shows the mean of various university variables, across the instrument distribution.
@@ -26,6 +26,7 @@ On the other hand, the measures of selectivity (acceptance rate, 6--year graduat
 This allays concerns that state-wide shifts in state funding are targetted more towards less selective universities (a possible confounder), and supports use of the shift-share IV empirical design.
 
 \subsection{University Level, IPEDS}
+\label{sec:results-ipeds}
 Funding cuts lead to measurable changes in the number of faculty at US public universities.
 \autoref{tab:facultycount-shock-reg} presents OLS and IV estimates for the effect of a change in state funding on the number of faculty at the university, for each faculty position (lecturer, assistant and full professors, total).
 The results are presented in two different units: Panel A shows how a \$1 increase in state funding changed the number of faculty per students, while Panel B shows how a 1\% increase in state funding led to a percent change in the number of faculty per students.
@@ -37,65 +38,85 @@ These are large substitution effects, and explain roughly 40\% of the trend in s
 The average public university has roughly 36\% less state funding per student in 2021 than they did in 1990, while employing over double the number of lecturers and 20\% fewer professors (relative to enrolment, \autoref{fig:mean-funding-fte}, \ref{fig:fte-perprof}).
 
 Once the funding cut has passed, universities do not re-adjust to hiring more professors to make up for last year's substitution towards lecturers.
-\autoref{fig:count-lp} shows local projection estimates, where the estimate is the elasticity for professor count per student in year $t+k$ with respect to state funding in year $t$ for later years $k = 0, \hdots, 10$.
-These estimates correspond to the elasticity estimates in \autoref{tab:facultycount-shock-reg} Panel B, where the outcome is faculty count per students in later years.
+\autoref{fig:count-lp} shows local projection estimates, where the estimate is the elasticity for professor count per student in year $t+k$ with respect to state funding in year $t$.
+These elasticity estimates are shown in \autoref{tab:facultycount-shock-reg} Panel B, where the outcome is faculty count per students in later years.
 State funding cuts affect the number of lecturers and professors at universities up to 9 years after the initial funding cut.
-A 10\% state funding cut leads to 4.2\% (2.9--5.5 in a 95 percent confident interval) more lecturers per student the following year, and around 3.1\% (0.6--5.5 confidence interval) more lecturers nine years later.
-A 10\% state funding cut leads to 1.5\% (0.6--2.2 in a 95 percent confident interval) fewer assistant professors per student the following year, and around 1.1\% (0.2--2.0 confidence interval) fewer nine years later;
-the same cut leads to 1.2\% (0.6--1.8 in a 95 percent confident interval) fewer full professors per student the following year, and around 0.9\% (0.1--1.7 confidence interval) fewer nine years later.
-The effects are a substitution with the composition of faculty, as the total number of faculty per students are relatively unaffected in the follow-on years.
+A 10\% state funding cut leads to 4.2\% (2.9--5.5 in a 95 percent confidence interval) more lecturers per student the following year, and around 3.1\% (0.6--5.5 confidence interval) more lecturers nine years later.
+A 10\% state funding cut leads to 1.5\% (0.6--2.2 in a 95 percent confidence interval) fewer assistant professors per student the following year, and around 1.1\% (0.2--2.0 confidence interval) fewer nine years later;
+the same cut leads to 1.2\% (0.6--1.8 in a 95 percent confidence interval) fewer full professors per student the following year, and around 0.9\% (0.1--1.7 confidence interval) fewer nine years later.
 
-\textbf{Paragraph comparing to any previous estimates, as do Lovenheim 2020 page 22.}
+These effects are a substitution of professors for lecturers, as the total number of faculty per students are relatively unaffected in the follow-on years, while numbers of lecturers increase and professors decreases.
+This agrees with a model for universities departments having fixed teaching requirements making human-resources decisions under constrained resources (e.g., \citealt{abe2015implications}), lending credibility to this type of model for understanding recent human resources decisions of public universities.
+Furthermore, if a university must teach more students, but cannot afford to hire a full-time professor who teaches 2--3 classes a year, then it makes sense that they hire 2--3 additional lecturers on part-time contracts as a replacement.
+This provides simple intuition for why the lecturers' elasticity is 2--3 times larger than that for assistant/full professors in \autoref{tab:facultycount-shock-reg}.
+While no previous research causally connects funding cuts to substituting professors for lecturers, the phenomenon has been alluded to in popular media \citep{wiu2016} and university rankings (where more lecturers hurts a university's ranking, \citealt{usnews2023}); these results provides real evidence for these claims.
 
 \subsection{Illinois Faculty, IBHED}
 Incumbent professors at Illinois universities are relatively unaffected by state funding cuts for their university.
 \autoref{tab:faculty-shock-illinois-rolling} show estimates of a 10\% change in state funding per student on faculty salaries, rate of exiting the Illinois public university system, and rate of promotion.
-The estimates are not discernible from zero, so that faculty who are already at the university (incumbent faculty) seem to have little or no state funding cuts passed on to them for these outcomes.
-Additionally, local projection estimates show that professors' salaries are also not affected in the years after a state funding cut (\autoref{fig:salaries-illinois-lp-rolling}).
-Similarly, promotion rate and exit rate among incumbent faculty (from the Illinois public university system) are unaffected in the years after an initial funding shift-share (\autoref{fig:promoted-illinois-lp-rolling}, \ref{fig:exit-illinois-lp-rolling}).
-There is evidence that lecturers see a 0.75\% increase in salary in the second and third year after a 10\% increase in state funding (\autoref{fig:salaries-lecturer-illinois-lp-rolling}), though this is the only evidence that incumbent faculty are affected by state funding cuts in the Illinois public university system.
+The estimates are not discernible from zero in any specification, including the shift-share IV estimates, so that faculty seem to have little or no state funding cuts passed on to them for these outcomes.
 
-These findings show that public universities increase (decrease) their count of tenure-track and tenured professors per student in years when revenues are more (less) plentiful.
-In the same vein, when funding increased, count of tenure-track and tenured professors per student increased --- and the opposite in years of funding cuts.
-These findings are in line with the observation that universities froze hiring for a couple of years after the 2008 recession and funding cuts \citep{turner2014impact}.
-For lecturers, we see a negative effect which lines up with two trends noted in \autoref{sec:trends}: state funding for public universities (per student) stagnated while usage of lecturers increased substantially.
+It could be the case that effects on faculty do not materialise until multiple years after a funding cut, though the data do not support this possibility.
+Local projection estimates show that professors' salaries, including salaries, are not significantly affected in years following funding cuts (\autoref{fig:salaries-illinois-lp-rolling}) --- they do not receive lower rates of pay raises, or delayed salary cuts, in response to state funding cuts.
+Similarly, promotion rate and rate of exit from the Illinois public university system are also unaffected in later years (\autoref{fig:promoted-illinois-lp-rolling}, \ref{fig:exit-illinois-lp-rolling}).
+Lecturers receive a 0.75\% increase in salary in the second and third year after a 10\% increase in state funding (\autoref{fig:salaries-lecturer-illinois-lp-rolling}), though they are they only faculty who saw any effect of state funding cuts in terms of salaries.
 
+These results show that faculty --- both lecturers and professors --- are relatively unaffected by state funding cuts, in the Illinois public university system.
+Illinois is a state with a large public university system, relative to student enrolment, with trends in state funding for education similar to national trends, and with both selective and non-selective universities (\autoref{sec:trends-illinois}).
+If faculty are unaffected in Illinois, then it is unlikely that faculty in the rest of the nation are affected on average.
+Note, however, that this analysis studies faculty who are already faculty.
+The IBHED data do not measure the entire pool of academics applying for faculty jobs at Illinois universities, but only those who applied to, were accepted, and then started a job as a lecturer or professor.
+These are incumbent faculty, and it is clear they are unaffected by state funding cuts.
+This raises a question: how can funding cuts lead to a large substitution of professors for lecturers, when incumbent faculty are not affected?
 
-\textbf{Paragraph comparing to any previous estimates, as do Lovenheim 2020 page 22.}
+\subsection{Impacts on Faculty Hiring}
+Turn-over is the primary channel that changes in faculty composition happen, where, where faculty exit their jobs and new faculty are hired to replace those leaving --- or no more are hired to replace those who left.
+\autoref{fig:exit-illinois-lp-rolling} shows that Illinois faculty are no more likely to exit the Illinois system (either retire or take a new job elsewhere) following state funding cuts, so there is one remaining channel for the substitution of professors for lecturers: increased hiring of lecturers and reduced hiring of new professors.
+
+To investigate reduced hiring of new professors, I first investigate faculty hiring rates among Illinois universities from the IBHED data.
+To do so, I count the number of faculty new in the panel of all Illinois public university faculty for years 2011--2021, where the panel first year is 2010.
+I then use this as the outcome in OLS and shift-share IV regressions, where each observation is an Illinois university--year and data for state funding come from IPEDS.\footnote{
+    This is the same specification as the IPEDS analysis restricted to Illinois universities.
+    The IPEDS data have yearly faculty counts, but not discern between faculty promotions, quits, and hires; the Illinois data can do so thanks to the panel structure of the data.
+}
+To study whether these effects hold true for nation-wide hiring of new professors, I use public on the number of professors at all US public universities for the entire decade 2011--2021, and perform the same analysis to see if state funding affected the number of professors hired.
+
+\autoref{tab:facultyhires-illinois-reg} shows these estimates for Illinois public universities.
+In general, faculty counts are relatively unrelated to state funding among Illinois universities; though the point estimates line up with analysis in IPEDS, the smaller number of observations mean that the precision of estimates are small and indistinguishable from zero, in bith raw counts and in log units.
+On the other hand, universities with more state funding hire more professors across 2011--2021, as seen in \autoref{fig:hiring-correlation}.
+An extra 10\% in state funding is associated with 8.5\% more professors hired per students.
+I use these data as part of a shift-share analysis, showing that a 10\% state funding cut per student leads to 13\% fewer professor hires (relative to enrolment), and that these hires are roughly equal for gender of professor hired.
+
+This shows that state funding is related in to professor hiring, and that the persistent funding cuts to public universities led to lower professor hiring across this time period.
+The other turn-over channels were unaffected by state funding cuts, and that professor hiring is related to professor hiring in both correlational terms and in a shift-share analysis.
+This means that effects on faculty hiring were likely the main mechanism for how state funding cuts led to a substitution of professors for lecturers at public universities.
 
 \subsection{Robustness Checks}
 \label{sec:results-robustness}
-\textbf{Describe robustness checks in one or two paragraphs here; see how Lovenheim$+$ did this section.}
+It is possible that the identification startegy is not robust to other possible confounders.
+For example, it is possible that selective institutions received less funding for other reasons, or states with lower performing insitutions or declining populations strategically limited funding for less selective universities.
+I address these main concerns with a number of different analyses.
 
-These tables describe the same analysis, with other controls added in, and with State $+$ Year fixed effects --- instead of Institution $+$ Year fixed effects.
-\autoref{tab:firststage-robustness-checks},
-\autoref{tab:facultycount-robustness-checks},
-\autoref{tab:facultycount-rawcount-robustness-checks}.
-Uses the FTE enrolment measure, with measures of selectivity.
+First, I re-estimate the primary results from \autoref{sec:results-ipeds} with additional controls for university selectivity.
+To be specific, I estimate \autoref{eqn:secondstage} with controls added for the base share of state funding, average acceptance rate and 6-year completion rate  in 2004--2006, tuition revenue, total enrolment, size of state enrolment, size of university enrolment relative to the rest of the state.
+Measures of selectivity are only available in certain years, so I use these values across the entire panel.
+This means that insitution fixed effects would over-identify the system, so I estimate with state $+$ year fixed effects (not intituion $+$ year fixed effects).
+In this way, this model also works as an alternative specification test.
+Additionally, this analysis uses the enrolment measure of full-time equivalent (FTE), and not reported enolment as in the original analysis.
+The first-stage is strong of the same order as the orginal analysis (\autoref{tab:firststage-robustness-checks}).
+The relationship between state funding, in both raw count terms and log units, are roughly the same as for the main analysis (\autoref{tab:facultycount-robustness-checks}, \ref{tab:facultycount-rawcount-robustness-checks}), despite the multiple specification changes, additional controls, and different measures for enrolment.
 
-\autoref{tab:facultycount-shock-private-robustness} describes the results of using private universities in a falsification test, by assigning their base share as the average of similarly selective public universities in their state, and using this as an instrument for total revenues (as state funding is uncommon for private universities).
-Note, the first-stage is not strong, and the IV estimates are all (encouragingly) not significant at any standard frequentist cut-off.
+Secondly, I return to the primary specification in \autoref{eqn:secondstage}, and estimate effect of state funding cuts on faculty counts separately among universities of different selectivity rates.
+This investigates whether results are consistent across different levels of selectivity, and whether less selective universities have unreasonably high estimates for substitution --- as would be the case if selectivity was an unaddressed confounder.
+\autoref{tab:facultycount-heterogeneity} collects these results together, separated by the \cite{barrons2009} selectivity rankings.
+Barrons rank 1-2 are the most selective (including e.g., UC Berkeley and  Berkeley and SUNY Binghamton), 3-4 selective (including e.g., Clemson University and University of Dallas), and rank 5 for the rest of universities.
+The first-stage is string in every group of universities, even the most selective group which is only 12 universities, the selective group which is 28, and the rest are 762 universities.
+Faculty substitution rates are not very string among the most selective universities, but are very similar between selective universities and unranked universities, showing that even selective public universities exhibit the substitution towards lecturers.
 
-\autoref{tab:facultycount-heterogeneity} shows  the effects of state funding cuts, separated among universities with different selectivity rankings.
-The most selective (rank 1-2, including Berkeley to SUNY Binghamton) have no faculty substitution effects, but even among selective universities (rank 3-4, including Clemson University to University of Dallas) there are strong substitution effects.
-1 indicates “most competitive,” 2 is “highly competitive plus,” 3 is “highly competitive,” and 4 is “very competitive plus.”
-
-\subsection{Reduced Hiring of New Professors}
-The results above present a conundrum: there are large substitution effects among faculty, but faculty themselves are unaffected by funding cuts.
-The analysis of Illinois faculty (IBHED) studies the effect of state funding cuts on faculty already at the university --- i.e., incumbent faculty.
-The findings above imply that substitution towards lecturers came about by limiting hiring of new professors, to replace leaving or retiring professors, so that they are replaced by hiring lecturers.
-In this subsection, I test this implication with data on universities' hiring of new professors.
-
-I take recent data on the total faculty hired at US public universities over 2011--2021 provided by \cite{wapman2022quantifying};
-they studied the composition of professor hiring in the years 2011--2021, and publicly released data on the number of professors (not lecturers) hired at US universities \citep{wapman2022zenodo}.\footnote{
-    These data are not panel data, instead only give the total professors hired over the ten-year period 2011--2021.
-}
-I combine this measure, with total state funding for public universities across the same time period from IPEDS, to validate the claim that state funding cuts led to faculty substitution via limiting hiring of new professors.
-
-There is a strong correlation between the number of professors hired (relative to student enrolment), where an extra \$1,000 of state funding per student is associated with the university hiring 0.12 more professors per hundred students.
-I apply the shift-share model to these data, summing the state funding and funding shifts for the decade of 2012--2021.
-I find that a state funding cut of 10\% leads to 13\% fewer professor hires (relative to enrolment).
-See \autoref{sec:appendix-hiring} for further details on this additional analysis of professor hiring.
-
-These results provide suggestive evidence that funding cuts caused faculty substitution by disrupting hiring of new professors at public universities.
-This provides a coherent mechanism for how incumbent faculty (those who are already hired at the university) were not meaningfully impacted by funding cuts, yet their wider composition nonetheless changed when their universities experienced funding cuts.
+The final robustness check I employ is a falsification test, testing whether the effects for public universities would be picked up among the sample of private universities (as in \citealt{NBERw27885}).
+Private universities do not rely on state funding in the same that public universities do, though they in some states do receive some state funding for projects and other smaller scale operating costs.
+Given this low reliance, it is unclear how state-wide funding shifts would affect faculty outcomes, and thus we would expect the two to be unrelated.
+If they were related, this would be evidence that the IV model picks up otherwise concurrent trends in higher education, unrelated to stagnating state funding for public universities.
+To impute a base share of reliance on state funding, I assign private universities the average reliance on state funding in the base period of universities in the same state with the same Barron's selectivity ranking, and then compute the shift-share instrument from this value.
+\autoref{tab:facultycount-shock-private-robustness} shows that the first-stage is not strong among private universities, and the IV results are significant for any faculty count.
+Notably, the OLS results for correlation between state funding and professor are highly statistically significant, showing that more funding is related to more lecturers and faculty in general, though the IV analysis shows that these relationships are spurious among private universities.

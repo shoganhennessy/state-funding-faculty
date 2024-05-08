@@ -1,0 +1,512 @@
+
+R version 4.3.1 (2023-06-16) -- "Beagle Scouts"
+Copyright (C) 2023 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> #!/usr/bin/R
+> ## Senan Hogan-Hennessy, 5 July 2023
+> ## IV for Prof's salaries, using IPEDS data.
+> print(Sys.time())
+[1] "2024-04-30 17:22:19 EDT"
+> library(tidyverse) # Functions for data manipulation and visualization
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.2     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.0
+✔ ggplot2   3.4.2     ✔ tibble    3.2.1
+✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+✔ purrr     1.0.1     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+> library(lfe) # Functions for fast linear models with IV + FEs
+Loading required package: Matrix
+
+Attaching package: ‘Matrix’
+
+The following objects are masked from ‘package:tidyr’:
+
+    expand, pack, unpack
+
+> library(plm) # Functions for panel data
+
+Attaching package: ‘plm’
+
+The following object is masked from ‘package:lfe’:
+
+    sargan
+
+The following objects are masked from ‘package:dplyr’:
+
+    between, lag, lead
+
+> library(car) # Function for F stat regarding IV models
+Loading required package: carData
+
+Attaching package: ‘car’
+
+The following object is masked from ‘package:dplyr’:
+
+    recode
+
+The following object is masked from ‘package:purrr’:
+
+    some
+
+> # My custom flavour of Stargazer TeX tables:
+> # devtools::install_github("shoganhennessy/stargazer")
+> # TeX tables:
+> library(stargazer)
+
+Please cite as: 
+
+ Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+ R package version 5.2.3. https://CRAN.R-project.org/package=stargazer 
+
+> library(xtable)
+> set.seed(47)
+> # This file follows an adjusted Deming Walters (2017, p.10) approach to
+> # Funding Shock instrument.
+> 
+> # Define number of digits in tables and graphs
+> digits.no <- 3
+> 
+> # Size for figures
+> fig.width <- 10
+> fig.height <- fig.width * 0.85
+> 
+> # Define a function to standardise the dplyr lag function
+> # --- negative numbers mean a lag of t time periods, positive a lead of t.
+> lag_lead <- function(column, t){
++     if (t < 0){
++         lag_column <- dplyr::lag(column, -t)
++     }
++     else if (t >= 0){
++         lag_column <- dplyr::lead(column, t)
++     }
++     return(lag_column)
++ }
+> 
+> 
+> # Load data sources ------------------------------------------------------------
+> 
+> # Load IPEDS data
+> ipeds.data <- read_csv("../../data/urban-ipeds/urban-clean-publicunis.csv")
+Rows: 26168 Columns: 70
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (2): inst_name, state
+dbl (68): unitid, year, public, forprofit, fouryear, associatescollege, cpi2...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+> 
+> 
+> # Clean data -------------------------------------------------------------------
+> 
+> # Select IPEDS variables, and define the panel at the university level
+> reg.data <- ipeds.data %>%
++     # Create independent columns and rows.
++     select(
++         # Identifiers and controls
++         unitid,
++         year,
++         state,
++         # Appropriations to the uni
++         totalrevenues_real,
++         nonauxrevenues_real,
++         stateappropriations_real,
++         tuitionrev_real,
++         # Uni spending.
++         nonauxspending_real,
++         # Uni enrollment
++         enrollment_reported,
++         enrollment_fte,
++         # Appropriation shocks Per student
++         appropriationshock_perEnroll_real,
++         appropriationshock_perFTE_real,
++         appropriationshock_peruni_real,
++         # Count of full-time professors (tenured or not)
++         lecturer_prof_count,
++         assistant_prof_count,
++         full_prof_count,
++         all_prof_count,
++         # Count of professors by tenure-rate (only 1990-)
++         nontenured_tenure_count,
++         tenuretrack_tenure_count,
++         tenured_tenure_count,
++         all_tenure_count,
++         # Average faculty salary
++         full_profmeansalary_real,
++         assistant_profmeansalary_real,
++         lecturer_profmeansalary_real,
++         all_profmeansalary_real,
++         # Total paid on professor salaries
++         all_profoutlays_real,
++         # Research and instruction expenditures.
++         instructionspending_total_real,
++         instructionspending_salaries_real,
++         researchspending_total_real,
++         researchspending_salaries_real,
++         nonauxspending_real)
+> 
+> 
+> # Restrict data to unis + years with measured state appropriations & shocks
+> reg.data <- reg.data %>%
++     filter(1990 <= year,
++         !is.na(enrollment_reported), enrollment_reported > 0,
++         !is.na(all_prof_count),
++         stateappropriations_real > 0,
++         !is.na(appropriationshock_perEnroll_real)) %>%
++     # Restrict to uni-years with all professor counts.
++     filter(!is.na(lecturer_prof_count), lecturer_prof_count > 0) %>%
++     filter(!is.na(assistant_prof_count), assistant_prof_count > 0) %>%
++     filter(!is.na(full_prof_count), full_prof_count > 0)
+> 
+> 
+> # Save memory by removing initally loaded files
+> rm(ipeds.data)
+> gc()
+          used  (Mb) gc trigger  (Mb) max used  (Mb)
+Ncells 2384599 127.4    4642020 248.0  3959727 211.5
+Vcells 4540929  34.7   10146329  77.5  8379775  64.0
+> 
+> 
+> # First stage Regressions ------------------------------------------------------
+> 
+> # Explain Revenues with a shock to (only) state appropriations.
+> firststage_raw.reg <- reg.data %>%
++     felm(I(stateappropriations_real / enrollment_reported) ~ 1 +
++         I(-appropriationshock_perEnroll_real) |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Get the F.Stat
+> firststage_raw.fstat <-
++     linearHypothesis(firststage_raw.reg, test = "F",
++         c("I(-appropriationshock_perEnroll_real)"))["F"] %>%
++     unlist() %>%
++     nth(2) %>%
++     as.numeric() %>%
++     round(digits.no)
+> 
+> # Without the FEs
+> # Explain State appropriations with a shock to (only) state appropriations.
+> firststage_raw_noFE.reg <- reg.data %>%
++     felm(I(stateappropriations_real / enrollment_reported) ~ 1 +
++         I(-appropriationshock_perEnroll_real) |
++         0 |
++         0 |
++         state + year,
++         data = .)
+> # Get the F.Stat
+> firststage_raw_noFE.fstat <-
++     linearHypothesis(firststage_raw_noFE.reg, test = "F",
++         c("I(-appropriationshock_perEnroll_real)=0"))["F"] %>%
++     unlist() %>%
++     nth(2) %>%
++     as.numeric() %>%
++     round(digits.no)
+> 
+> # Explain Revenues with a shock to (only) state appropriations.
+> firststage_raw_tuit.reg <- reg.data %>%
++     felm(I(stateappropriations_real / enrollment_reported) ~ 1 +
++         I(-appropriationshock_perEnroll_real) +
++         I(tuitionrev_real / enrollment_reported) |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Get the F.Stat
+> firststage_raw_tuit.fstat <-
++     linearHypothesis(firststage_raw_tuit.reg, test = "F",
++         c("I(-appropriationshock_perEnroll_real)=0"))["F"] %>%
++     unlist() %>%
++     nth(2) %>%
++     as.numeric() %>%
++     round(digits.no)
+> 
+> # Without the FEs
+> # Explain State appropriations with a shock to (only) state appropriations.
+> firststage_raw_tuit_noFE.reg <- reg.data %>%
++     felm(I(stateappropriations_real / enrollment_reported) ~ 1 +
++         I(-appropriationshock_perEnroll_real) +
++         I(tuitionrev_real / enrollment_reported) |
++         0 |
++         0 |
++         state + year,
++         data = .)
+> # Get the F.Stat
+> firststage_raw_tuit_noFE.fstat <-
++     linearHypothesis(firststage_raw_tuit_noFE.reg, test = "F",
++         c("I(-appropriationshock_perEnroll_real)=0"))["F"] %>%
++     unlist() %>%
++     nth(2) %>%
++     as.numeric() %>%
++     round(digits.no)
+> 
+> # Collate the results to a LaTeX table
+> stargazer(
++     firststage_raw.reg, firststage_raw_noFE.reg,
++     firststage_raw_tuit.reg, firststage_raw_tuit_noFE.reg,
++     dep.var.caption = "Dependent Variable: State Funding",
++     dep.var.labels.include = FALSE,
++     digits = digits.no,
++     digits.extra = digits.no,
++     model.names = FALSE,
++     omit = "factor|count|year",
++     intercept.bottom = TRUE,
++     covariate.labels = c("Funding Shift-Share", "Tuition Revenue", "Constant"),
++     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq", "f"),
++     add.lines = list(
++         c("Uni. + Year fixed effects?", "Yes", "No", "Yes", "No"),
++         c("F stat.",
++             firststage_raw_tuit.fstat, firststage_raw_tuit_noFE.fstat,
++             firststage_raw.fstat, firststage_raw_noFE.fstat)),
++     star.cutoffs = NA,
++     header = FALSE, float = FALSE, no.space = TRUE,
++     omit.table.layout = "n", notes.append = FALSE,
++     type = "text",
++     out = "../../text/tables/firststage-reg-rawcount.tex")
+
+==================================================================
+                              Dependent Variable: State Funding   
+                           ---------------------------------------
+                             (1)       (2)       (3)       (4)    
+------------------------------------------------------------------
+Funding Shift-Share        -1.176    -0.160    -1.100    -1.071   
+                           (0.226)   (0.265)   (0.242)   (0.264)  
+Tuition Revenue                                -0.295     1.012   
+                                               (0.136)   (0.329)  
+Constant                            9,716.437          -1,708.334 
+                                   (1,805.394)         (2,716.150)
+------------------------------------------------------------------
+Uni. + Year fixed effects?   Yes       No        Yes       No     
+F stat.                    20.712    16.512    26.999     0.365   
+Observations               17,012    17,012    17,012    17,012   
+R2                          0.918    0.0004     0.919     0.074   
+==================================================================
+> 
+> 
+> # Faculty Count Regressions, in raw counts -------------------------------------
+> 
+> ## Lecturer faculty Count
+> # Naive OLS Regression
+> naive_lecturer_count.reg <- reg.data %>%
++     mutate(`I(stateappropriations_real/(1000 * enrollment_reported))(fit)` =
++         I(stateappropriations_real/(1000 * enrollment_reported))) %>%
++     felm(lecturer_prof_count ~ 1 +
++         `I(stateappropriations_real/(1000 * enrollment_reported))(fit)` |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_lecturer_count.reg <- reg.data %>%
++     felm(lecturer_prof_count ~ 1 |
++         unitid + year |
++         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
++             I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> 
+> ## assistant professor Count
+> # Naive OLS Regression
+> naive_assistant_count.reg <- reg.data %>%
++     mutate(`I(stateappropriations_real/(1000 * enrollment_reported))(fit)` =
++         I(stateappropriations_real/(1000 * enrollment_reported))) %>%
++     felm(assistant_prof_count ~ 1 +
++         `I(stateappropriations_real/(1000 * enrollment_reported))(fit)` |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_assistant_count.reg <- reg.data %>%
++     felm(assistant_prof_count ~ 1 |
++         unitid + year |
++         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
++             I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> 
+> ## Full professor faculty Count
+> # Naive OLS Regression
+> naive_full_count.reg <- reg.data %>%
++     mutate(`I(stateappropriations_real/(1000 * enrollment_reported))(fit)` =
++         I(stateappropriations_real/(1000 * enrollment_reported))) %>%
++     felm(full_prof_count ~ 1 +
++         `I(stateappropriations_real/(1000 * enrollment_reported))(fit)` |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_full_count.reg <- reg.data %>%
++     felm(full_prof_count ~ 1 |
++         unitid + year |
++         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
++             I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> 
+> ## All faculty Count
+> # Naive OLS Regression
+> naive_all_count.reg <- reg.data %>%
++     mutate(`I(stateappropriations_real/(1000 * enrollment_reported))(fit)` =
++         I(stateappropriations_real/(1000 * enrollment_reported))) %>%
++     felm(all_prof_count ~ 1 +
++         `I(stateappropriations_real/(1000 * enrollment_reported))(fit)` |
++         unitid + year |
++         0 |
++         state + year,
++         data = .)
+> # Shift-share IV Regression, explained by state appropriation shock
+> shiftshare_all_count.reg <- reg.data %>%
++     felm(all_prof_count ~ 1 |
++         unitid + year |
++         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
++             I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> 
+> # Collate the outcome means
+> outcome.means <- list(c("Outcome Mean",
++     # Lecturers
++     reg.data %>% pull(lecturer_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     reg.data %>% pull(lecturer_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     # naive_assistant_count.reg
++     reg.data %>% pull(assistant_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     reg.data %>% pull(assistant_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     # naive_full_count.reg
++     reg.data %>% pull(full_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     reg.data %>% pull(full_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     # naive_all_count.reg
++     reg.data %>% pull(all_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no),
++     reg.data %>% pull(all_prof_count) %>% mean(na.rm = TRUE) %>% round(digits.no)
++ ))
+> 
+> # Collate the results to a LaTeX table
+> stargazer(
++     naive_lecturer_count.reg, shiftshare_lecturer_count.reg,
++     naive_assistant_count.reg, shiftshare_assistant_count.reg,
++     naive_full_count.reg, shiftshare_full_count.reg,
++     naive_all_count.reg, shiftshare_all_count.reg,
++     add.lines = outcome.means,
++     dep.var.caption =
++         "Dependent Variable: Faculty Count per 1,000 Students, by Position",
++     dep.var.labels = c(
++         "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
++     column.labels = rep(c("OLS", "2SLS"), 4),
++     digits = digits.no,
++     digits.extra = digits.no,
++     model.names = FALSE,
++     omit = "factor|count|year",
++     intercept.bottom = TRUE,
++     order = c(2, 1, 3),
++     covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
++     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
++     star.cutoffs = NA,
++     header = FALSE, float = FALSE, no.space = TRUE,
++     omit.table.layout = "n", notes.append = FALSE,
++     type = "text",
++     out = "../../text/tables/facultycount-shock-reg-rawcount.tex")
+
+======================================================================================
+                 Dependent Variable: Faculty Count per 1,000 Students, by Position    
+              ------------------------------------------------------------------------
+                  Lecturers      Asst. Professors   Full Professors     All Faculty   
+                 OLS      2SLS     OLS      2SLS     OLS      2SLS     OLS      2SLS  
+                 (1)      (2)      (3)      (4)      (5)      (6)      (7)      (8)   
+--------------------------------------------------------------------------------------
+State Funding  -0.451    -5.957   -0.479   1.031    -0.104   2.288    -1.198   -3.333 
+               (0.177)  (1.725)  (0.211)  (1.232)  (0.275)  (2.910)  (0.612)  (4.259) 
+--------------------------------------------------------------------------------------
+Outcome Mean   59.253    59.253  116.121  116.121  269.103  269.103  452.507  452.507 
+Observations   17,012    17,012   17,012   17,012   17,012   17,012   17,012   17,012 
+R2              0.742    0.595    0.887    0.881    0.973    0.971    0.954    0.954  
+======================================================================================
+> 
+> # Plot the results.
+> # Estimate with separate names
+> plot_lecturer_count.reg <- reg.data %>%
++     mutate(lect_funding = - (stateappropriations_real / (1000 * enrollment_reported))) %>%
++     felm(lecturer_prof_count ~ 1 |
++         unitid + year |
++         (lect_funding ~ I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> plot_assistant_count.reg <- reg.data %>%
++     mutate(asst_funding = - (stateappropriations_real / (1000 * enrollment_reported))) %>%
++     felm(assistant_prof_count ~ 1 |
++         unitid + year |
++         (asst_funding ~ I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> plot_full_count.reg <- reg.data %>%
++     mutate(full_funding = - (stateappropriations_real / (1000 * enrollment_reported))) %>%
++     felm(full_prof_count ~ 1 |
++         unitid + year |
++         (full_funding ~ I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> plot_all_count.reg <- reg.data %>%
++     mutate(all_funding = - (stateappropriations_real / (1000 * enrollment_reported))) %>%
++     felm(all_prof_count ~ 1 |
++         unitid + year |
++         (all_funding ~ I(-appropriationshock_perEnroll_real)) |
++         state + year,
++         data = .)
+> substitution_rawcount.plot <-
++     jtools::plot_summs(
++         plot_lecturer_count.reg,
++         plot_assistant_count.reg,
++         plot_full_count.reg,
++         plot_all_count.reg,
++         coefs = c(
++             "Lecturers" = "`lect_funding(fit)`",
++             "Asst. Professors" = "`asst_funding(fit)`",
++             "Full Professors" = "`full_funding(fit)`",
++             "All Faculty" = "`all_funding(fit)`"),
++         legend.title = "",
++         plot.distributions = TRUE,
++         inner_ci_level = 0.95) +
++     theme_bw() +
++     theme(
++         #plot.title = element_text(size = rel(1)),
++         plot.margin = unit(c(0.5, 0, 0, 0), "mm"),
++         legend.position = "none",
++         legend.margin = margin(t = -10)) +
++     scale_x_continuous(expand = c(0, 0),
++         name = "IV Estimate",
++         breaks = seq(-14, 14, by = 2))
+Registered S3 methods overwritten by 'broom':
+  method            from  
+  tidy.glht         jtools
+  tidy.summary.glht jtools
+Loading required namespace: broom.mixed
+inner_ci_level is ignored when plot.distributions == TRUE and more than one
+model is used.
+> # Save this plot
+> ggsave("../../text/figures/substitution-rawcount-plot.png",
++     plot = substitution_rawcount.plot,
++     units = "cm", dpi = 300, width = 1.25 * fig.width, height = 0.8 * fig.height)
+> 
+> proc.time()
+   user  system elapsed 
+  7.781   0.227   7.673 

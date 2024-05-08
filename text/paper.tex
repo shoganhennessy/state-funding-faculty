@@ -18,17 +18,6 @@
 \usepackage{booktabs}                                                      % caption graphics + tables (with name in bold)
 \usepackage[labelfont=bf]{caption} 
 \usepackage{subcaption}
-% caption graphics + tables (with name in bold)
-\usepackage{tikz}                                                          % Draw graphs inline, guide: https://sites.google.com/site/kochiuyu/Tikz
-\usetikzlibrary{shapes,decorations,arrows,calc,arrows.meta,fit,positioning}
-\tikzset{
-    -Latex,auto,node distance =1 cm and 1 cm,semithick,
-    state/.style ={ellipse, draw, minimum width = 0.7 cm},
-    point/.style = {circle, draw, inner sep=0.04cm,fill,node contents={}},
-    bidirected/.style={Latex-Latex,dashed},
-    el/.style = {inner sep=2pt, align=left, sloped}
-}
-\usepackage{pgfplots} \pgfplotsset{compat=1.16}                            % Automatic graphing, read https://www.overleaf.com/learn/latex/pgfplots_package for examples
 % Maths + numbers
 \usepackage{mathtools}                                                     % Various maths functions
 \usepackage{amssymb}                                                       % Various maths functions
@@ -112,7 +101,7 @@
 % Empirical results
 \input{sections/05-results.tex}
 % Dicussion
-\input{sections/06-discussion.tex}
+%\input{sections/06-discussion.tex}
 % Conclusion
 \input{sections/07-conclusion.tex}
 % Rev of Econ Ed Statements.

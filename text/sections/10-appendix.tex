@@ -49,7 +49,7 @@ A number of statistical packages, for the $R$ language \citep{R2022}, made the e
     \centering
     \singlespacing
     \caption{Correlation Between State Funding Shift-Share and Public University State Funding in Surrounding Years.}
-    \includegraphics[width=\textwidth]{figures/lag-firststage.png}
+    \includegraphics[width=0.75\textwidth]{figures/lag-firststage.png}
     \label{fig:lag-firststage}
     \justify
     \footnotesize
@@ -273,6 +273,19 @@ These results were produced by integrating the total count of professor hires fo
 
 There were no observable differences in the hiring rate of male vs female faculty.
 
+\begin{figure}[H]
+    \centering
+    \singlespacing
+    \caption{Correlation Between State Funding and Total COunt Professors Hired, 2011--2021.}
+    \includegraphics[width=\textwidth]{figures/hiring-correlation.png}
+    \label{fig:hiring-correlation}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    This figure shows the correlation between total state funding per student and total professors hired, 2010--2021.
+    Funding data are taken from IPEDS, and data on professor hiring  from \cite{wapman2022quantifying,wapman2022zenodo}.
+\end{figure}
+
 \begin{table}[h!]
     \singlespacing
     \centering
@@ -290,7 +303,7 @@ There were no observable differences in the hiring rate of male vs female facult
 \end{table}
 
 \newpage
-\subsection{IPEDS Robustness Checks}
+\subsection{Robustness Checks}
 
 \begin{table}[H]
     \singlespacing
@@ -330,8 +343,11 @@ There were no observable differences in the hiring rate of male vs female facult
     \footnotesize
     \textbf{Note}:
     These tables show the IV estimates of regression specification \eqref{eqn:secondstage}, 
-    in the same manner as \autoref{tab:facultycount-shock-reg}, but restricting to institutions ranked as most selective, selective, and unranked by \cite{barrons2009}.
+    in the same manner as \autoref{tab:facultycount-shock-reg}, but restricting to institutions ranked as most selective, selective, and unranked by \cite{barrons2009} --- and including state
+    The first column presents the coefficient between state funding and shift-share IV, which is a string first-stage among every level of selectivity for public universities.
+    The other columns show the coefficient between state funding the count of faculty per students.
     For example, Row 1 of panel B shows that a $10\%$ cut in the state shift-share leads to a fall of $9.44\%$ in state funding for the public universities ranked as ``most selective.''
+    Standard errors for the coefficient estimates are in brackets, and the outcome mean are in square brackets beneath.
 \end{table}
 
 \begin{table}[H]

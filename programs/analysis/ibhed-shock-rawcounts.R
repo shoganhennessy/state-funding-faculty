@@ -234,6 +234,8 @@ firststage_raw.fstat <-
     nth(2) %>%
     as.numeric() %>%
     round(digits.no)
+# Show that the first stage, and its strength
+summary(firststage_raw.reg)
 
 ## Lecturer faculty Count
 # Naive OLS Regression
@@ -242,14 +244,14 @@ naive_lecturer_count.reg <- institutional.data %>%
         stateappropriations_real / (1000 * enrollment_reported)) %>%
     felm(lecturer_prof_count ~ 1 +
         `I(stateappropriations_real/(1000 * enrollment_reported))(fit)` |
-        unitid |
+        unitid + year |
         0 |
         unitid + year,
         data = .)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_lecturer_count.reg <- institutional.data %>%
     felm(lecturer_prof_count ~ 1 |
-        unitid |
+        unitid + year |
         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
             I(-appropriationshock_perEnroll_real)) |
         unitid + year,
@@ -262,14 +264,14 @@ naive_assistant_count.reg <- institutional.data %>%
         stateappropriations_real / (1000 * enrollment_reported)) %>%
     felm(assistant_prof_count ~ 1 +
         `I(stateappropriations_real/(1000 * enrollment_reported))(fit)` |
-        unitid |
+        unitid + year |
         0 |
         unitid + year,
         data = .)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_assistant_count.reg <- institutional.data %>%
     felm(assistant_prof_count ~ 1 |
-        unitid |
+        unitid + year |
         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
             I(-appropriationshock_perEnroll_real)) |
         unitid + year,
@@ -282,14 +284,14 @@ naive_full_count.reg <- institutional.data %>%
         stateappropriations_real / (1000 * enrollment_reported)) %>%
     felm(full_prof_count ~ 1 +
         `I(stateappropriations_real/(1000 * enrollment_reported))(fit)` |
-        unitid |
+        unitid + year |
         0 |
         unitid + year,
         data = .)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_full_count.reg <- institutional.data %>%
     felm(full_prof_count ~ 1 |
-        unitid |
+        unitid + year |
         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
             I(-appropriationshock_perEnroll_real)) |
         unitid + year,
@@ -302,14 +304,14 @@ naive_all_count.reg <- institutional.data %>%
         stateappropriations_real / (1000 * enrollment_reported)) %>%
     felm(all_prof_count ~ 1 +
         `I(stateappropriations_real/(1000 * enrollment_reported))(fit)` |
-        unitid |
+        unitid + year |
         0 |
         unitid + year,
         data = .)
 # Shift-share IV Regression, explained by state appropriation shock
 shiftshare_all_count.reg <- institutional.data %>%
     felm(all_prof_count ~ 1 |
-        unitid |
+        unitid + year |
         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
             I(-appropriationshock_perEnroll_real)) |
         unitid + year,
@@ -339,7 +341,8 @@ stargazer(
     naive_all_count.reg, shiftshare_all_count.reg,
     add.lines = outcome.means,
     dep.var.caption = "Dependent Variable: Employment Count by Professor Group",
-    dep.var.labels = c("Lecturer", "Assistant", "Full", "All"),
+    dep.var.labels = c(
+        "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
     column.labels = rep(c("OLS", "2SLS"), 4),
     digits = digits.no,
     digits.extra = digits.no,
@@ -366,7 +369,7 @@ naive_lecturer_hires.reg <- institutional.data %>%
         stateappropriations_real / (1000 * enrollment_reported)) %>%
     felm(lecturer_prof_hires ~ 1 +
         `I(stateappropriations_real/(1000 * enrollment_reported))(fit)` |
-        unitid |
+        unitid + year |
         0 |
         unitid + year,
         data = .)
@@ -374,7 +377,7 @@ naive_lecturer_hires.reg <- institutional.data %>%
 shiftshare_lecturer_hires.reg <- institutional.data %>%
     filter(lecturer_prof_hires > 0) %>%
     felm(lecturer_prof_hires ~ 1 |
-        unitid |
+        unitid + year |
         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
             I(-appropriationshock_perEnroll_real)) |
         unitid + year,
@@ -388,7 +391,7 @@ naive_assistant_hires.reg <- institutional.data %>%
         stateappropriations_real / (1000 * enrollment_reported)) %>%
     felm(assistant_prof_hires ~ 1 +
         `I(stateappropriations_real/(1000 * enrollment_reported))(fit)` |
-        unitid |
+        unitid + year |
         0 |
         unitid + year,
         data = .)
@@ -396,7 +399,7 @@ naive_assistant_hires.reg <- institutional.data %>%
 shiftshare_assistant_hires.reg <- institutional.data %>%
     filter(assistant_prof_hires > 0) %>%
     felm(assistant_prof_hires ~ 1 |
-        unitid |
+        unitid + year |
         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
             I(-appropriationshock_perEnroll_real)) |
         unitid + year,
@@ -410,7 +413,7 @@ naive_full_hires.reg <- institutional.data %>%
         stateappropriations_real / (1000 * enrollment_reported)) %>%
     felm(full_prof_hires ~ 1 +
         `I(stateappropriations_real/(1000 * enrollment_reported))(fit)` |
-        unitid |
+        unitid + year |
         0 |
         unitid + year,
         data = .)
@@ -418,7 +421,7 @@ naive_full_hires.reg <- institutional.data %>%
 shiftshare_full_hires.reg <- institutional.data %>%
     filter(full_prof_hires > 0) %>%
     felm(full_prof_hires ~ 1 |
-        unitid |
+        unitid + year |
         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
             I(-appropriationshock_perEnroll_real)) |
         unitid + year,
@@ -432,7 +435,7 @@ naive_all_hires.reg <- institutional.data %>%
         stateappropriations_real / (1000 * enrollment_reported)) %>%
     felm(all_prof_hires ~ 1 +
         `I(stateappropriations_real/(1000 * enrollment_reported))(fit)` |
-        unitid |
+        unitid + year |
         0 |
         unitid + year,
         data = .)
@@ -440,7 +443,7 @@ naive_all_hires.reg <- institutional.data %>%
 shiftshare_all_hires.reg <- institutional.data %>%
     filter(all_prof_hires > 0) %>%
     felm(all_prof_hires ~ 1 |
-        unitid |
+        unitid + year |
         (I(stateappropriations_real / (1000 * enrollment_reported)) ~
             I(-appropriationshock_perEnroll_real)) |
         unitid + year,
@@ -470,7 +473,8 @@ stargazer(
     naive_all_hires.reg, shiftshare_all_hires.reg,
     add.lines = outcome.means,
     dep.var.caption = "Dependent Variable: Yearly New Hires by Professor Group",
-    dep.var.labels = c("Lecturer", "Assistant", "Full", "All"),
+    dep.var.labels = c(
+        "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
     column.labels = rep(c("OLS", "2SLS"), 4),
     digits = digits.no,
     digits.extra = digits.no,

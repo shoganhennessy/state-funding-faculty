@@ -305,7 +305,7 @@ stargazer(
     model.names = FALSE,
     omit = "factor|count|year",
     intercept.bottom = TRUE,
-    covariate.labels = c("Appropriations Shock", "Tuition Revenue", "Constant"),
+    covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
     omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq", "f"),
     add.lines = list(
         c("Fixed effects?", "Yes", "No", "Yes", "No"),
