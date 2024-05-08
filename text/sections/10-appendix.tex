@@ -49,7 +49,7 @@ A number of statistical packages, for the $R$ language \citep{R2022}, made the e
     \centering
     \singlespacing
     \caption{Correlation Between State Funding Shift-Share and Public University State Funding in Surrounding Years.}
-    \includegraphics[width=0.75\textwidth]{figures/lag-firststage.png}
+    \includegraphics[width=\textwidth]{figures/lag-firststage.png}
     \label{fig:lag-firststage}
     \justify
     \footnotesize
@@ -246,6 +246,8 @@ We then interpret parameter $\beta$ as the effect of changes in state funding at
 \label{sec:appendix-hiring}
 
 These results were produced by integrating the total count of professor hires for 2010--2021 for the top-ranked 180 US universities with a sum of the funding variables, and then estimating the models specified in \autoref{sec:iv-model-uni}.
+There were no observable differences in the hiring rate of male versus female faculty.
+
 \begin{table}[H]
     \singlespacing
     \centering
@@ -259,6 +261,7 @@ These results were produced by integrating the total count of professor hires fo
     
     \makebox[\textwidth][c]{\input{tables/facultyhires-illinois-reg-fte.tex}}
     \label{tab:facultyhires-illinois-reg}
+    \vspace{-0.5cm}
     \justify
     \footnotesize
     \textbf{Note}:
@@ -271,13 +274,12 @@ These results were produced by integrating the total count of professor hires fo
     Standard errors are clustered at the university-year level, and university $+$ year fixed effects are included through--out.
 \end{table}
 
-There were no observable differences in the hiring rate of male vs female faculty.
-
+\vspace{-0.5cm}
 \begin{figure}[H]
     \centering
     \singlespacing
-    \caption{Correlation Between State Funding and Total COunt Professors Hired, 2011--2021.}
-    \includegraphics[width=\textwidth]{figures/hiring-correlation.png}
+    \caption{Correlation Between State Funding and Total Count Professors Hired, 2011--2021.}
+    \includegraphics[width=0.75\textwidth]{figures/hiring-correlation.png}
     \label{fig:hiring-correlation}
     \justify
     \footnotesize
