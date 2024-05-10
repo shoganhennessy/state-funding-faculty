@@ -42,3 +42,6 @@ cd ../text
 latexmk -pdf paper.tex
 latexmk -c
 cp paper.pdf ../state-funding-faculty-2024.pdf
+# Put the most recent presentation into the main folder.
+cd ../presentation
+cp presentation.pdf ../state-funding-faculty-presentation.pdf

@@ -93,30 +93,33 @@ This means that effects on faculty hiring were likely the main mechanism for how
 
 \subsection{Robustness Checks}
 \label{sec:results-robustness}
-It is possible that the identification startegy is not robust to other possible confounders.
-For example, it is possible that selective institutions received less funding for other reasons, or states with lower performing insitutions or declining populations strategically limited funding for less selective universities.
-I address these main concerns with a number of different analyses.
+It is possible that the identification strategy is not robust to some possible confounders.
+For example, it is possible that selective institutions received less funding for other reasons, or states with lower performing institutions or declining populations strategically limited funding for less selective universities.
+I address these main concerns with three different analyses.
 
 First, I re-estimate the primary results from \autoref{sec:results-ipeds} with additional controls for university selectivity.
-To be specific, I estimate \autoref{eqn:secondstage} with controls added for the base share of state funding, average acceptance rate and 6-year completion rate  in 2004--2006, tuition revenue, total enrolment, size of state enrolment, size of university enrolment relative to the rest of the state.
+Specifically, I estimate \autoref{eqn:secondstage} with controls added for the base share of state funding, average acceptance rate and 6-year completion rate  in 2004--2006, tuition revenue, total enrolment, size of state enrolment, size of university enrolment relative to the rest of the state.
 Measures of selectivity are only available in certain years, so I use these values across the entire panel.
-This means that insitution fixed effects would over-identify the system, so I estimate with state $+$ year fixed effects (not intituion $+$ year fixed effects).
+This means that institution fixed effects would over-identify the system, so I estimate with state $+$ year fixed effects (not institution $+$ year fixed effects).
 In this way, this model also works as an alternative specification test.
-Additionally, this analysis uses the enrolment measure of full-time equivalent (FTE), and not reported enolment as in the original analysis.
-The first-stage is strong of the same order as the orginal analysis (\autoref{tab:firststage-robustness-checks}).
+Additionally, this analysis uses the enrolment measure of full-time equivalent (FTE), and not reported enrolment as in the original analysis.
+The first-stage is strong of the same order as the original analysis (\autoref{tab:firststage-robustness-checks}).
 The relationship between state funding, in both raw count terms and log units, are roughly the same as for the main analysis (\autoref{tab:facultycount-robustness-checks}, \ref{tab:facultycount-rawcount-robustness-checks}), despite the multiple specification changes, additional controls, and different measures for enrolment.
 
 Secondly, I return to the primary specification in \autoref{eqn:secondstage}, and estimate effect of state funding cuts on faculty counts separately among universities of different selectivity rates.
 This investigates whether results are consistent across different levels of selectivity, and whether less selective universities have unreasonably high estimates for substitution --- as would be the case if selectivity was an unaddressed confounder.
 \autoref{tab:facultycount-heterogeneity} collects these results together, separated by the \cite{barrons2009} selectivity rankings.
-Barrons rank 1-2 are the most selective (including e.g., UC Berkeley and  Berkeley and SUNY Binghamton), 3-4 selective (including e.g., Clemson University and University of Dallas), and rank 5 for the rest of universities.
+Barrons rank 1-2 are the most selective (including e.g., UC Berkeley and SUNY Binghamton), 3-4 selective (including e.g., Clemson University and University of Dallas), and rank 5 for the rest of universities.
 The first-stage is string in every group of universities, even the most selective group which is only 12 universities, the selective group which is 28, and the rest are 762 universities.
 Faculty substitution rates are not very string among the most selective universities, but are very similar between selective universities and unranked universities, showing that even selective public universities exhibit the substitution towards lecturers.
 
-The final robustness check I employ is a falsification test, testing whether the effects for public universities would be picked up among the sample of private universities (as in \citealt{NBERw27885}).
-Private universities do not rely on state funding in the same that public universities do, though they in some states do receive some state funding for projects and other smaller scale operating costs.
-Given this low reliance, it is unclear how state-wide funding shifts would affect faculty outcomes, and thus we would expect the two to be unrelated.
-If they were related, this would be evidence that the IV model picks up otherwise concurrent trends in higher education, unrelated to stagnating state funding for public universities.
-To impute a base share of reliance on state funding, I assign private universities the average reliance on state funding in the base period of universities in the same state with the same Barron's selectivity ranking, and then compute the shift-share instrument from this value.
-\autoref{tab:facultycount-shock-private-robustness} shows that the first-stage is not strong among private universities, and the IV results are significant for any faculty count.
-Notably, the OLS results for correlation between state funding and professor are highly statistically significant, showing that more funding is related to more lecturers and faculty in general, though the IV analysis shows that these relationships are spurious among private universities.
+The final robustness check I employ is a falsification test, testing whether the effects for public universities would be picked up among a sample of private universities.
+Private universities do not rely on state funding in the same that public universities do,\footnote{
+    Though private universities do receive some state funding, as some states fund for project at private universities and other smaller scale operating costs.
+}
+so we would expect state funding to not affect their faculty counts.
+If the state funding and faculty counts were related among private universities, this would be evidence that the IV model picks up otherwise concurrent trends in higher education, unrelated to stagnating state funding for public universities.
+To impute a base share of reliance on state funding, I assign private universities the average reliance on state funding in the base period of universities in the same state with the same Barrons selectivity ranking, and then compute the shift-share instrument from this value.
+\autoref{tab:facultycount-shock-private-robustness} shows that the first-stage is not strong among private universities; despite this, the IV results are still not significant for any faculty count, showing that state funding is not related to private universities' faculty counts.
+Notably, the OLS results for correlation between state funding and professor are highly statistically significant, showing that more funding is positively correlated with count of lecturers and total faculty.
+The IV estimates show that these relationships are spurious, and that the two are not causally related among private universities, validating the approach for public universities.
