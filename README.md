@@ -1,6 +1,6 @@
 # Less Funding, More Lecturers, and Fewer Professors
 
-Senan Hogan-Hennessy, latest revision: 3 January 2024
+Senan Hogan-Hennessy, latest revision: 10 May 2024
 
 ## Stagnating State Funding for Higher Education and its Effect on Faculty at US Universities
 
@@ -13,6 +13,7 @@ Incumbent professors' salaries, promotion rates, and quit rates at Illinois univ
 Stagnating state funding impacts public universities and faculty, likely contributing to the deterioration of student outcomes at public universities since the 1990s.
 
 - [state-funding-faculty-2024.pdf](https://github.com/shoganhennessy/state-funding-faculty/blob/main/state-funding-faculty-2024.pdf) is the latest version of the working paper.
+- [state-funding-faculty-presentation.pdf](https://github.com/shoganhennessy/state-funding-faculty/blob/main/state-funding-faculty-presentation.pdf) is the latest version of the associated slides.
 
 
 ## Replication
