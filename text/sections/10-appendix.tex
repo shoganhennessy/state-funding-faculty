@@ -74,6 +74,27 @@ A number of statistical packages, for the $R$ language \citep{R2022}, made the e
     Standard errors are clustered at the state-year level.
 \end{figure}
 
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{Effect of State Funding on Areas of University Spending, IPEDS Data, IV Estimates.}
+    \textbf{Panel A: units in \$ per student}
+     
+    \makebox[\textwidth][c]{\input{tables/expenditures-shock-rawcount.tex}}
+    
+    \textbf{Panel B: units in log \$ per student}
+    
+    \makebox[\textwidth][c]{\input{tables/expenditures-shock-reg-fte.tex}}
+    
+    \label{tab:expenditures-shock-reg}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These tables show the IV estimates of regression specification \eqref{eqn:secondstage}, showing the effect of state funding (instrumented with the shift-share) on areas of university spending.
+    Outcomes are measured in \$ student spending, so that the estimates representat the relationship between a \$1 increase in state funding on area of spending (or 1\% increase).    
+    The ``outcome mean'' rows are spending in thousands \$ per student.
+\end{table}
+
 \newpage
 \subsection{Illinois IBHED First Stage}
 \label{sec:iv-model-indiv}
@@ -106,7 +127,7 @@ The formulation here takes as given that the professor is already employed at th
     
     \makebox[\textwidth][c]{\input{tables/firststage-reg-rawcount.tex}}
     
-    \textbf{Panel A: units in log \$ per student}
+    \textbf{Panel B: units in log \$ per student}
     
     \makebox[\textwidth][c]{\input{tables/firststage-illinois.tex}}
     

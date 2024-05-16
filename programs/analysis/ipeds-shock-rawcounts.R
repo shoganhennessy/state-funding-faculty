@@ -82,11 +82,17 @@ reg.data <- ipeds.data %>%
         all_profmeansalary_real,
         # Total paid on professor salaries
         all_profoutlays_real,
-        # Research and instruction expenditures.
+        # Research and instruction and other expenditures.
         instructionspending_total_real,
         instructionspending_salaries_real,
         researchspending_total_real,
         researchspending_salaries_real,
+        exp_pub_serv_real,
+        exp_student_serv_real,
+        exp_acad_supp_real,
+        exp_inst_supp_real,
+        exp_opm_areal,
+        exp_net_grant_aid_real,
         nonauxspending_real)
 
 
@@ -388,3 +394,294 @@ substitution_rawcount.plot <-
 ggsave("../../text/figures/substitution-rawcount-plot.png",
     plot = substitution_rawcount.plot,
     units = "cm", dpi = 300, width = 1.25 * fig.width, height = 0.8 * fig.height)
+
+
+# Research + Instruction Spending Regressions ----------------------------------
+
+# Restrict to spending data with no missings
+spending.data <- reg.data %>%
+    filter(nonauxspending_real > 0)
+
+## Total instruction spending.
+# Naive OLS Regression
+naive_instruction_spending.reg <- spending.data %>%
+    mutate(`I(stateappropriations_real/(enrollment_reported))(fit)` =
+        I(stateappropriations_real/(enrollment_reported))) %>%
+    felm(I(instructionspending_total_real / enrollment_reported) ~ 1 +
+        `I(stateappropriations_real/(enrollment_reported))(fit)` |
+        unitid + year |
+        0 |
+        unitid + year,
+        data = .)
+# Shift-share IV Regression, explained by state appropriation shock
+shiftshare_instruction_spending.reg <- spending.data %>%
+    felm(I(instructionspending_total_real / enrollment_reported) ~ 1 |
+        unitid + year |
+        (I(stateappropriations_real / (enrollment_reported)) ~
+            I(-appropriationshock_perEnroll_real)) |
+        unitid + year,
+        data = .)
+
+## Total research spending.
+# Naive OLS Regression
+naive_research_spending.reg <- spending.data %>%
+    filter(researchspending_total_real > 0) %>%
+    mutate(`I(stateappropriations_real/(enrollment_reported))(fit)` =
+        I(stateappropriations_real/(enrollment_reported))) %>%
+    felm(I(researchspending_total_real / enrollment_reported) ~ 1 +
+        `I(stateappropriations_real/(enrollment_reported))(fit)` |
+        unitid + year |
+        0 |
+        unitid + year,
+        data = .)
+# Shift-share IV Regression, explained by state appropriation shock
+shiftshare_research_spending.reg <- spending.data %>%
+    filter(researchspending_total_real > 0) %>%
+    felm(I(researchspending_total_real / enrollment_reported) ~ 1 |
+        unitid + year |
+        (I(stateappropriations_real / (enrollment_reported)) ~
+            I(-appropriationshock_perEnroll_real)) |
+        unitid + year,
+        data = .)
+
+## Public service spending.
+# Naive OLS Regression
+naive_pub_serv_spending.reg <- spending.data %>%
+    filter(exp_pub_serv_real > 0) %>%
+    mutate(`I(stateappropriations_real/(enrollment_reported))(fit)` =
+        I(stateappropriations_real/(enrollment_reported))) %>%
+    felm(I(exp_pub_serv_real / enrollment_reported) ~ 1 +
+        `I(stateappropriations_real/(enrollment_reported))(fit)` |
+        unitid + year |
+        0 |
+        unitid + year,
+        data = .)
+# Shift-share IV Regression, explained by state appropriation shock
+shiftshare_pub_serv_spending.reg <- spending.data %>%
+    filter(exp_pub_serv_real > 0) %>%
+    felm(I(exp_pub_serv_real / enrollment_reported) ~ 1 |
+        unitid + year |
+        (I(stateappropriations_real / (enrollment_reported)) ~
+            I(-appropriationshock_perEnroll_real)) |
+        unitid + year,
+        data = .)
+
+## Student services spending.
+# Naive OLS Regression
+naive_student_serv_spending.reg <- spending.data %>%
+    mutate(`I(stateappropriations_real/(enrollment_reported))(fit)` =
+        I(stateappropriations_real/(enrollment_reported))) %>%
+    felm(I(exp_student_serv_real / enrollment_reported) ~ 1 +
+        `I(stateappropriations_real/(enrollment_reported))(fit)` |
+        unitid + year |
+        0 |
+        unitid + year,
+        data = .)
+# Shift-share IV Regression, explained by state appropriation shock
+shiftshare_student_serv_spending.reg <- spending.data %>%
+    felm(I(exp_student_serv_real / enrollment_reported) ~ 1 |
+        unitid + year |
+        (I(stateappropriations_real / (enrollment_reported)) ~
+            I(-appropriationshock_perEnroll_real)) |
+        unitid + year,
+        data = .)
+
+## Academic support spending.
+# Naive OLS Regression
+naive_acad_supp_spending.reg <- spending.data %>%
+    mutate(`I(stateappropriations_real/(enrollment_reported))(fit)` =
+        I(stateappropriations_real/(enrollment_reported))) %>%
+    felm(I(exp_acad_supp_real / enrollment_reported) ~ 1 +
+        `I(stateappropriations_real/(enrollment_reported))(fit)` |
+        unitid + year |
+        0 |
+        unitid + year,
+        data = .)
+# Shift-share IV Regression, explained by state appropriation shock
+shiftshare_acad_supp_spending.reg <- spending.data %>%
+    felm(I(exp_acad_supp_real / enrollment_reported) ~ 1 |
+        unitid + year |
+        (I(stateappropriations_real / (enrollment_reported)) ~
+            I(-appropriationshock_perEnroll_real)) |
+        unitid + year,
+        data = .)
+
+## Institutional support spending.
+# Naive OLS Regression
+naive_inst_supp_spending.reg <- spending.data %>%
+    mutate(`I(stateappropriations_real/(enrollment_reported))(fit)` =
+        I(stateappropriations_real/(enrollment_reported))) %>%
+    felm(I(exp_inst_supp_real / enrollment_reported) ~ 1 +
+        `I(stateappropriations_real/(enrollment_reported))(fit)` |
+        unitid + year |
+        0 |
+        unitid + year,
+        data = .)
+# Shift-share IV Regression, explained by state appropriation shock
+shiftshare_inst_supp_spending.reg <- spending.data %>%
+    felm(I(exp_inst_supp_real / enrollment_reported) ~ 1 |
+        unitid + year |
+        (I(stateappropriations_real / (enrollment_reported)) ~
+            I(-appropriationshock_perEnroll_real)) |
+        unitid + year,
+        data = .)
+
+## Operations spending.
+# Naive OLS Regression
+naive_opm_spending.reg <- spending.data %>%
+    filter(exp_opm_areal > 0) %>%
+    mutate(`I(stateappropriations_real/(enrollment_reported))(fit)` =
+        I(stateappropriations_real/(enrollment_reported))) %>%
+    felm(I(exp_opm_areal / enrollment_reported) ~ 1 +
+        `I(stateappropriations_real/(enrollment_reported))(fit)` |
+        unitid + year |
+        0 |
+        unitid + year,
+        data = .)
+# Shift-share IV Regression, explained by state appropriation shock
+shiftshare_opm_spending.reg <- spending.data %>%
+    filter(exp_opm_areal > 0) %>%
+    felm(I(exp_opm_areal / enrollment_reported) ~ 1 |
+        unitid + year |
+        (I(stateappropriations_real / (enrollment_reported)) ~
+            I(-appropriationshock_perEnroll_real)) |
+        unitid + year,
+        data = .)
+
+## Grant + aid spending
+# Naive OLS Regression
+naive_grant_aid_spending.reg <- spending.data %>%
+    filter(exp_net_grant_aid_real > 0) %>%
+    mutate(`I(stateappropriations_real/(enrollment_reported))(fit)` =
+        I(stateappropriations_real/(enrollment_reported))) %>%
+    felm(I(exp_net_grant_aid_real / enrollment_reported) ~ 1 +
+        `I(stateappropriations_real/(enrollment_reported))(fit)` |
+        unitid + year |
+        0 |
+        unitid + year,
+        data = .)
+# Shift-share IV Regression, explained by state appropriation shock
+shiftshare_grant_aid_spending.reg <- spending.data %>%
+    filter(exp_net_grant_aid_real > 0) %>%
+    felm(I(exp_net_grant_aid_real / enrollment_reported) ~ 1 |
+        unitid + year |
+        (I(stateappropriations_real / (enrollment_reported)) ~
+            I(-appropriationshock_perEnroll_real)) |
+        unitid + year,
+        data = .)
+
+## Total non-operating spending.
+# Naive OLS Regression
+naive_nonaux_spending.reg <- spending.data %>%
+    mutate(`I(stateappropriations_real/(enrollment_reported))(fit)` =
+        I(stateappropriations_real/(enrollment_reported))) %>%
+    felm(I(nonauxspending_real / enrollment_reported) ~ 1 +
+        `I(stateappropriations_real/(enrollment_reported))(fit)` |
+        unitid + year |
+        0 |
+        unitid + year,
+        data = .)
+# Shift-share IV Regression, explained by state appropriation shock
+shiftshare_nonaux_spending.reg <- spending.data %>%
+    felm(I(nonauxspending_real / enrollment_reported) ~ 1 |
+        unitid + year |
+        (I(stateappropriations_real / (enrollment_reported)) ~
+            I(-appropriationshock_perEnroll_real)) |
+        unitid + year,
+        data = .)
+
+## Tuition revenue.
+# Naive OLS Regression
+naive_tuition_rev.reg <- spending.data %>%
+    mutate(`I(stateappropriations_real/(enrollment_reported))(fit)` =
+        I(stateappropriations_real/(enrollment_reported))) %>%
+    felm(I(tuitionrev_real / enrollment_reported) ~ 1 +
+        `I(stateappropriations_real/(enrollment_reported))(fit)` |
+        unitid + year |
+        0 |
+        unitid + year,
+        data = .)
+# Shift-share IV Regression, explained by state appropriation shock
+shiftshare_tuition_rev.reg <- spending.data %>%
+    felm(I(tuitionrev_real / enrollment_reported) ~ 1 |
+        unitid + year |
+        (I(stateappropriations_real / (enrollment_reported)) ~
+            I(-appropriationshock_perEnroll_real)) |
+        unitid + year,
+        data = .)
+
+# Collate the outcome means
+outcome.means <- list(c("Outcome Mean",
+    spending.data %>% mutate(instructionspending_total_real = (instructionspending_total_real / 10^3) /  enrollment_reported) %>% pull(instructionspending_total_real) %>% mean(na.rm = TRUE) %>% round(digits.no),
+    spending.data %>% mutate(researchspending_total_real = (researchspending_total_real / 10^3) /  enrollment_reported) %>% pull(researchspending_total_real)  %>% mean(na.rm = TRUE) %>% round(digits.no),
+    spending.data %>% mutate(exp_pub_serv_real = (exp_pub_serv_real / 10^3) /  enrollment_reported) %>% pull(exp_pub_serv_real) %>% mean(na.rm = TRUE) %>% round(digits.no),
+    spending.data %>% mutate(exp_student_serv_real = (exp_student_serv_real / 10^3) /  enrollment_reported) %>% pull(exp_student_serv_real) %>% mean(na.rm = TRUE) %>% round(digits.no),
+    spending.data %>% mutate(exp_acad_supp_real = (exp_acad_supp_real / 10^3) /  enrollment_reported) %>% pull(exp_acad_supp_real) %>% mean(na.rm = TRUE) %>% round(digits.no),
+    spending.data %>% mutate(exp_inst_supp_real = (exp_inst_supp_real / 10^3) /  enrollment_reported) %>% pull(exp_inst_supp_real) %>% mean(na.rm = TRUE) %>% round(digits.no),
+    spending.data %>% mutate(exp_opm_areal = (exp_opm_areal / 10^3) /  enrollment_reported) %>% pull(exp_opm_areal) %>% mean(na.rm = TRUE) %>% round(digits.no),
+    spending.data %>% mutate(exp_net_grant_aid_real = (exp_net_grant_aid_real / 10^3) /  enrollment_reported) %>% pull(exp_net_grant_aid_real) %>% mean(na.rm = TRUE) %>% round(digits.no),
+    spending.data %>% mutate(nonauxspending_real = (nonauxspending_real / 10^3) /  enrollment_reported) %>% pull(nonauxspending_real) %>% mean(na.rm = TRUE) %>% round(digits.no),
+    spending.data %>% mutate(tuitionrev_real = (tuitionrev_real / 10^3) /  enrollment_reported) %>% pull(tuitionrev_real) %>% mean(na.rm = TRUE) %>% round(digits.no))
+)
+
+# Collate the results to a LaTeX table
+stargazer(
+    # naive_instruction_spending.reg,
+    shiftshare_instruction_spending.reg,
+    # naive_research_spending.reg,
+    shiftshare_research_spending.reg,
+    # naive_pub_serv_spending.reg,
+    shiftshare_pub_serv_spending.reg,
+    # naive_student_serv_spending.reg,
+    shiftshare_student_serv_spending.reg,
+    # naive_acad_supp_spending.reg,
+    shiftshare_acad_supp_spending.reg,
+    # naive_inst_supp_spending.reg,
+    shiftshare_inst_supp_spending.reg,
+    # naive_opm_spending.reg,
+    shiftshare_opm_spending.reg,
+    # naive_grant_aid_spending.reg,
+    shiftshare_grant_aid_spending.reg,
+    # naive_nonaux_spending.reg,
+    shiftshare_nonaux_spending.reg,
+    # naive_tuition_rev.reg,
+    shiftshare_tuition_rev.reg,
+    add.lines = outcome.means,
+    dep.var.caption = "Dependent Variable: University Spending",
+    dep.var.labels = c(
+        #"Instruction",
+        #"Research",
+        #"Public Service",
+        #"Student Services",
+        #"Academic Support",
+        #"Inst. Support",
+        #"Operations",
+        #"Grant Aid",
+        #"Tuition Revenue",
+        #"All Spending",
+        #"Tuition Revenue"),
+        "\\multirow{2}{1.1cm}{Instruction}",
+        "\\multirow{2}{1cm}{Research}",
+        "\\multirow{2}{0.8cm}{Public \\\\ Service}",
+        "\\multirow{2}{1cm}{Student \\\\ Services}",
+        "\\multirow{2}{1cm}{Academic \\\\ Support}",
+        "\\multirow{2}{1cm}{Inst. \\\\ Support}",
+        "\\multirow{2}{1cm}{Operations}",
+        "\\multirow{2}{1cm}{Grant \\\\ Aid}",
+        "\\multirow{2}{1cm}{All \\\\ Spending}",
+        "\\multirow{2}{1cm}{Tuition \\\\ Revenue} \\\\"),
+    digits = digits.no,
+    digits.extra = digits.no,
+    model.names = FALSE,
+    model.numbers = FALSE,
+    omit = "factor|count|year",
+    intercept.bottom = TRUE,
+    order = c(2, 1, 3),
+    covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
+    omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
+    star.cutoffs = NA,
+    header = FALSE, float = FALSE, no.space = TRUE,
+    omit.table.layout = "n", notes.append = FALSE,
+    type = "text",
+    out = "../../text/tables/expenditures-shock-rawcount.tex")
+

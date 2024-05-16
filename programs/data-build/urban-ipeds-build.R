@@ -133,7 +133,8 @@ finance.data <- finance.data %>%
             is.na(exp_total_opm) | exp_total_opm < 0, NA) / cpi2021,
         exp_net_grant_aid_real = replace(exp_net_grant_aid_total,
             is.na(exp_net_grant_aid_total) | exp_net_grant_aid_total < 0, NA) / cpi2021,
-        nonauxspending_real = (exp_instruc_real +
+        nonauxspending_real = (
+            exp_instruc_real +
             exp_research_real +
             exp_pub_serv_real +
             exp_student_serv_real +

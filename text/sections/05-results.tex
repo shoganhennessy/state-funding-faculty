@@ -25,6 +25,15 @@ The university--years in the lowest 20\% of the instrument distribution have mor
 On the other hand, the measures of selectivity (acceptance rate, 6--year graduation rate) are not substantially different across the distribution of the instrument.
 This allays concerns that state-wide shifts in state funding are targetted more towards less selective universities (a possible confounder), and supports use of the shift-share IV empirical design.
 
+Do state funding cuts meaningfully affect universities?
+While the shift-share performs well in predicting state funding (i.e., a strong instrument), it could be the case that universities are not affected.
+For expample, universities can respond to funding cuts by charging higher tuition fees; it could be the case that this entirely off-sets funding cuts, leading to no effects on the university.
+I estimate the IV model on IPEDS data for areas of university spending  (\autoref{tab:expenditures-shock-reg}).
+This exercise gauges the effects of state funding on areas of university spending to guage whether the first stage is economically meaningful, and to see which areas of higher education operations are affected by state funding cuts.
+Following a state funding cut, universities spend less on instruction, student services, operations, and grant aid.
+Additionally, they charge higher tuition fees, though this rise is at most a quarter of the state funding cut, so does not anywhere near off-set state funding cuts.
+These results are in line with previous work showing state funding cuts (or limits) reduce student-focused spending \citep{NBERw23736}, financial aid \citep{miller2022making}, and lead to increased tuition fees \citep{bound2019public}.
+
 \subsection{University Level, IPEDS}
 \label{sec:results-ipeds}
 Funding cuts lead to measurable changes in the number of faculty at US public universities.
@@ -121,5 +130,5 @@ so we would expect state funding to not affect their faculty counts.
 If the state funding and faculty counts were related among private universities, this would be evidence that the IV model picks up otherwise concurrent trends in higher education, unrelated to stagnating state funding for public universities.
 To impute a base share of reliance on state funding, I assign private universities the average reliance on state funding in the base period of universities in the same state with the same Barrons selectivity ranking, and then compute the shift-share instrument from this value.
 \autoref{tab:facultycount-shock-private-robustness} shows that the first-stage is not strong among private universities; despite this, the IV results are still not significant for any faculty count, showing that state funding is not related to private universities' faculty counts.
-Notably, the OLS results for correlation between state funding and professor are highly statistically significant, showing that more funding is positively correlated with count of lecturers and total faculty.
-The IV estimates show that these relationships are spurious, and that the two are not causally related among private universities, validating the approach for public universities.
+The OLS columns show that per student state funding is highly correlated with lecturer and professor counts at private universities.
+The IV estimates show that these correlations are not causal relationships, validating the approach for inference on public universities' faculty counts.
