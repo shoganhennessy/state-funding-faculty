@@ -28,22 +28,22 @@ IPEDS reports the count of professors employed by position.\footnote{
     For these reasons I do not further analyse IPEDS salary data, and use salary data from IBHED to analyse faculty salaries.
     Notably, IPEDS data on faculty counts do not suffer from these problems.
 }
-This gives a resulting panel data-set, where each row represents a university-year, and includes columns for university funding and tuition revenue, plus total count\footnote{
-    Real salary is computed by scaling nominal salary to 2021 dollars by the CPI-U.
-} for each faculty position (lecturer, assistant professor, tenured professor, and total faculty), and other university characteristics.
+This gives a resulting panel data-set, where each row represents a university-year, and includes columns for university funding and tuition revenue, plus total count for each faculty position (lecturer, assistant professor, tenured professor, and total faculty), and other university characteristics.
 \autoref{tab:ipeds-summary} presents summary statistics for these variables in IPEDS data.
 
 IPEDS provides information at the university level, but only provides aggregated information within a university.
 To investigate outcomes for individual faculty members, I integrate individual-level data for all faculty members at all Illinois public universities 2010--2021.
-These data allow me to investigate how individual faculty members are affected by funding cuts to their university, investigating outcomes are more granular details than total faculty counts.
-IBHED freely provides this information, as the state of Illinois is required to publicly report base salary and benefits for all administrators, faculty members, and instructors employed by each public college or university.\footnote{
+These data allow me to investigate how individual faculty members are affected by funding cuts to their university, investigating individual-level professor outcomes unavailable in IPEDS data.
+IBHED freely provides this information, as the state of Illinois is required to publicly report base salary and benefits\footnote{
+    Real salary is computed by scaling nominal salary and benefits to 2021 dollars by the CPI-U.
+} for all administrators, faculty members, and instructors employed by each public college or university.\footnote{
     Public Act 96-0266, effective 1 January 2010, is the relevant Illinois law that requires publicly publishing salary data for all public university faculty salary and benefits \citep{illinois-public-act}.
     A pdf copy of Public Act 096-0266 is included in the supplmentary data of this paper.
     This law applies to all nine Illinois public universities: Chicago State University, Eastern Illinois University, Governors State University, Illinois State University, Northeastern Illinois University, Northern Illinois University, Southern Illinois University (all five campuses), University of Illinois (all four campuses), Western Illinois University.
 }
 These data provide the basis to build a panel of Illinois public university faculty across years 2010--2021; I define a faculty member as an individual by their first plus last name and university pairing,\footnote{
     Some faculty are listed multiple times in these panel data.
-    For example, Professor Alberto Agustin Lopez-Scala of the University of Illinois Chicago has two appointments, one as an adjunct faculty and one as a department director.
+    For example, Professor Alberto Agustin Lopez-Scala of the University of Illinois Chicago has two appointments in each year 2013--2021, one as an adjunct faculty and one as a department director.
     For this observation I take the highest paid position (department director) as the primary appointment and drop the secondary appointment (adjunct faculty).
     In analysis of faculty exit rate, I collapse the appointments into one and only consider faculty exits as having a faculty appointment versus no appointment.
 }

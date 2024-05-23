@@ -23,7 +23,7 @@ Type 'q()' to quit R.
 > ## Long term outcomes by local projections method.
 > ## Using a rolling-share variant of the instrument.
 > print(Sys.time())
-[1] "2024-04-30 17:37:13 EDT"
+[1] "2024-05-23 10:35:29 EDT"
 > library(tidyverse) # Functions for data manipulation and visualisation
 ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 ✔ dplyr     1.1.2     ✔ readr     2.1.4
@@ -191,7 +191,7 @@ dbl (68): unitid, year, public, forprofit, fouryear, associatescollege, cpi2...
 > rm(illinois.data)
 > gc()
           used  (Mb) gc trigger  (Mb) max used  (Mb)
-Ncells 2415636 129.1    4642020 248.0  3928662 209.9
+Ncells 2415636 129.1    4642077 248.0  3928662 209.9
 Vcells 8818880  67.3   22427171 171.2 22416568 171.1
 > 
 > # Binary for professor position
@@ -274,6 +274,7 @@ Vcells 8818880  67.3   22427171 171.2 22416568 171.1
 > 
 > # Define length of time horizon to plot over
 > time.horizon <- 5
+> limits.vector <- c(-0.2, 0.6)
 > 
 > # Define data sample for the LP estimation
 > lp.data <- reg.data %>%
@@ -303,7 +304,7 @@ Vcells 8818880  67.3   22427171 171.2 22416568 171.1
 +     pdata.frame(index = c("name_unitid", "year"), drop.index = FALSE)
 > 
 > ## Define a function to nicely plot the LP results.
-> lpreg.plot <- function(model.lpreg, given.colour) {
+> lpreg.plot <- function(model.lpreg, limits.vector, given.colour) {
 +     ## Input a LP-reg (estimates an elesticity \in [-1,1])
 +     ## And the time.hirozon for how far to plot LP model
 +     # Get the estimates
@@ -325,6 +326,7 @@ Vcells 8818880  67.3   22427171 171.2 22416568 171.1
 +         scale_x_continuous(name = "Years, Relative to Funding Cut",
 +             breaks = model.lpdata$t, expand = c(0.01, 0.01)) +
 +         scale_y_continuous(name = "",
++             limits = limits.vector,
 +             breaks = seq(-5, 5, by = 0.1)) +
 +         theme_bw() +
 +         ggtitle("Estimate") +
@@ -354,7 +356,7 @@ Vcells 8818880  67.3   22427171 171.2 22416568 171.1
 +         hor = time.horizon)
 > # Save this plot of th first stage.
 > ggsave("../../text/figures/firststage-illinois-lp-rolling.png",
-+     plot = lpreg.plot(firststage.lpreg, colour.list[1]),
++     plot = lpreg.plot(firststage.lpreg, c(-1.15, 0.2), colour.list[1]),
 +     units = "cm", width = fig.width, height = fig.height)
 > 
 > 
@@ -383,7 +385,7 @@ Vcells 8818880  67.3   22427171 171.2 22416568 171.1
 +         hor = time.horizon)
 > # Save this plot
 > ggsave("../../text/figures/salaries-lecturer-illinois-lp-rolling.png",
-+     plot = lpreg.plot(lecturer_salaries.lpreg, colour.list[2]),
++     plot = lpreg.plot(lecturer_salaries.lpreg, limits.vector, colour.list[2]),
 +     units = "cm", width = fig.width, height = fig.height)
 > 
 > # LP estimation for salaries of APs.
@@ -409,7 +411,7 @@ Vcells 8818880  67.3   22427171 171.2 22416568 171.1
 +         hor = time.horizon)
 > # Save this plot
 > ggsave("../../text/figures/salaries-assistant-illinois-lp-rolling.png",
-+     plot = lpreg.plot(assistant_salaries.lpreg, colour.list[3]),
++     plot = lpreg.plot(assistant_salaries.lpreg, limits.vector, colour.list[3]),
 +     units = "cm", width = fig.width, height = fig.height)
 > 
 > # LP estimation for salaries of full profs.
@@ -435,7 +437,7 @@ Vcells 8818880  67.3   22427171 171.2 22416568 171.1
 +         hor = time.horizon)
 > # Save this plot
 > ggsave("../../text/figures/salaries-full-illinois-lp-rolling.png",
-+     plot = lpreg.plot(full_salaries.lpreg, colour.list[4]),
++     plot = lpreg.plot(full_salaries.lpreg, limits.vector, colour.list[4]),
 +     units = "cm", width = fig.width, height = fig.height)
 > 
 > # LP estimation for salaries of administrator faculty.
@@ -461,7 +463,7 @@ Vcells 8818880  67.3   22427171 171.2 22416568 171.1
 +         hor = time.horizon)
 > # Save this plot
 > ggsave("../../text/figures/salaries-administrator-illinois-lp-rolling.png",
-+     plot = lpreg.plot(administrator_salaries.lpreg, colour.list[5]),
++     plot = lpreg.plot(administrator_salaries.lpreg, limits.vector, colour.list[5]),
 +     units = "cm", width = fig.width, height = fig.height)
 > 
 > # LP estimation for salaries of all faculty.
@@ -487,7 +489,7 @@ Vcells 8818880  67.3   22427171 171.2 22416568 171.1
 +         hor = time.horizon)
 > # Save this plot
 > ggsave("../../text/figures/salaries-all-illinois-lp-rolling.png",
-+     plot = lpreg.plot(all_salaries.lpreg, colour.list[6]),
++     plot = lpreg.plot(all_salaries.lpreg, limits.vector, colour.list[6]),
 +     units = "cm", width = fig.width, height = fig.height)
 > 
 > 
@@ -518,7 +520,7 @@ Vcells 8818880  67.3   22427171 171.2 22416568 171.1
 +         hor = time.horizon)
 > # Save this plot
 > ggsave("../../text/figures/promoted-lecturer-illinois-lp-rolling.png",
-+     plot = lpreg.plot(lecturer_promoted.lpreg, colour.list[2]),
++     plot = lpreg.plot(lecturer_promoted.lpreg, limits.vector, colour.list[2]),
 +     units = "cm", width = fig.width, height = fig.height)
 > 
 > # LP estimation for promotion rate of APs.
@@ -546,7 +548,7 @@ Vcells 8818880  67.3   22427171 171.2 22416568 171.1
 +         hor = time.horizon)
 > # Save this plot
 > ggsave("../../text/figures/promoted-assistant-illinois-lp-rolling.png",
-+     plot = lpreg.plot(assistant_promoted.lpreg, colour.list[3]),
++     plot = lpreg.plot(assistant_promoted.lpreg, limits.vector, colour.list[3]),
 +     units = "cm", width = fig.width, height = fig.height)
 > 
 > # LP estimation for promotion rate of full profs.
@@ -574,7 +576,7 @@ Vcells 8818880  67.3   22427171 171.2 22416568 171.1
 +         hor = time.horizon)
 > # Save this plot
 > ggsave("../../text/figures/promoted-full-illinois-lp-rolling.png",
-+     plot = lpreg.plot(full_promoted.lpreg, colour.list[4]),
++     plot = lpreg.plot(full_promoted.lpreg, limits.vector, colour.list[4]),
 +     units = "cm", width = fig.width, height = fig.height)
 > 
 > 
@@ -603,7 +605,7 @@ Vcells 8818880  67.3   22427171 171.2 22416568 171.1
 +         hor = time.horizon)
 > # Save this plot
 > ggsave("../../text/figures/exit-lecturer-illinois-lp-rolling.png",
-+     plot = lpreg.plot(lecturer_exit.lpreg, colour.list[2]),
++     plot = lpreg.plot(lecturer_exit.lpreg, limits.vector, colour.list[2]),
 +     units = "cm", width = fig.width, height = fig.height)
 > 
 > # LP estimation for exit rate of APs.
@@ -629,7 +631,7 @@ Vcells 8818880  67.3   22427171 171.2 22416568 171.1
 +         hor = time.horizon)
 > # Save this plot
 > ggsave("../../text/figures/exit-assistant-illinois-lp-rolling.png",
-+     plot = lpreg.plot(assistant_exit.lpreg, colour.list[3]),
++     plot = lpreg.plot(assistant_exit.lpreg, limits.vector, colour.list[3]),
 +     units = "cm", width = fig.width, height = fig.height)
 > 
 > # LP estimation for exit rate of full profs.
@@ -655,7 +657,7 @@ Vcells 8818880  67.3   22427171 171.2 22416568 171.1
 +         hor = time.horizon)
 > # Save this plot
 > ggsave("../../text/figures/exit-full-illinois-lp-rolling.png",
-+     plot = lpreg.plot(full_exit.lpreg, colour.list[4]),
++     plot = lpreg.plot(full_exit.lpreg, limits.vector, colour.list[4]),
 +     units = "cm", width = fig.width, height = fig.height)
 > 
 > # LP estimation for exit rate of administrator faculty.
@@ -681,7 +683,7 @@ Vcells 8818880  67.3   22427171 171.2 22416568 171.1
 +         hor = time.horizon)
 > # Save this plot
 > ggsave("../../text/figures/exit-administrator-illinois-lp-rolling.png",
-+     plot = lpreg.plot(administrator_exit.lpreg, colour.list[5]),
++     plot = lpreg.plot(administrator_exit.lpreg, limits.vector, colour.list[5]),
 +     units = "cm", width = fig.width, height = fig.height)
 > 
 > # LP estimation for exit rate of all faculty.
@@ -707,9 +709,9 @@ Vcells 8818880  67.3   22427171 171.2 22416568 171.1
 +         hor = time.horizon)
 > # Save this plot
 > ggsave("../../text/figures/exit-all-illinois-lp-rolling.png",
-+     plot = lpreg.plot(all_exit.lpreg, colour.list[6]),
++     plot = lpreg.plot(all_exit.lpreg, limits.vector, colour.list[6]),
 +     units = "cm", width = fig.width, height = fig.height)
 > 
 > proc.time()
    user  system elapsed 
-108.588   0.668 109.037 
+101.175   1.054 101.758 
