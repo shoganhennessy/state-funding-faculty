@@ -1,6 +1,8 @@
 # Less Funding, More Lecturers, and Fewer Professors
 
-Senan Hogan-Hennessy, latest revision: 10 May 2024
+Senan Hogan-Hennessy, latest revision: 28 May 2024
+
+[![DOI](https://zenodo.org/badge/592568213.svg)](https://zenodo.org/doi/10.5281/zenodo.11373226)
 
 ## Stagnating State Funding for Higher Education and its Effect on Faculty at US Universities
 
