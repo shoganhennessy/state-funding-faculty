@@ -75,7 +75,7 @@ ipeds.data %>%
         total_count = n(),
         enrollment_reported = sum(enrollment_reported, na.rm = TRUE)) %>%
     ungroup() %>%
-    View() #print()
+    print() #View()
 
 # Show enrollment at public vs private over time: total + average
 enrollment.data <- ipeds.data %>%
@@ -288,25 +288,3 @@ all_fte_perprof.plot <- prof_perfte.data %>%
 ggsave("../../text/figures/all-fte-perprof.png",
     plot = all_fte_perprof.plot,
     units = "cm", width = fig.width, height = fig.height)
-
-
-# Get figures in revenues (total + per student) public vs private --------------
-mean_funding.data <- ipeds.data %>%
-    group_by(year, public) %>%
-    summarise(
-        totalrevenues_mill =
-            mean(totalrevenues_real, na.rm = TRUE) / (10^6),
-        nonauxrevenues_mill =
-            mean(nonauxrevenues_real, na.rm = TRUE) / (10^6),
-        stateappropriations_mill =
-            mean(stateappropriations_real, na.rm = TRUE) / (10^6),
-        tuitionrev_mill =
-            mean(tuitionrev_real, na.rm = TRUE) / (10^6),
-        totalrevenues_perEnroll =
-            mean(totalrevenues_real / enrollment_reported, na.rm = TRUE),
-        nonauxrevenues_perEnroll =
-            mean(nonauxrevenues_real / enrollment_reported, na.rm = TRUE),
-        stateappropriations_perEnroll =
-            mean(stateappropriations_real / enrollment_reported, na.rm = TRUE),
-        tuitionrev_perEnroll =
-            mean(tuitionrev_real / enrollment_reported, na.rm = TRUE))

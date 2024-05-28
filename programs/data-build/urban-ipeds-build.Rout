@@ -21,7 +21,7 @@ Type 'q()' to quit R.
 > ## Senan Hogan-Hennessy, 21 December 2021
 > ## Build IPEDS data with the Urban Inst's package
 > print(Sys.time())
-[1] "2024-04-26 12:31:29 EDT"
+[1] "2024-05-28 14:41:47 EDT"
 > # https://educationdata.urban.org/documentation/colleges.html
 > # Load functions for data manipulation and visualisation
 > library(tidyverse)
@@ -255,7 +255,8 @@ date (1): DATE
 +             is.na(exp_total_opm) | exp_total_opm < 0, NA) / cpi2021,
 +         exp_net_grant_aid_real = replace(exp_net_grant_aid_total,
 +             is.na(exp_net_grant_aid_total) | exp_net_grant_aid_total < 0, NA) / cpi2021,
-+         nonauxspending_real = (exp_instruc_real +
++         nonauxspending_real = (
++             exp_instruc_real +
 +             exp_research_real +
 +             exp_pub_serv_real +
 +             exp_student_serv_real +
@@ -624,4 +625,4 @@ In right_join(., urban_ipeds.data, by = "unitid") :
 > quit("no")
 > proc.time()
    user  system elapsed 
- 72.390   3.475  43.905 
+ 67.146   3.338  58.425 

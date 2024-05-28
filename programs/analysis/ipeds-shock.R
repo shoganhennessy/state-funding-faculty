@@ -1578,68 +1578,6 @@ stargazer(
     out = "../../text/tables/expenditures-shock-reg-fte.tex")
 
 
-## Salaries instruction spending.
-# Naive OLS Regression
-naive_instruction_salaries.reg <- research_instruct.data %>%
-    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
-        log(stateappropriations_real / enrollment_reported)) %>%
-    felm(log(instructionspending_salaries_real / enrollment_reported) ~ 1 +
-        `log(stateappropriations_real/enrollment_reported)(fit)` |
-        unitid + year |
-        0 |
-        state + year,
-        data = .)
-# Shift-share IV Regression, explained by state appropriation shock
-shiftshare_instruction_salaries.reg <- research_instruct.data %>%
-    felm(log(instructionspending_salaries_real / enrollment_reported) ~ 1 |
-        unitid + year |
-        (log(stateappropriations_real / enrollment_reported) ~
-            I(-log(appropriationshock_perEnroll_real))) |
-        state + year,
-        data = .)
-
-## Salaries research spending.
-# Naive OLS Regression
-naive_research_salaries.reg <- research_instruct.data %>%
-    mutate(`log(stateappropriations_real/enrollment_reported)(fit)` =
-        log(stateappropriations_real / enrollment_reported)) %>%
-    felm(log(researchspending_salaries_real / enrollment_reported) ~ 1 +
-        `log(stateappropriations_real/enrollment_reported)(fit)` |
-        unitid + year |
-        0 |
-        state + year,
-        data = .)
-# Shift-share IV Regression, explained by state appropriation shock
-shiftshare_research_salaries.reg <- research_instruct.data %>%
-    felm(log(researchspending_salaries_real / enrollment_reported) ~ 1 |
-        unitid + year |
-        (log(stateappropriations_real / enrollment_reported) ~
-            I(-log(appropriationshock_perEnroll_real))) |
-        state + year,
-        data = .)
-
-# Collate the results to a LaTeX table
-stargazer(
-    naive_instruction_salaries.reg, shiftshare_instruction_salaries.reg,
-    naive_research_salaries.reg, shiftshare_research_salaries.reg,
-    dep.var.caption = "Dependent Variable: Salary Expenditures",
-    dep.var.labels = c("Instruction", "Research", "All"),
-    column.labels = rep(c("OLS", "2SLS"), 3),
-    digits = digits.no,
-    digits.extra = digits.no,
-    model.names = FALSE,
-    omit = "factor|count|year",
-    intercept.bottom = TRUE,
-    order = c(2, 1, 3),
-    covariate.labels = c("State Funding", "Tuition Revenue", "Constant"),
-    omit.stat = c("LL", "ser", "aic", "wald", "adj.rsq"),
-    star.cutoffs = NA,
-    header = FALSE, float = FALSE, no.space = TRUE,
-    omit.table.layout = "n", notes.append = FALSE,
-    type = "text",
-    out = "../../text/tables/expenditures-shock-reg-fte.tex")
-
-
 ################################################################################
 ## Show rate of part-time lecturers in the incomplete recent data.
 

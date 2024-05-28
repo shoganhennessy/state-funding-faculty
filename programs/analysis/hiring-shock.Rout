@@ -21,7 +21,7 @@ Type 'q()' to quit R.
 > ## Senan Hogan-Hennessy, 3 February 2023
 > ## IV for hiring of faculty, using IPEDS + hiring networks data.
 > print(Sys.time())
-[1] "2024-02-23 14:38:46 EST"
+[1] "2024-05-28 14:54:08 EDT"
 > set.seed(47)
 > # Functions for data manipulation and visualisation
 > library(tidyverse)
@@ -64,11 +64,11 @@ Please cite as:
 > 
 > # Load IPEDS data on all universities
 > ipeds.data <- read_csv("../../data/urban-ipeds/urban-clean-allunis.csv")
-Rows: 318274 Columns: 69
+Rows: 318274 Columns: 70
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr  (2): inst_name, state
-dbl (67): unitid, year, public, forprofit, fouryear, associatescollege, cpi2...
+dbl (68): unitid, year, public, forprofit, fouryear, associatescollege, cpi2...
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
@@ -174,11 +174,11 @@ the `.groups` argument.
 > unitid.data <- read_csv("../../data/urban-ipeds/urban-clean-allunis.csv") %>%
 +     filter(year == 2021) %>%
 +     select(unitid, inst_name)
-Rows: 318274 Columns: 69
+Rows: 318274 Columns: 70
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr  (2): inst_name, state
-dbl (67): unitid, year, public, forprofit, fouryear, associatescollege, cpi2...
+dbl (68): unitid, year, public, forprofit, fouryear, associatescollege, cpi2...
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
@@ -209,17 +209,11 @@ dbl (67): unitid, year, public, forprofit, fouryear, associatescollege, cpi2...
 +         breaks = seq(0, 15, by = 1)) +
 +     scale_y_continuous(name = "",
 +         breaks = seq(0, 15, by = 2),
-+         limits = c(0, 12)
-+         ) +
++         limits = c(0, 12)) +
 +     theme_bw() +
 +     ggtitle("Professors Hired, count / 100 students") +
 +     theme(plot.title = element_text(size = rel(1)),
 +         plot.margin = unit(c(0.5, 2, 0, 0), "mm"))
-> hiring_correlation.plot
-`geom_smooth()` using formula = 'y ~ x'
-Warning messages:
-1: Removed 1 rows containing non-finite values (`stat_smooth()`). 
-2: Removed 1 rows containing missing values (`geom_point()`). 
 > # Save this plot
 > ggsave("../../text/figures/hiring-correlation.png",
 +     plot = hiring_correlation.plot,
@@ -228,6 +222,38 @@ Warning messages:
 Warning messages:
 1: Removed 1 rows containing non-finite values (`stat_smooth()`). 
 2: Removed 1 rows containing missing values (`geom_point()`). 
+> 
+> # Give the value of the correlation:
+> reg.data %>%
++     lm(I(total_hired / (enrollment_reported / 1000)) ~ 1 +
++         I(stateappropriations_real / (1000 * enrollment_reported)),
++         data = .) %>%
++     summary() %>%
++     print()
+
+Call:
+lm(formula = I(total_hired/(enrollment_reported/1000)) ~ 1 + 
+    I(stateappropriations_real/(1000 * enrollment_reported)), 
+    data = .)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+-99.91 -52.92 -27.81  -2.24 977.91 
+
+Coefficients:
+                                                         Estimate Std. Error
+(Intercept)                                                64.507     14.716
+I(stateappropriations_real/(1000 * enrollment_reported))    1.182      0.837
+                                                         t value Pr(>|t|)    
+(Intercept)                                                4.384 2.14e-05 ***
+I(stateappropriations_real/(1000 * enrollment_reported))   1.412     0.16    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 143.3 on 155 degrees of freedom
+Multiple R-squared:  0.0127,	Adjusted R-squared:  0.006328 
+F-statistic: 1.993 on 1 and 155 DF,  p-value: 0.16
+
 > 
 > 
 > ################################################################################
@@ -364,4 +390,4 @@ R2             0.396   0.366   0.415   0.383   0.408   0.381
 > 
 > proc.time()
    user  system elapsed 
- 17.215   0.498  10.186 
+ 17.653   0.473   9.917 

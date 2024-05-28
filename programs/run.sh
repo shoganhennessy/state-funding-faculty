@@ -41,7 +41,12 @@ cd ..
 cd ../text
 latexmk -pdf paper.tex
 latexmk -c
+# Remove the stubborn digits in one table
+sed -i -e 's/.00//g' tables/summary-quantiles.tex
+
+# Host the draft as the main file in the replication package.
 cp paper.pdf ../state-funding-faculty-2024.pdf
+
 # Put the most recent presentation into the main folder.
 cd ../presentation
 cp presentation.pdf ../state-funding-faculty-presentation.pdf
