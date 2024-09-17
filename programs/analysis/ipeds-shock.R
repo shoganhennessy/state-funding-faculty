@@ -723,26 +723,26 @@ reg.data %>%
     group_by(instrument_quantile) %>%
     summarise(
         `IV Components, \\$ per student:` = NA,
-        `Funding shift--share`        = round(mean(- appropriationshock_perEnroll_real, na.rm = TRUE)),
-        `Shift in state--wide funding`   = round(mean(- allstate_stateappropriations_real / stateEnroll_count, na.rm = TRUE)),
-        `Share reliance on state funding, \\% in 1990--1993`    = round(mean(staterevenues_baseshare, na.rm = TRUE), 2),
+        `Funding shift--share`        = mean(- appropriationshock_perEnroll_real, na.rm = TRUE),
+        `Shift in state--wide funding`   = mean(- allstate_stateappropriations_real / stateEnroll_count, na.rm = TRUE),
+        `Share reliance on state funding, \\% in 1990--1993`    = 100 * mean(staterevenues_baseshare, na.rm = TRUE),
         `\\hline University Funding and Spending, \\$ millions:` = NA,
-        `State funding`               = round(mean(stateappropriations_real / 10^6, na.rm = TRUE)),
-        `Tuition revenue`             = round(mean(tuitionrev_real / 10^6, na.rm = TRUE)),
-        `Total non-inst. revenues`    = round(mean(nonauxrevenues_real / 10^6, na.rm = TRUE)),
-        `Instruction spending`        = round(mean(instructionspending_total_real / 10^6, na.rm = TRUE)),
-        `Research Spending`           = round(mean(researchspending_total_real / 10^6, na.rm = TRUE)),
+        `State funding`               = mean(stateappropriations_real / 10^6, na.rm = TRUE),
+        `Tuition revenue`             = mean(tuitionrev_real / 10^6, na.rm = TRUE),
+        `Total non-inst. revenues`    = mean(nonauxrevenues_real / 10^6, na.rm = TRUE),
+        `Instruction spending`        = mean(instructionspending_total_real / 10^6, na.rm = TRUE),
+        `Research Spending`           = mean(researchspending_total_real / 10^6, na.rm = TRUE),
         `\\hline University Funding and Spending, \\$ per student` = NA,
-        `fte State funding`              = round(mean(stateappropriations_real / enrollment_reported, na.rm = TRUE)),
-        `fte Tuition revenue`            = round(mean(tuitionrev_real / enrollment_reported, na.rm = TRUE)),
-        `fte Total non-inst. revenues`   = round(mean(nonauxrevenues_real / enrollment_reported, na.rm = TRUE)),
-        `fte Instruction spending`       = round(mean(instructionspending_total_real / enrollment_reported, na.rm = TRUE)),
-        `fte Research spending`          = round(mean(researchspending_total_real / enrollment_reported, na.rm = TRUE)),
+        `fte State funding`              = mean(stateappropriations_real / enrollment_reported, na.rm = TRUE),
+        `fte Tuition revenue`            = mean(tuitionrev_real / enrollment_reported, na.rm = TRUE),
+        `fte Total non-inst. revenues`   = mean(nonauxrevenues_real / enrollment_reported, na.rm = TRUE),
+        `fte Instruction spending`       = mean(instructionspending_total_real / enrollment_reported, na.rm = TRUE),
+        `fte Research spending`          = mean(researchspending_total_real / enrollment_reported, na.rm = TRUE),
         `\\hline Selectivity:` = NA,
-        `Reported enrolment`            = round(mean(enrollment_reported, na.rm = TRUE)),
-        `Full-time equivalent enrolment` = round(mean(enrollment_fte, na.rm = TRUE)),
-        `Acceptance rate, \\%`          = round(mean(acceptance_rate, na.rm = TRUE), 2),
-        `6 Year graduation rate, \\%`   = round(mean(completion_rate_150pct, na.rm = TRUE), 2)) %>%
+        `Reported enrolment`             = mean(enrollment_reported, na.rm = TRUE),
+        `Full-time equivalent enrolment` = mean(enrollment_fte, na.rm = TRUE),
+        `Acceptance rate, \\%`           = 100 * mean(acceptance_rate, na.rm = TRUE),
+        `6 Year graduation rate, \\%`    = 100 * mean(completion_rate_150pct, na.rm = TRUE)) %>%
     ungroup() %>%
     pivot_longer(!instrument_quantile,
         names_to = "variable", values_to = "value") %>%
@@ -756,7 +756,8 @@ reg.data %>%
         `4th` = `3`,
         `5th` = `4`) %>%
     xtable(type = "latex",
-        align = "llccccc") %>%
+        align = "llccccc",
+        digits = 1) %>%
     print(
         sanitize.colnames.function = identity,
         sanitize.text.function = identity,

@@ -20,7 +20,7 @@ Stagnating state funding impacts public universities and faculty, likely contrib
 
 ## Replication
 
-This folder is the replication package for the economics research paper ``Less Funding, More Lecturers, and Fewer Professors: Stagnating State Funding for Higher Education and its Effect on Faculty at US Universities,'' with statistical analysis on IPEDS and public Illinois data using the programming language *R*, and associated packages.
+This folder is the replication package for the paper, with statistical analysis on IPEDS and public Illinois data using the programming language *R*, and associated packages.
 
 A master bash file calls all code to build analysis data from raw files, produce the analysis files, and compile the final paper in one-go.
 
