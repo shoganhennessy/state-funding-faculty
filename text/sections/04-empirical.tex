@@ -47,16 +47,16 @@ The first-stage is then as follows, including institution and year fixed effects
 The instrument must be conditionally independent of faculty outcomes for the IV results to be valid causal estimates.
 The instrument is conditionally independent if state policy decisions for funding of public universities are uncorrelated with unobserved institutional changes of any specific college or university in the state.
 This assumption is plausible given that the majority of states have multiple (i.e., more than five) public universities, without any single university campus receiving the majority of state funding within any single state.
-Secondly, the shift-share identification strategy requires exogeneity in either the base-line share or shift component of the instrument \citep{borusyak2022quasi}.
+Secondly, the shift-share identification strategy requires exogeneity in either the base-share or shift component of the instrument \citep{borusyak2022quasi}.
 We satisfy the second: faculty or university institutional-level decisions are not correlated with contemporaneous (or upcoming shocks) to state funding, so that the shift-share approach yields causal estimates by IV \citep{NBERw27885}.\footnote{
-    It would be plausible to consider the case that universities make institutional-level decisions in a consistently different manner to those with differing reliance on state funding in 1990, so that exogeneity by the base-line share is not plausible here.
+    It would be plausible to consider the case that universities make institutional-level decisions in a consistently different manner to those with differing reliance on state funding in 1990, so that exogeneity by the base-share is not plausible here.
 }
 Additionally, the shift-share approach assumes that shift-share instruments affect faculty outcomes only via affecting university funding (exclusion restriction).
 This means that state-wide changes in higher education funding are assumed to affect faculty at universities only by changing how much their university is funded.
 
 The conditional independence assumption for the shift-share instrument makes sense in theory for state funding, but is fundamentally untestable with data.
 However, the assumption is bolstered by the fact that universities with higher values of the shift-share instrument differ little in observed characteristics compared to those with lower values \citep{pei2019poorly}.
-Universities are by-in-large smaller (in terms of enrolment, total revenues, and professor count) at the top of the shift-share instrument distribution (see~\autoref{tab:summary-quantiles}).
+Universities are by and large smaller (in terms of enrolment, total revenues, and professor count) at the top of the shift-share instrument distribution (see~\autoref{tab:summary-quantiles}).
 Though on a per-student basis, there is little difference across the distribution (except in the outcomes under consideration).
 The shift-share instrument is positively associated with the total enrolment and total amount of state funding for each university, in both \$ and $\log$/percentage change terms, while other the other sources of university finances are not associated with the funding shift-share.
 So that the other sources of finances are not clear confounders for the IV strategy, as they exhibit balance with respect to the funding shift-share.
@@ -106,8 +106,10 @@ This level of time-series correlation would confound IV estimates of the effect 
 
 I employ a local projections approach to model how faculty outcomes in years $t+k$ are affected by state funding in year $t$, for future years $k > 0$ \citep{jorda2005}.
 The local projections method is an empirical model used to estimate dynamic treatment effects when the treatment is not binary, when time-series confounding is present \citep{montiel2021local}.
-Faculty outcomes could be affected in only a transitory manner, where effects in later years are close to zero, or in a persistent manner, where the effects of state funding cuts linger for multiple years.
+Faculty outcomes could be only affected in a transitory manner, where effects are limited to the short-run and fade away quickly, or persistently, where the effects of state funding cuts linger for many years.
 This method allows me to estimate the effect of state funding $X_{i,t}$ on faculty outcomes $Y_{i, t+ k}$ in follow-on years $k > 0$, credibly testing whether effects are transitory or long-lasting.
 The approach accommodates the shift-share instrument for state funding \citep{olea2021inference}, so that I present results using the shift-share to instrument for state funding (as in the rest of the empirical analysis).\footnote{
     The funding shift-share has a persistent effect on state funding, multiple years after the initial funding shift-share, so that the instrument is similarly strong for the local projections method --- see \autoref{sec:appendix-ipeds-firststage} further evidence on the strength of the first stage in local projections estimation.
 }
+
+\textbf{An extra paragpragh here, showing what LP does.  Give the equation.}
