@@ -1,0 +1,521 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Appendix section
+% Set-up the section.
+\newpage
+\appendix
+\setcounter{table}{0}
+\renewcommand{\thetable}{A\arabic{table}}
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{A\arabic{figure}}
+
+% Start appendix
+\section{Appendix}
+\label{appendix}
+This project used data which are fully public, and computational tools which are fully open-source.
+As such, all code and data (anonymised versions where necessary) involved in this project are available at this project's Github repository, available at \url{https://github.com/shoganhennessy/state-faculty-composition}.
+They may be used for replication, or as the basis for further work, as needed.
+Any comments or suggestions may be sent to me at \href{mailto:seh325@cornell.edu}{\nolinkurl{seh325@cornell.edu}}, or raised as an issue on the Github project.
+
+A number of statistical packages, for the $R$ language \citep{R2022}, made the empirical analysis for this paper possible.
+\begin{itemize}
+    \item \textit{Tidyverse} \citep{tidyverse} collected tools for data analysis in the $R$ language.
+    \item \textit{LFE} \citep{lfe} implemented linear fixed effect models, with instruments, crucial for the empirical estimation in \autoref{sec:empirics}.
+    \item \textit{Stargazer} \citep{stargazer} provided methods to efficiently convert empirical results into presentable output in \LaTeX.
+    \item \textit{Lpirfs} \citep{lpirfs2019} implemented estimation of the \cite{jorda2005} local projections methods, with instrumental variables, crucial to the local projections estimates presented in this project.
+\end{itemize}
+
+\subsection{IPEDS First Stage}
+\label{sec:appendix-ipeds-firststage}
+
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{Shift-Share Instrument Balance, Mean Characteristics Across Instrument Distribution.}
+    \makebox[\textwidth][c]{\input{tables/summary-quantiles.tex}}
+    \label{tab:summary-quantiles}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    This table shows the summary statistics for every public university--year observation in IPEDS data, for each of the 5 quantiles of the funding shift-share instrument.
+    Funding shift-share is the instrument defined in \autoref{sec:empirics} the product of (1) state-wide funding shift and (2) share reliance on state funding.
+    State-wide funding shift is total funding for higher education in that university's state (divided by the count of state students); share reliance on state funding is the the total amount of state funding received by the university in 1990--1993 divided by total revenues for those years. 
+    The column labelled ``1st'' refers to the mean for all university-year observations in the first quintile (bottom 20\%) of the funding shift-share distribution, and so on.
+    The numbers are adjusted to 2021 figures by CPI-U.
+    Non-institutional revenues refers to the sum of federal, state, and local funding plus tuition revenues; these sum to the majority of university funding, but exclude numbers such as university income from capital projects.
+    Acceptance rate and 6 year graduation rate are for university undergraduates, and are calculated from IPEDS data available for academic years 1997 through 2018.
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \singlespacing
+    \caption{Correlation Between State Funding Shift-Share and Public University State Funding in Surrounding Years.}
+    \includegraphics[width=\textwidth]{figures/lag-firststage.png}
+    \label{fig:lag-firststage}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    This figure shows the correlation between state funding in year $t+k$ with the funding shift-share in year $t$ for a university, where $k = -7, \hdots, 5$ are the years on the $x$-axis.
+    This shows that state funding and the funding shift-share are correlated across years, so that dynamic effects must be estimated by local projections --- and not simple OLS or 2SLS.
+    The estimates are of \eqref{eqn:firststage}, calculated with IPEDS data, separately for each year relative to initial shock, using the $\log-\log$ specification, including fixed effects for university $+$ year, and clustering standard errors by university $+$ year.
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \singlespacing
+    \caption{Local Projection Estimates for Funding Shift-Share on State Funding, in IPEDS Data.}
+    \includegraphics[width=0.6\textwidth]{figures/firststage-lp.png}
+    \label{fig:firststage-lp}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These figures show the local projections estimates of regression specification \eqref{eqn:firststage}, with the funding shift-share as an instrument for state funding, using IPEDS data.
+    The coefficient estimate is effect of funding shift-share ($Z_{i,t}$) on state funding ($X_{i,t}$), while accounting for auto-correlation between different time periods --- i.e., between $Z_{i,t}, Z_{i,t-1}$ and $X_{i,t}, X_{i,t-1}$.
+    These results use a $\log-\log$ specification, so the estimates are for the elasticity of state funding per student in a year $t+k$ with respect to funding shift-share in year $t$, where years $k = 0, \hdots, 10$ are on the $x$-axis. 
+    Standard errors are clustered at the state-year level.
+\end{figure}
+
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{Effect of State Funding on Areas of University Spending, IPEDS Data, IV Estimates.}
+    \textbf{Panel A: units in \$ per student}
+     
+    \makebox[\textwidth][c]{\input{tables/expenditures-shock-rawcount.tex}}
+    
+    \textbf{Panel B: units in log \$ per student}
+    
+    \makebox[\textwidth][c]{\input{tables/expenditures-shock-reg-fte.tex}}
+    
+    \label{tab:expenditures-shock-reg}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These tables show the IV estimates of regression specification \eqref{eqn:secondstage}, showing the effect of state funding (instrumented with the shift-share) on areas of university spending.
+    Outcomes are measured in \$ student spending, so that the estimates representat the relationship between a \$1 increase in state funding on area of spending (or 1\% increase).    
+    The ``outcome mean'' rows are spending in thousands \$ per student.
+\end{table}
+
+\newpage
+\subsection{Illinois IBHED First Stage}
+\label{sec:iv-model-indiv}
+
+This paper uses data on individual professors in the Illinois university system, to investigate the effects of changes in university revenues on the individual professors at the universities.
+The outcomes here now refer to individual professors (e.g., their salary and promotion rate), so requires adjustment to the empirical approach, leveraging variation in university funding for the years after a professor joins the university.
+
+\autoref{eqn:rolling-instrument} defines a rolling-share variant of the instrument, $\tilde Z_{i(j),t}$, where the university's state funding share exposure is based in the year a professor joins the university --- and not the base period 1990--1993.
+$j$ indexes each professor in year $t$, $\tau(j)$ for the year the professor first joins their institution.
+Identifying $\tau(j)$ is possible for $j$ by restricting to all professors hired 2011-2021 --- i.e., in the years after the start of the full panel.
+It is not possible to discern the hiring year for professors who  were hired in the years preceding 2011, and so the entire sample is only possible to analyse using the base-share in years 1990-1993 formulation.
+
+\begin{align}
+    \label{eqn:rolling-instrument}
+    \tilde Z_{i(j),t} &\coloneqq - \left[
+    \left( \frac{\text{Total State Funding}_{s(j),t}}{\text{Student Population}_{s(j),t}} \right)
+    \left( \frac{\text{State Funding}_{\tau(j)}}{\text{Total Revenues}_{i,\tau(j)}} \right) \right]
+\end{align}
+
+This approach leverages an insight, made available by level of the data: that an individual professor is affected by changes in university revenues after they have joined the university.
+\autoref{sec:iv-model-uni} considers the number of professors employed by the university; whether a professor becomes employed at the university is likely affected by that university's finances.
+The formulation here takes as given that the professor is already employed at the university, and then projects the effect of changes in state funding on these \textit{incumbent} professors following the state funding shift-share.
+\autoref{tab:firststage-illinois} presents the first-stage results in Illinois data.
+
+\begin{table}[h!]
+    \singlespacing
+    \centering
+    \caption{First Stage Estimates, for State Funding by Funding Shift-Share in IBHED Data.}
+    \textbf{Panel A: units in \$ per student}
+    
+    \makebox[\textwidth][c]{\input{tables/firststage-reg-rawcount.tex}}
+    
+    \textbf{Panel B: units in log \$ per student}
+    
+    \makebox[\textwidth][c]{\input{tables/firststage-illinois.tex}}
+    
+    \label{tab:firststage-illinois}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These tables show the first stage OLS estimates of regression specification \eqref{eqn:secondstage1_indiv}, showing the effect of the funding shift-share on state funding to gauge performance as an instrument.
+    Each observation is a professor-year, in the IBHED data, and funding data are merged from IPEDS.
+    %Panel A shows the effect of an funding shift-share of \$-1 per student in the state on the number of \$'s of state funding per student at the university --- i.e.,
+    %\$-1 funding shift-share per student in the state leads to \$1.176 less state funding per student at the university according to preferred specification column 1.
+    Panel A shows the effect of a $-10$\% change funding shift-share per student in the state on $10$\% change in state funding per student at the university --- i.e.,
+    $-10$\% funding shift-share per student in the state leads to $-9.77$\% less state funding per student at the university according to prefferred specification column 1.        
+    Standard errors are clustered at the institution-year level, and institution $+$ year fixed effects are included where noted.
+\end{table}
+
+Exogeneity and relevance of the rolling-share instrument, $\tilde Z_{i(j),t}$, follows the same reasoning as that for the base-share instrument, $Z_{i,t}$, discussed in \autoref{sec:approp-shocks}.
+The base-share instrument is appropriate for some outcomes with the individual Illinois professors, where appropriate.
+We satisfy the assumptions for exogeneity by noting that none of the Illinois public campuses take the majority of state funding, and that the identification strategy relies on exogeneity in changes in state funding to individual professor-outcomes, following the year they joined the university.
+Additionally, within-institution changes resulting from share reliance on state funding may be correlated with unobserved changes in the outcomes, so that \cite{NBERw27885} note the importance of controlling for the base share and state student population.
+The formulation here implicitly controls for these factors via the fixed effects; results are relatively similar while including these controls with and without including fixed effects, and so are omitted.
+
+The instrumental variables model is then defined as follows, where $i(j)$ refers to the institution that professor $j$ is employed at, and $Y_{j,t}$ for salary, rate of promotion, and propensity to leave the Illinois public university system.
+The system includes fixed effects for the institution and first year of employment.
+The instrument varies by institution, based in the year of first employment, so that these are the corresponding fixed effects and level of clustered standard errors.
+\begin{eqnarray}
+    \label{eqn:secondstage1_indiv}
+    X_{i(j),t} &=& \theta_{i(j)} + \phi_{\tau(j)} + \delta \tilde Z_{i(j),t} + \epsilon_{i(j),t} \\
+    \label{eqn:secondstage2_indiv}
+    Y_{j,t} &=& \mu_{i(j)} + \nu_{\tau(j)} + \beta \widehat X_{i(j),t} + \varepsilon_{j,t}
+\end{eqnarray}
+We then interpret parameter $\beta$ as the effect of changes in state funding at an Illinois public university, via state funding shift-shares, on an individual professor's outcome $Y_{j,t}$.
+
+\newpage
+\begin{figure}[H]
+    \centering
+    \singlespacing
+    \caption{Local Projection Estimates for Effect of State Funding on Faculty Promotion Rate at Illinois Public Universities, by Professor Group.}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{First-stage Estimate.}
+        \includegraphics[width=\textwidth]{figures/firststage-illinois-lp-rolling.png}
+        \label{fig:firststage-illinois-lp-rolling}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Lecturers.}
+        \includegraphics[width=\textwidth]{figures/promoted-lecturer-illinois-lp-rolling.png}
+        \label{fig:promoted-lecturer-illinois-lp-rolling}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Assistant Professors.}
+        \includegraphics[width=\textwidth]{figures/promoted-assistant-illinois-lp-rolling.png}
+        \label{fig:promoted-assistant-illinois-lp-rolling}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Full Professors.}
+        \includegraphics[width=\textwidth]{figures/promoted-full-illinois-lp-rolling.png}
+        \label{fig:promoted-full-illinois-lp-rolling}
+    \end{subfigure}
+    \label{fig:promoted-illinois-lp-rolling}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These figures show the local projections estimates of regression specification \eqref{eqn:secondstage}, with the funding shift-share as an instrument for state funding.
+    The unit of analysis is an individual faculty member (at an Illinois public university); funding data come from IPEDS, and faculty promotion rate from IBHED.
+    The coefficient estimate is effect of state funding ($X_{i(j),t}$) on faculty promotion rate ($Y_{j,t}$), using the funding shift-share instrument ($Z_{i(j),t}$), while accounting for auto-correlation between different time periods --- i.e., between $X_{i(j),t}, X_{i(j),t-1}$ and $Y_{i(j),t}, Y_{i(j),t-1}$.
+    These results use a $\log-\log$ specification, so the estimates are for the rate of promotion in a year $t+k$ affected by a 1\% change in state funding in year $t$, where years $k = 0, \hdots, 4$ are on the $x$-axis. 
+    Standard errors are clustered at the university-year level, and \autoref{sec:iv-model-indiv} fully describes the differences in empirical specification when unit of analysis is an individual faculty member.
+\end{figure}
+
+\newpage
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{Effects of Changes in State Funding on University Faculty Composition, in Illinois 2010--2021, OLS and 2SLS Estimates.}
+
+    \textbf{Panel A: units in \$ per student}
+
+    \makebox[\textwidth][c]{\input{tables/facultycount-illinois-reg-rawcount.tex}}
+    
+    \textbf{Panel B: units in log \$ per student}
+    
+    \makebox[\textwidth][c]{\input{tables/facultycount-illinois-reg-fte.tex}}
+
+    \label{tab:facultycount-illinois-reg}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These tables show the second stage OLS and 2SLS estimates of regression specification \eqref{eqn:secondstage}, showing the effect of state funding changes on number of faculty per student in Illinois universities, using the funding shift-share to instrument for state funding in the columns labelled 2SLS.
+    Each observation is a public university-year in the state of Illinois, where funding data come from IPEDS and faculty count come from IBHED data.
+    Panel A shows the effect of a fall in state funding \$$-1,000$ per student in the state on the number of professors.
+    Panel B shows the effect of a $10$\% change in state funding per student at the university on the 10\% change in the number of professors per students.
+    Outcome-mean is the mean of the outcome, for Panel A the number of professors per student, for Panel B the number of faculty per student.
+    Panel B uses $\log$ faculty count per student as the outcome, though the outcome mean is count of faculty per student (not in $\log$ terms).
+    Standard errors are clustered at the university-year level, and university $+$ year fixed effects are included through--out.
+\end{table}
+
+\newpage
+\begin{figure}[H]
+    \centering
+    \singlespacing
+    \caption{Local Projection Estimates for Effect of State Funding on Faculty Exit Rate at Illinois Public Universities, by Professor Group.}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Lecturers.}
+        \includegraphics[width=\textwidth]{figures/exit-lecturer-illinois-lp-rolling.png}
+        \label{fig:exit-lecturer-illinois-lp-rolling}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Assistant Professors.}
+        \includegraphics[width=\textwidth]{figures/exit-assistant-illinois-lp-rolling.png}
+        \label{fig:exit-assistant-illinois-lp-rolling}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Full Professors.}
+        \includegraphics[width=\textwidth]{figures/exit-full-illinois-lp-rolling.png}
+        \label{fig:exit-full-illinois-lp-rolling}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Administrator Professors.}
+        \includegraphics[width=\textwidth]{figures/exit-administrator-illinois-lp-rolling.png}
+        \label{fig:exit-administrator-illinois-lp-rolling}
+    \end{subfigure}
+    \label{fig:exit-illinois-lp-rolling}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These figures show the local projections estimates of regression specification \eqref{eqn:secondstage}, with the funding shift-share as an instrument for state funding.
+    The unit of analysis is an individual faculty member (at an Illinois public university); funding data come from IPEDS, and faculty promotion rate from IBHED.
+    The coefficient estimate is effect of state funding ($X_{i(j),t}$) on faculty promotion rate ($Y_{j,t}$), using the funding shift-share instrument ($Z_{i(j),t}$), while accounting for auto-correlation between different time periods --- i.e., between $X_{i(j),t}, X_{i(j),t-1}$ and $Y_{i(j),t}, Y_{i(j),t-1}$.
+    These results use a rate$-\log$ specification, so the estimates are for the rate of promotion in a year $t+k$ affected by a 1\% change in state funding in year $t$, where years $k = 0, \hdots, 4$ are on the $x$-axis. 
+    Standard errors are clustered at the university-year level, and \autoref{sec:iv-model-indiv} fully describes the differences in empirical specification when unit of analysis is an individual faculty member.
+\end{figure}
+
+\newpage
+\subsection{Professor Hiring}
+\label{sec:appendix-hiring}
+
+These results were produced by integrating the total count of professor hires for 2010--2021 for the top-ranked 180 US universities with a sum of the funding variables, and then estimating the models specified in \autoref{sec:iv-model-uni}.
+There were no observable differences in the hiring rate of male versus female faculty.
+
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{OLS and 2SLS Estimates for University Faculty Hires, in Illinois 2011--2021.}
+
+    \textbf{Panel A: units in \$ per student}
+
+    \makebox[\textwidth][c]{\input{tables/facultyhires-illinois-reg-rawcount.tex}}
+    
+    \textbf{Panel B: units in log \$ per student}
+    
+    \makebox[\textwidth][c]{\input{tables/facultyhires-illinois-reg-fte.tex}}
+    \label{tab:facultyhires-illinois-reg}
+    \vspace{-0.5cm}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These tables show the second stage OLS and 2SLS estimates of regression specification \eqref{eqn:secondstage}, showing the effect of state funding changes on number of faculty hires at Illinois universities, using the funding shift-share to instrument for state funding in the columns labelled 2SLS.
+    Each observation is a public university-year in the state of Illinois, where funding data come from IPEDS and faculty count come from IBHED data.
+    Panel A shows the effect of a fall in state funding \$$-1,000$ per student in the state on the number of new faculty hires by position.
+    Panel B shows the effect of a $10$\% change in state funding per student at the university on the 10\% change in the number of faculty hires per students.
+    Outcome-mean is the mean of the outcome, for Panel A the number of faculty hires, for Panel B the number of faculty hires per student.
+    Panel B uses new faculty hires per student as the outcome (in $\log$ terms), though the outcome mean is count of new faculty hires per student (not in $\log$ terms).
+    Standard errors are clustered at the university-year level, and university $+$ year fixed effects are included through--out.
+\end{table}
+
+\vspace{-0.5cm}
+\begin{figure}[H]
+    \centering
+    \singlespacing
+    \caption{Correlation Between State Funding and Total Count Professors Hired, 2011--2021.}
+    \includegraphics[width=0.75\textwidth]{figures/hiring-correlation.png}
+    \label{fig:hiring-correlation}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    This figure shows the correlation between total state funding per student and total professors hired, 2010--2021.
+    Funding data are taken from IPEDS, and data on professor hiring  from \cite{wapman2022quantifying,wapman2022zenodo}.
+\end{figure}
+
+\begin{table}[h!]
+    \singlespacing
+    \centering
+    \caption{OLS and 2SLS Estimates for Professor Hiring, Total for 2011--2020.}
+    \makebox[\textwidth][c]{\input{tables/hiring-shock-reg-fte.tex}}
+    \label{tab:hiring-shock-reg}
+    \justify
+    \footnotesize
+    \textbf{Note}: 
+    This table show the second stage 2SLS estimates of regression specification \eqref{eqn:secondstage}, showing the effect of state funding changes on the number of faculty hires (per student) total for 2011--2021 at US public universities, using the funding shift-share to instrument for state funding.
+    Yearly variation in total hires is not observed here, so only the total hires across 2011--2021 for 157 universities, can be considered.
+    Each observation is a public university across the years 2011--2021, where data on total funding across 2011--2021 come from IPEDS and faculty count total from \citep{wapman2022quantifying,wapman2022zenodo}.
+    The panels show the effect of a $1$\% change in state funding per student at the university (total for 2011--2021) on the number of new faculty hires by gender (and all).
+    Standard errors are clustered at the state level, and state fixed effects are included through--out.
+\end{table}
+
+\newpage
+\subsection{Robustness Checks}
+
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{Effects of State Funding on Faculty Counts, IPEDS 1990--2021, IV Estimates by Institution Selectivity.}
+
+    \textbf{Panel A: units in \$ per student}
+
+    \makebox[\textwidth][c]{
+        \begin{tabular}{@{\extracolsep{5pt}}lcccccl} 
+            \\[-1.8ex]\hline 
+            \hline \\[-1.8ex]
+            & First-stage & Lecturers & Asst. Professors & Full Professors & All Faculty & Observations \\ 
+            \cline{2-7} 
+            \\[-1.8ex]
+            \input{tables/facultycount-rawcounts-heterogeneity.tex}
+            \\[-1.8ex] \hline 
+            \hline 
+        \end{tabular}}
+    
+        \vspace{0.2cm}
+    \textbf{Panel B: units in log \$ per student}
+    
+    \makebox[\textwidth][c]{
+        \begin{tabular}{@{\extracolsep{5pt}}lcccccl} 
+            \\[-1.8ex]\hline 
+            \hline \\[-1.8ex]
+            & First-stage & Lecturers & Asst. Professors & Full Professors & All Faculty & Observations \\ 
+            \cline{2-7} 
+            \\[-1.8ex]
+            \input{tables/facultycount-heterogeneity.tex}
+            \\[-1.8ex] \hline 
+            \hline 
+        \end{tabular}}
+    \label{tab:facultycount-heterogeneity}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These tables show the IV estimates of regression specification \eqref{eqn:secondstage}, 
+    in the same manner as \autoref{tab:facultycount-shock-reg}, but restricting to institutions ranked as most selective, selective, and unranked by \cite{barrons2009} --- and including state
+    The first column presents the coefficient between state funding and shift-share IV, which is a string first-stage among every level of selectivity for public universities.
+    The other columns show the coefficient between state funding the count of faculty per students.
+    For example, Row 1 of panel B shows that a $10\%$ cut in the state shift-share leads to a fall of $9.44\%$ in state funding for the public universities ranked as ``most selective.''
+    Standard errors for the coefficient estimates are in brackets, and the outcome mean are in square brackets beneath.
+\end{table}
+
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{First-stage Robustness Checks for Effects of State Funding Shift-Share on State Funding, OLS Estimates.}
+    \makebox[\textwidth][c]{\input{tables/firststage-robustness-checks.tex}}
+    \label{tab:firststage-robustness-checks}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These tables show the second stage OLS and 2SLS estimates of regression specification \eqref{eqn:firststage}, showing the effect of state funding shift-share on each university's state funding.
+    This table differs from the main analysis by replacing University $+$ Year fixed effects with State $+$ Year fixed effects, measuring enrolment in full-time equivalent (FTE), and including controls for (1)
+    State Funding as a percent of total funding in base period, (2) acceptance rate in mid-2000s, (3) 6--year completion rate in mid-2000s, (4) tuition revenue, (5) enrolment measured by full-time equivalent FTE, (6) total public university enrolment in the entire state, (7) percent of public university enrolment for the state enrolled at this university.
+    The first column uses the raw count specification, and the second column uses the $\log$ specification for percentage terms.
+\end{table}
+
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{Robustness Checks for Effects of State Funding Cuts on Faculty Composition, OLS and 2SLS Estimates in $\log$ Units.}
+    \makebox[\textwidth][c]{
+        %\small
+        \input{tables/facultycount-robustness-checks.tex}}
+    \label{tab:facultycount-robustness-checks}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These tables show the second stage OLS and 2SLS estimates of regression specification \eqref{eqn:secondstage}, showing the effect of state funding changes on number of faculty per student in Illinois universities, using the funding shift-share to instrument for state funding in the columns labelled 2SLS.
+    This table differs from the main analysis by replacing University $+$ Year fixed effects with State $+$ Year fixed effects, measuring enrolment in full-time equivalent (FTE), and including controls for (1)
+    State Funding as a percent of total funding in base period, (2) acceptance rate in mid-2000s, (3) 6--year completion rate in mid-2000s, (4) tuition revenue, (5) enrolment measured by full-time equivalent FTE, (6) total public university enrolment in the entire state, (7) percent of public university enrolment for the state enrolled at this university.
+\end{table}
+
+
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{Robustness Checks for Effects of State Funding Cuts on Faculty Composition, OLS and 2SLS Estimates in Raw Count Units.}
+    \makebox[\textwidth][c]{
+        \small
+        \input{tables/facultycount-rawcount-robustness-checks.tex}}
+    \label{tab:facultycount-rawcount-robustness-checks}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These tables show the second stage OLS and 2SLS estimates of regression specification \eqref{eqn:secondstage}, showing the effect of state funding changes on count of faculty in Illinois universities, using the funding shift-share to instrument for state funding in the columns labelled 2SLS.
+    This table differs from the main analysis by replacing University $+$ Year fixed effects with State $+$ Year fixed effects, measuring enrolment in full-time equivalent (FTE), and including controls for (1)
+    State Funding as a percent of total funding in base period, (2) acceptance rate in mid-2000s, (3) 6--year completion rate in mid-2000s, (4) tuition revenue, (5) enrolment measured by full-time equivalent FTE, (6) total public university enrolment in the entire state, (7) percent of public university enrolment for the state enrolled at this university.
+\end{table}
+
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{Effects of State--Wide Funding Changes on Private University Faculty Counts, IPEDS 1990--2021, OLS and 2SLS Estimates.}
+
+    \textbf{Panel A: units in \$ per student}
+
+    \makebox[\textwidth][c]{\input{tables/facultycount-shock-private-robustness-rawcount.tex}}
+    
+    \textbf{Panel B: units in log \$ per student}
+    
+    \makebox[\textwidth][c]{\input{tables/facultycount-shock-private-robustness.tex}}
+
+    \label{tab:facultycount-shock-private-robustness}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These tables show the second stage OLS and 2SLS estimates of regression specification \eqref{eqn:secondstage}, among private universities --- as described in \autoref{sec:results-robustness}.
+    Each observation is a public university-year, in the IPEDS data.
+    Panel A shows the effect of a fall in state funding \$$-1,000$ per student on the number of professors --- i.e.,
+    an extra \$$1,000$ per student leads to 6 fewer lecturers according to column 2.
+    Panel B shows the effect of a $10$\% change in state funding per student at the university on the 10\% change in the number of professors per students --- i.e.,
+    an extra 10\% of state funding per student leads to 4.37\% fewer lecturers per student according to column 2.
+    Outcome-mean is the mean of the outcome, for Panel A the number of professors per student, for Panel B the number of faculty per student.
+    Panel B uses $\log$ faculty count per student as the outcome, though the outcome mean is count of faculty per student (not in $\log$ terms).
+    Standard errors are clustered at the state-year level, and university $+$ year fixed effects are included through--out.
+\end{table}
+
+%\newpage
+%\subsection{Rates of Substitution}
+%\label{sec:appendix-substitution}
+%The funding elasticities can be used to recover the marginal rate of substitution between two outcomes.
+%For example, write $Y^1$ for the number of lecturers per student at a university, and $Y^2$ for the number of full professors.
+%I use the above approaches to estimate the funding elasticities, where $\% \Delta$ denotes percent change.
+%\[ \beta_1 = \frac{\% \Delta Y^1}{\% \Delta X}
+%\text{, and }
+%\beta_2 = \frac{\% \Delta Y^2}{\% \Delta X} \]
+%As such, it is possible to recover the elasticity for substitution between lecturers and full professors by the universities via the respective funding elasticities.
+%\[ \frac{\% \Delta Y^1}{\% \Delta Y^2}
+%= \frac{\% \Delta Y^1 / \% \Delta X}{\% \Delta Y^2 / \% \Delta X}
+%= \frac{\beta_1}{\beta_2} \]
+%I present results for the rates of substitution between different levels of faculty by this approach, dividing the relevant coefficient estimates and presenting standard errors calculated by a non-parametric bootstrap.
+%In practice, this corresponds to division of the estimates of the elasticity for employment of professors (by rank) with respect to state funding, presented in Panel B \autoref{tab:facultycount-shock-reg}, and bootstrapping the results to generate standard errors and confidence intervals.
+%% https://stackoverflow.com/questions/63777368/computing-the-standard-error-when-dividing-coefficients-of-different-regressions
+%
+%The implied marginal rate of substitution between lecturers and assistant professors is estimated as -3.26 (standard error 0.50), based on 10,000 bootstrap samples.
+%This means that public universities increased their number lecturers per student by 3.26\% when they decreased their count of assistant professors, on average and subject to the changes in state funding they experienced 1990--2017.
+%Between lecturers and full professors the rate of substitution is -3.19 (0.34), which implies that universities substitute between lecturers and full professors in the same way.
+%Between assistant and full professors the rate of substitution is 0.99 (0.11), which intuitively implies that universities treated assistant and full professors (i.e., those before and after tenure in the tenure system) as complements.
+%
+%"Calculated point est for substitution between lecturers + ast profs" 
+%                                                                      
+%                                                  "-3.26372574229461" 
+%                                                                      
+%                                                           "with SEs" 
+%                                                                      
+%                                                  "0.501721750806993" 
+%                                                                      
+%                                                        "and 95 % CI" 
+%                                                                 2.5% 
+%                                                  "-4.38380704259523" 
+%                                                                97.5% 
+%                                                  "-2.40372605889863"
+
+                                                                      
+% "Calculated point est for substitution between lecturers + full profs" 
+%                                                                       
+%                                                    "-3.1876596143219" 
+%                                                                       
+%                                                            "with SEs" 
+%                                                                       
+%                                                   "0.340087353132307" 
+%                                                                       
+%                                                         "and 95 % CI" 
+%                                                                  2.5% 
+%                                                   "-3.88637781601822" 
+%                                                                 97.5% 
+%                                                   "-2.56722681973736" 
+
+% "Calculated point est for substitution between ast + full profs" 
+%                                                                  
+%                                              "0.990674987591129" 
+%                                                                  
+%                                                       "with SEs" 
+%                                                                  
+%                                              "0.116874891784044" 
+%                                                                  
+%                                                    "and 95 % CI" 
+%                                                             2.5% 
+%                                              "0.771569155168642" 
+%                                                            97.5% 
+%                                               "1.23151772759759" 
