@@ -18,8 +18,8 @@ $Z_{i,t}$ is the shift-share instrument for institution $i$ in year $t$:
     \label{eqn:public-instrument}
     Z_{i,t} &\coloneqq - \left[
     \left( \frac{\text{Total State Funding}_{s(i),t}}{\text{Student Population}_{s(i),t}} \right)
-    \sum_{\tau = 0}^{3} \frac 14
-    \left( \frac{\text{State Funding}_{i,1990 + \tau}}{\text{Total Revenues}_{i,1990 + \tau}} \right) \right].
+    \sum_{k = 0}^{3} \frac 14
+    \left( \frac{\text{State Funding}_{i,1990 + k}}{\text{Total Revenues}_{i,1990 + k}} \right) \right].
 \end{align}
 
 The system exploits the fact that institutions who rely more on state funding will be affected by follow-on state-wide funding cuts.
@@ -33,7 +33,7 @@ $Z_{i,t}$ is negative to reflect the fact that the long term trend in, and most 
 }
 State funding has been falling, so that the instrument describes shocks to university revenues, mostly in a negative direction.\footnote{
     \label{foot:control}
-    \cite{NBERw27885} note the tendency for public universities to respond to state funding cuts by increasing reliance on tuition, where \cite{NBERw23736} specifically instruments for tuition revenues with collected information on legislative tuition price controls.
+    \cite{NBERw27885,webber2017state} note the tendency for public universities to respond to state funding cuts by increasing reliance on tuition, where \cite{NBERw23736} specifically instruments for tuition revenues with collected information on legislative tuition price controls.
     It may be argued that tuition revenues are confounder between the causal effect of changes in state funding on a university's total revenues, so that this analysis focuses on state support for higher education (not total revenue), as do \cite{NBERw27885}.
     On the other hand, rises in tuition revenues (per-student) may arise as result of tuition hikes thanks declining state support, which would mean controlling for tuition would constitute a bad control.
     Nonetheless, estimates including tuition revenues (per-student) as a control in the second stage of the IV estimates produce results of very similar magnitude and direction, and so are omitted.
@@ -65,7 +65,7 @@ Nonetheless, yearly and institution fixed effects are included in regressions th
 \subsection{Instrumental Variables (IV) Model}
 \label{sec:iv-model-uni}
 I use the instrument defined in \autoref{eqn:public-instrument} to overcome the endogeneity concerns for state funding to each public university, for an IV approach.
-\autoref{eqn:firststage} is the first stage for exogenous variation in the state funding for university $i$ in year $t$, and \autoref{eqn:secondstage} the second stage for the effect of state funding on faculty outcomes.\footnote{
+\autoref{eqn:firststage} is the first-stage for exogenous variation in the state funding for university $i$ in year $t$, and \autoref{eqn:secondstage} the second stage for the effect of state funding on faculty outcomes.\footnote{
     The IV approach identifies the local average treatment effect, weighted towards larger values of the instrument in the continuous case.
     So we interpret this treatment effect as a weighted average of causal effects on faculty at public universities to state funding changes, specific to shift-share instruments, among compliers --- i.e., among universities who respond to funding cut and would not have made faculty-outcome changes absent the funding cut.
     Also, we assume that no universities state funding increased in response to the negative shift-share instrument (monotonicity).
@@ -77,7 +77,7 @@ I use the instrument defined in \autoref{eqn:public-instrument} to overcome the 
 I estimate the system by two stage least squares, including institution and year fixed effects.\footnote{
     Note that dividing by student count also implicitly controls for the size of the university, so that this model implicitly accounts for yearly variation in professor count and university revenues arising from a university's size of growth/decline.
 }
-$Y_{i,t}$ represents faculty outcomes for university $i$ in year $t$, $\alpha_i, \gamma_t$ university and year fixed effects, and $\widehat X_{i,t}$ state funding for university $i$ estimated in first stage \eqref{eqn:firststage}.
+$Y_{i,t}$ represents faculty outcomes for university $i$ in year $t$, $\alpha_i, \gamma_t$ university and year fixed effects, and $\widehat X_{i,t}$ state funding for university $i$ estimated in first-stage \eqref{eqn:firststage}.
 
 Additionally, I investigate the effect of state funding cuts on professors using the Illinois data (IBHED).
 State funding cuts may affect faculty in years after they join the university, so I base the instrument in the year that the professor was hired, and include fixed effects for the hiring year.\footnote{
@@ -99,17 +99,27 @@ As such, I include regression specifications where the explanatory and outcome v
 
 \subsection{Effects in Years After the Initial Funding Cut}
 \label{sec:local-projections}
-The effects of a change in the universities funding may not be immediate, and faculty may be affected multiple years after a funding cut.
-Yet, the funding shift-share instrument is significantly auto-correlated year-on-year; a large state funding cut in year $t$ is also likely to experience a large funding cut in years $t \pm 1$.
-\autoref{fig:lag-firststage} shows that the shift-share instrument is correlated with state funding five years into the past and future.
-This level of time-series correlation would confound IV estimates of the effect of state funding in year $t$ on faculty outcomes in later years $t+k$, providing inconsistent estimates for the causal relationships when using two-stage least squares.
-
-I employ a local projections approach to model how faculty outcomes in years $t+k$ are affected by state funding in year $t$, for future years $k > 0$ \citep{jorda2005}.
-The local projections method is an empirical model used to estimate dynamic treatment effects when the treatment is not binary, when time-series confounding is present \citep{montiel2021local}.
 Faculty outcomes could be only affected in a transitory manner, where effects are limited to the short-run and fade away quickly, or persistently, where the effects of state funding cuts linger for many years.
-This method allows me to estimate the effect of state funding $X_{i,t}$ on faculty outcomes $Y_{i, t+ k}$ in follow-on years $k > 0$, credibly testing whether effects are transitory or long-lasting.
-The approach accommodates the shift-share instrument for state funding \citep{olea2021inference}, so that I present results using the shift-share to instrument for state funding (as in the rest of the empirical analysis).\footnote{
-    The funding shift-share has a persistent effect on state funding, multiple years after the initial funding shift-share, so that the instrument is similarly strong for the local projections method --- see \autoref{sec:appendix-ipeds-firststage} further evidence on the strength of the first stage in local projections estimation.
-}
+I employ a Local Projections (LP) approach to answer the following question: are university faculty affected multiple years after a state funding cut to their university?
+The LP method is an empirical model used to estimate dynamic treatment effects when time-series confounding is present, and accommodates an instrument \citep{jorda2005,olea2021inference}.
+\begin{align}
+    \label{eqn:firststage-lp}
+    X_{i,t}   &= \eta_i + \zeta_t + \delta Z_{i,t} + \epsilon_{i,t} \\
+    \label{eqn:secondstage-lp}
+    Y_{i,t+k} &= \alpha_i + \gamma_t + \beta_k \widehat X_{i,t} + \varepsilon_{i,t+k}
+\end{align}
+The approach estimates the first-stage \eqref{eqn:firststage-lp} by ordinary least squares; here this approach is the same as in conventional IV analysis, instrumenting for a university's state funding in year $t$ with state-wide funding shifts in year $t$.
+The second-stage \eqref{eqn:secondstage-lp} is estimated by a regression of 
+faculty outcomes in future years $t+k$ on (predicted) state funding cuts in year $t$.
+Fixed effects, and two-way standard error clustering are maintained throughout, as before.
 
-\textbf{An extra paragpragh here, showing what LP does.  Give the equation.}
+The LP method estimates the cumulative effect of a state funding cut in year $t$, and its cumulative follow-on funding cuts in intermediate years, on faculty outcomes in year $t+k$.\footnote{
+    See \citet[Section~8.3]{jorda2023local} for a technical definition, and discussion of the differences in estimands when accounting (or not) for the intermediate values.
+}
+This is because the funding shift-share instrument is significantly auto-correlated year-on-year, as shown in \autoref{fig:lag-firststage}.
+If Vermont cuts state funding for higher education in 1993, the LP method uses this observation's predicted state funding in year 1993 to calculate the effect of the funding cut in 1993, combined with the correlated funding cut in 1994, on faculty outcomes in 1995.
+The LP method then averages estimates across all years and all universities by two-stage least squares, calculating an estimate $\hat \beta_k$.
+This is an estimate of the effect of a funding cut in year $t$, and the average of accumulated funding cuts in intermediate years, on faculty outcomes in year $t+k$.\footnote{
+    The funding shift-share has a persistent effect on state funding, multiple years after the initial shift-share instrument, so that estimates in this setting represent both the effect of the initial funding cut and cumulative funding cuts in intermediate years.
+    See \autoref{sec:appendix-ipeds-firststage} for this demonstrated by estimating the first-stage by the LP method.
+}

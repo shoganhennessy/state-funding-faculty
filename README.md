@@ -1,6 +1,6 @@
 # Less Funding, More Lecturers, and Fewer Professors
 
-Senan Hogan-Hennessy, latest revision: 28 May 2024
+Senan Hogan-Hennessy, latest revision: 23 September 2024
 
 [![DOI](https://zenodo.org/badge/592568213.svg)](https://zenodo.org/doi/10.5281/zenodo.11373226)
 

@@ -3,32 +3,39 @@
 \section{Results}
 \label{sec:results}
 
-\subsection{First Stage Estimates}
-The shift-share instrument has a strong first stage for universities' yearly state funding.
+\subsection{First-Stage Estimates}
+The shift-share instrument has a strong first-stage for universities' yearly state funding.
 \autoref{tab:firststage-reg} show results of the first-stage regression among IPEDS data, separately with and without a control for tuition revenue per student.
 \autoref{tab:firststage-reg} Panel A shows estimates of a state funding shift-share of \$1 per student on state funding per student at the university, and Panel B the effects of a 1\% increase in the state funding shift-share on state funding per student.
 Column (1) shows that a state funding shift-share of \$10 per student is associated with \$11.76 less state funding per student at the university; $-10$\% state funding shift-share leads to $-9.77$\% state funding per student at the average university.
 Estimates are presented for specifications with and without fixed effects.
-Column (2) shows estimates of the first-stage without including fixed effects, and gives less precise estimates for the funding shift-share --- this may be due to systematic differences in universities, which are not accounted for without fixed effects.
+Column (2) shows estimates of the first-stage without including fixed effects, and gives less precise estimates for the funding shift-share --- this may be due to systematic differences in universities, which are not accounted for when omitting fixed effects.
 Columns (3) and (4) include the tuition revenue as a control (explained in \autoref{foot:control}) to exhibit estimates with or without this control variable.
 Column (3) shows similar estimates to column (1) in both Panels A and B thanks to inclusion of fixed effects, so whether tuition revenue is a bad control does not affect empirical estimates.
-Column (1) represents the estimates for \autoref{eqn:firststage} with fixed effects (not including tuition revenue as a control variable), and is the preferred specification that I proceed with.
+Column (1) represents the estimates for \autoref{eqn:firststage} with fixed effects (not including tuition revenue as a control variable), and is the preferred specification that I proceed with;
+all specifications (except column 4 in both panels) have a large F statistic on the excluded instrument.\footnote{
+    I calculate the F statistic on the excluded instrument, while also accounting for fixed effects and two-way standard error clustering, by the methods provided in \cite{olea2013robust}.
+}
 I use the same empirical strategy in the analysis of Illinois faculty, and \autoref{tab:firststage-illinois} presents first-stage estimates among the IBHED data; results are similar to those calculated in IPEDS data.
 These results show the funding shift-share instrument strongly predicts a university's state funding in the first-stage estimation.
 
-The first stage is strong in both IPEDS and IBHED data, and the argument for exogeneity comes from independence of the state funding mechanism to any individual public university campus (as in \autoref{sec:empirics}).
+The first-stage is strong in both IPEDS and IBHED data, and the argument for exogeneity comes from independence of the state funding mechanism to any individual public university campus (as in \autoref{sec:empirics}).
 The IV approach also assumes that shifts in state-wide funding for higher education (the instrument) affect outcomes only via affecting state funding for the university (exclusion restriction).
 This assumption is fundamentally untestable, but is bolstered by the lack of relationship with university characteristics.
-\autoref{tab:summary-quantiles} shows the mean of various university variables, across the instrument distribution.
+\autoref{tab:summary-quantiles} shows the mean of various university variables, across the instrument distribution.\footnote{
+    The shift-share instrument is correlated with tuition revenues (and thus the sum of non-institutional revenues), so could be a presenting a threat to endogeneity.
+    As mentioned above, including tuition revenue as a control (even though it could also be a bad control) does not meaningfully change first- and second-stage results in any specification, rendering this plausible threat to identification moot.
+    See \autoref{foot:control} and \autoref{tab:firststage-reg}.
+}
 The university--years in the bottom 20\% of the instrument distribution have more research spending than those in the next 20\%; this is to be expected, as university spending is heavily related to state--wide shifts in funding.
-On the other hand, the measures of selectivity (acceptance rate, 6--year graduation rate) are not substantially different across the distribution of the instrument.
-This allays concerns that state-wide shifts in state funding are targetted at less selective universities (a possible confounder), and supports use of the shift-share IV empirical design.
+On the other hand, the measures of selectivity (acceptance rate, 6--year graduation rate) are noticeably different across the distribution of the instrument.
+While the shift--share instrument exhibits balance for many relevant university characteristics (except tuition revenues and selectivity), I include institution and year fixed effects throughout my analysis, effectively controlling for any possible confounding effects of differences between universities.
 
 Do state funding cuts meaningfully affect universities?
 While the shift-share performs well in predicting state funding (i.e., a strong instrument), it could be the case that the day-to-day operations of a university are not affected.
 University could have responded to state funding cuts by cutting areas of spending unrelated to research or instruction, or fully off-set the cuts by charging higher tuition fees, leading to no effects on the university or faculty.
 To allay this concern, I estimate the IV model on IPEDS data for areas of university spending  (\autoref{tab:expenditures-shock-reg}).
-This exercise gauges the effects of state funding cuts on areas of university spending to gauge whether the first stage is economically meaningful, and to see which areas of higher education operations are affected by state funding cuts.
+This exercise gauges the effects of state funding cuts on areas of university spending to gauge whether the first-stage is economically meaningful, and to see which areas of higher education operations are affected by state funding cuts.
 Following a state funding cut, universities spend less on instruction, student services, operations, and grant aid.
 Additionally, they charge higher tuition fees, though this rise is at most a quarter of the state funding cut, so does not come close to fully off-setting state funding cuts.
 These results are in line with previous work showing state funding cuts (or tuition price limits) reduce student-focused spending \citep{NBERw23736}, financial aid \citep{miller2022making}, and lead to increased tuition fees \citep{bound2019public}.
@@ -46,7 +53,7 @@ These are large substitution effects, and explain roughly 40\% of the trend in s
 The average public university has roughly 36\% less state funding per student in 2021 than they did in 1990, while employing over double the number of lecturers and 20\% fewer professors (relative to enrolment, seen in \autoref{fig:mean-funding-fte}, \ref{fig:fte-perprof}).
 
 Universities do not re-adjust by hiring more professors to make up for last year's funding cut, and so the substitution towards lecturers becomes persistent.
-\autoref{fig:count-lp} shows local projection estimates, showing the elasticity for professor count per student in year $t+k$ with respect to state funding in year $t$.
+\autoref{fig:count-lp} shows LP estimates, showing the elasticity for professor count per student in year $t+k$ with respect to state funding in year $t$ (and cumulative intermediate cuts).
 State funding cuts affect the number of lecturers and professors at universities up to 9 years after the initial funding cut.
 A 10\% state funding cut leads to 4.2\% (2.9--5.5 in a 95 percent confidence interval) more lecturers per student the following year, and around 3.1\% (0.6--5.5 confidence interval) more lecturers nine years later.
 A 10\% state funding cut leads to 1.5\% (0.6--2.2 in a 95 percent confidence interval) fewer assistant professors per student the following year, and around 1.1\% (0.2--2.0 confidence interval) fewer nine years later;
@@ -65,7 +72,7 @@ Incumbent professors at Illinois universities are relatively unaffected by state
 The estimates are not discernible from zero in any specification, including the shift-share IV estimates, so that faculty seem to have little or no state funding cuts passed on to them for these outcomes.
 
 It could be the case that effects on faculty do not materialise until multiple years after a funding cut, though the data do not support this possibility.
-Local projection estimates show that professors' salaries, including salaries, are not significantly affected in years following funding cuts (\autoref{fig:salaries-illinois-lp-rolling}) --- they do not receive lower rates of pay raises, or delayed salary cuts, in response to state funding cuts.
+LP estimates show that professors' salaries, including salaries, are not significantly affected in years following funding cuts (\autoref{fig:salaries-illinois-lp-rolling}) --- they do not receive lower rates of pay raises, or delayed salary cuts, in response to state funding cuts.
 Similarly, promotion rate and rate of exit from the Illinois public university system are also unaffected in later years (\autoref{fig:promoted-illinois-lp-rolling}, \ref{fig:exit-illinois-lp-rolling}).
 Lecturers receive a 0.75\% increase in salary in the second and third year after a 10\% increase in state funding (\autoref{fig:salaries-lecturer-illinois-lp-rolling}), though they are they only faculty who saw any effect of state funding cuts in terms of salaries.
 
@@ -101,11 +108,12 @@ State funding cuts lead to lower professor hiring, and the persistent funding cu
 The channels for faculty turn-over were unaffected by state funding cuts in the analysis of Illinois faculty, while professor hiring is related to funding cuts in both correlational terms and in a shift-share analysis.
 Combining these pieces of evidence means that reduced professor hiring was likely the main mechanism for how state funding cuts led to a substitution of professors for lecturers at public universities.
 
-\subsection{Robustness Checks}
+\subsection{Robustness Checks and Heterogeneity Analysis}
 \label{sec:results-robustness}
 It is possible that the identification strategy is not robust to some confounding issues or trends.
 For example, selective institutions may have received funding cuts for other reasons, or states with lower performing institutions or declining populations strategically cut funding for only less selective universities.
-I address these concerns with three different analyses.
+Additionally, the effect of state funding cuts may affect faculty at different universities to different extents
+I investigate these issues with three different analyses.
 
 First, I re-estimate the primary results from \autoref{sec:results-ipeds} with additional controls for university selectivity.
 Specifically, I estimate \autoref{eqn:secondstage} with controls added for the base share of state funding, average acceptance rate and 6-year completion rate  in 2004--2006, tuition revenue, total enrolment, size of state enrolment, size of university enrolment relative to the rest of the state.
@@ -116,16 +124,19 @@ Additionally, this analysis uses the enrolment measure of full-time equivalent (
 The first-stage is strong of the same order as the original analysis (\autoref{tab:firststage-robustness-checks}).
 The relationship between state funding, in both raw count terms and log units, are roughly the same as for the main analysis (\autoref{tab:facultycount-robustness-checks}, \ref{tab:facultycount-rawcount-robustness-checks}), despite the multiple specification changes, additional controls, and different measures for enrolment.
 
-Secondly, I return to the primary specification in \autoref{eqn:secondstage}, and estimate effect of state funding cuts on faculty counts separately among universities of different selectivity rates.
-This investigates whether results are consistent across different levels of selectivity, and whether less selective universities have unreasonably high estimates for substitution --- as would be the case if selectivity were an unaddressed confounder.
-\autoref{tab:facultycount-heterogeneity} collects these results together, separated by the \cite{barrons2009} selectivity rankings.
+Second, I return to the primary specification in \autoref{eqn:secondstage}, and estimate effect of state funding cuts on faculty counts separately among universities of different selectivity rates.
+This investigates whether substitution rates are different across different levels of selectivity; \autoref{tab:facultycount-heterogeneity} collects these results together, separated by the \cite{barrons2009} selectivity rankings.
 Barrons rank 1-2 are the most selective (including e.g., UC Berkeley and SUNY Binghamton), 3-4 selective (including e.g., Clemson University and University of Dallas), and rank 5 for the rest of universities.
 The first-stage is strong in every group of universities, even among the small sample size of the 12 universities in the most selective group, and the 28 universities in the next selective group.
-Faculty substitution rates are not very strong among the most selective universities, but are very similar between selective universities and unranked universities, showing that even selective public universities exhibit the substitution towards lecturers.
+Faculty substitution rates are not very strong among the most selective universities, but are very similar between selective universities and unranked universities.
+One might expect that the effect is driven entirely by the least selective universities, as they are the most resource-constrained;
+this heterogeneity analysis shows that even selective (if not top) universities substitute towards lecturers following state funding cuts.
 
-The final robustness check I employ is a falsification test, testing whether the effects for public universities would be picked up among a sample of private universities.
-Private universities do not rely on state funding in the same that public universities do,\footnote{
-    Though private universities do receive some state funding, as some states fund for project at private universities and other smaller scale operating costs.
+The final robustness check I employ is a falsification test, testing whether the effects for public universities would be picked up among a sample of private universities.\footnote{
+    This is a robustness check similar to one performed in \citealt{NBERw27885}, as a robustness check for the same instrument.
+}
+Private universities do not rely on state funding in the same way that public universities do,\footnote{
+    Though private universities do receive some state funding, as some states fund smaller scale operating costs and other specific projects at private universities.
 }
 so we would expect state funding to not affect their faculty counts.
 If the state funding and faculty counts were related among private universities, this would be evidence that the IV model picks up otherwise concurrent trends in higher education, unrelated to stagnating state funding for public universities.

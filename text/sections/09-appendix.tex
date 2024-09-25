@@ -37,7 +37,7 @@ A number of statistical packages, for the $R$ language \citep{R2022}, made the e
     \footnotesize
     \textbf{Note}:
     This table shows the summary statistics for every public university--year observation in IPEDS data, for each of the 5 quantiles of the funding shift-share instrument.
-    Funding shift-share is the instrument defined in \autoref{sec:empirics} the product of (1) state-wide funding shift and (2) share reliance on state funding.
+    Funding shift-share is the instrument defined in \autoref{sec:empirics}, the product of (second row) state-wide funding shift and (third row) share reliance on state funding.
     State-wide funding shift is total funding for higher education in that university's state (divided by the count of state students); share reliance on state funding is the the total amount of state funding received by the university in 1990--1993 divided by total revenues for those years. 
     The column labelled ``1st'' refers to the mean for all university-year observations in the first quintile (bottom 20\%) of the funding shift-share distribution, and so on.
     The numbers are adjusted to 2021 figures by CPI-U.
@@ -301,20 +301,6 @@ There were no observable differences in the hiring rate of male versus female fa
     Standard errors are clustered at the university-year level, and university $+$ year fixed effects are included through--out.
 \end{table}
 
-\vspace{-0.5cm}
-\begin{figure}[H]
-    \centering
-    \singlespacing
-    \caption{Correlation Between State Funding and Total Count Professors Hired, 2011--2021.}
-    \includegraphics[width=0.75\textwidth]{figures/hiring-correlation.png}
-    \label{fig:hiring-correlation}
-    \justify
-    \footnotesize
-    \textbf{Note}:
-    This figure shows the correlation between total state funding per student and total professors hired, 2010--2021.
-    Funding data are taken from IPEDS, and data on professor hiring  from \cite{wapman2022quantifying,wapman2022zenodo}.
-\end{figure}
-
 \begin{table}[h!]
     \singlespacing
     \centering
@@ -455,67 +441,8 @@ There were no observable differences in the hiring rate of male versus female fa
     Standard errors are clustered at the state-year level, and university $+$ year fixed effects are included through--out.
 \end{table}
 
-%\newpage
-%\subsection{Rates of Substitution}
-%\label{sec:appendix-substitution}
-%The funding elasticities can be used to recover the marginal rate of substitution between two outcomes.
-%For example, write $Y^1$ for the number of lecturers per student at a university, and $Y^2$ for the number of full professors.
-%I use the above approaches to estimate the funding elasticities, where $\% \Delta$ denotes percent change.
-%\[ \beta_1 = \frac{\% \Delta Y^1}{\% \Delta X}
-%\text{, and }
-%\beta_2 = \frac{\% \Delta Y^2}{\% \Delta X} \]
-%As such, it is possible to recover the elasticity for substitution between lecturers and full professors by the universities via the respective funding elasticities.
-%\[ \frac{\% \Delta Y^1}{\% \Delta Y^2}
-%= \frac{\% \Delta Y^1 / \% \Delta X}{\% \Delta Y^2 / \% \Delta X}
-%= \frac{\beta_1}{\beta_2} \]
-%I present results for the rates of substitution between different levels of faculty by this approach, dividing the relevant coefficient estimates and presenting standard errors calculated by a non-parametric bootstrap.
-%In practice, this corresponds to division of the estimates of the elasticity for employment of professors (by rank) with respect to state funding, presented in Panel B \autoref{tab:facultycount-shock-reg}, and bootstrapping the results to generate standard errors and confidence intervals.
-%% https://stackoverflow.com/questions/63777368/computing-the-standard-error-when-dividing-coefficients-of-different-regressions
-%
-%The implied marginal rate of substitution between lecturers and assistant professors is estimated as -3.26 (standard error 0.50), based on 10,000 bootstrap samples.
-%This means that public universities increased their number lecturers per student by 3.26\% when they decreased their count of assistant professors, on average and subject to the changes in state funding they experienced 1990--2017.
-%Between lecturers and full professors the rate of substitution is -3.19 (0.34), which implies that universities substitute between lecturers and full professors in the same way.
-%Between assistant and full professors the rate of substitution is 0.99 (0.11), which intuitively implies that universities treated assistant and full professors (i.e., those before and after tenure in the tenure system) as complements.
-%
-%"Calculated point est for substitution between lecturers + ast profs" 
-%                                                                      
-%                                                  "-3.26372574229461" 
-%                                                                      
-%                                                           "with SEs" 
-%                                                                      
-%                                                  "0.501721750806993" 
-%                                                                      
-%                                                        "and 95 % CI" 
-%                                                                 2.5% 
-%                                                  "-4.38380704259523" 
-%                                                                97.5% 
-%                                                  "-2.40372605889863"
+\newpage
+\subsection{Analysis of IPEDS Salary Data and Years Following the Great Recession}
+\label{sec:recession-analysis}
 
-                                                                      
-% "Calculated point est for substitution between lecturers + full profs" 
-%                                                                       
-%                                                    "-3.1876596143219" 
-%                                                                       
-%                                                            "with SEs" 
-%                                                                       
-%                                                   "0.340087353132307" 
-%                                                                       
-%                                                         "and 95 % CI" 
-%                                                                  2.5% 
-%                                                   "-3.88637781601822" 
-%                                                                 97.5% 
-%                                                   "-2.56722681973736" 
-
-% "Calculated point est for substitution between ast + full profs" 
-%                                                                  
-%                                              "0.990674987591129" 
-%                                                                  
-%                                                       "with SEs" 
-%                                                                  
-%                                              "0.116874891784044" 
-%                                                                  
-%                                                    "and 95 % CI" 
-%                                                             2.5% 
-%                                              "0.771569155168642" 
-%                                                            97.5% 
-%                                               "1.23151772759759" 
+Bigger analysis in here.

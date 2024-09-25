@@ -4,6 +4,7 @@
 \label{sec:data}
 
 \subsection{Data Description}
+\label{sec:data-desc}
 The data used in this paper come from two primary sources: \citet[IPEDS]{ipeds} for data on university funding, finances, and enrolment, and \citet[IBHED]{ibhed} for data on every faculty member in the Illinois public university system.
 
 IPEDS is a survey of higher educational institutions in the US, and legally requires institutions to participate in order to receive Federal Title IV student aid.\footnote{
@@ -20,13 +21,18 @@ and provide information on university funding, enrolment, and numerous other cha
 }
 I restrict analysis to public, four-year, degree-granting institutions, as these institutions have the largest majority of faculty employed and students enrolled.
 For-profit institutions employ and enrol a negligible share of professors and students respectively, while students at two-year institutions by majority intend to eventually enrol at a four-year institution \citep{mountjoy2022}, so that these institutions are not considered.
-IPEDS reports the count of professors employed by position.\footnote{
+IPEDS reports the count of professors employed by position; IPEDS data on average faculty salaries are inconsistent with trends in faculty salaries from other sources, so I do not consider these data reliable and conduct no analysis involving them.\footnote{
     IPEDS gives a mean salary measure for faculty by rank, but these figures have many missing values and disagree with calculated values from other reputable sources.
     Over 40\% of university--year observations are missing in the IPEDS panel data-set, representing an average of 55\% undergraduate enrolment in each year.
     Yearly averages of faculty salaries by the non-missing values do not agree with trends in average professor salary over the sample time period compared to summary statistics provided in \cite{aau2021survey}.
     IPEDS values consistently report that public university professors are paid on average 20\% more than private sector faculty, which disagrees with other sources on the salary gap direction, and IPEDS figures are consistently higher than averages calculated from individual-level IBHED data.
-    For these reasons I do not further analyse IPEDS salary data, and use salary data from IBHED to analyse faculty salaries.
+    For these reasons I do not further analyse IPEDS salary data, and use salary data from IBHED (which do closely agree with trends in other sources) to analyse faculty salaries.
     Notably, IPEDS data on faculty counts do not suffer from these problems.
+}\footnote{
+    In a contemporaneous working paper, \cite{hinrichs2022state} analyses the effect of state funding cuts on university faculty, using the same shift-share variation.
+    \cite{hinrichs2022state} bases the shift--share instrument in the year 2011, despite major upheavals in the level of state funding for state funding for higher education around the 2008 Great Recession, and years following (see \autoref{sec:trends});
+    \cite{hinrichs2022state} also does not mention the data inconsistencies in IPEDS data for average faculty salaries.
+    These two major differences explain the different conclusions that our contemporary papers come to; \autoref{sec:recession-analysis} replicates the \cite{hinrichs2022state} empirical findings with my primary specification, and further discuses the differences in findings.
 }
 This gives a resulting panel data-set, where each row represents a university-year, and includes columns for university funding and tuition revenue, plus total count for each faculty position (lecturer, assistant professor, tenured professor, and total faculty), and other university characteristics.
 \autoref{tab:ipeds-summary} presents summary statistics for these variables in IPEDS data.
