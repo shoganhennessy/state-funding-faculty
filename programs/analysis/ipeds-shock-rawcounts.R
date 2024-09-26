@@ -319,7 +319,7 @@ stargazer(
     naive_all_count.reg, shiftshare_all_count.reg,
     add.lines = outcome.means,
     dep.var.caption =
-        "Dependent Variable: Faculty Count per 1,000 Students, by Position",
+        "Dependent Variable: Faculty Count, by Position",
     dep.var.labels = c(
         "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
     column.labels = rep(c("OLS", "2SLS"), 4),

@@ -16,7 +16,7 @@ set.seed(47)
 # appropriations shock instrument.
 
 # Define number of digits in tables and graphs
-digits.no <- 3
+digits.no <- 2
 
 # Size for figures
 fig.width <- 10
@@ -101,7 +101,7 @@ reg.data <- ipeds.data %>%
         lecturer_fulltime_count,
         assistant_fulltime_count,
         full_fulltime_count,
-        # Exploratory, areas of spending.
+        # Areas of spending.
         exp_instruc_real,
         exp_research_real,
         exp_pub_serv_real,
@@ -113,7 +113,7 @@ reg.data <- ipeds.data %>%
 
 # Restrict data to unis + years with measured state appropriations & shocks
 reg.data <- reg.data %>%
-    filter(1990 <= year, #year < 2019,
+    filter(1990 <= year,
         !is.na(enrollment_reported), enrollment_reported > 0,
         !is.na(all_prof_count),
         stateappropriations_real > 0,
@@ -529,6 +529,9 @@ ggsave("../../text/figures/percent-spending.png",
 
 
 # Tables for Instrument Exogeneity ---------------------------------------------
+
+# Make the regression data only consider after 1993 (after base instrument)
+reg.data <- reg.data %>% filter(1993 < year)
 
 # Regressions for Instrument balance test, in log terms
 balance_log_enrollment_reported.reg <- reg.data %>%

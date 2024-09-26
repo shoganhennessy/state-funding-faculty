@@ -442,7 +442,95 @@ There were no observable differences in the hiring rate of male versus female fa
 \end{table}
 
 \newpage
-\subsection{Analysis of IPEDS Salary Data and Years Following the Great Recession}
-\label{sec:recession-analysis}
+\subsection{Different Rates of Substitution for Each Decade}
+\label{sec:decade-analysis}
 
-Bigger analysis in here.
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{Effects of State Funding on Faculty Counts, in IPEDS Data 1990--2021, Separated for Each Decade.}
+
+    \textbf{Panel A: Estimated Separately for 1990--2009}
+
+    \makebox[\textwidth][c]{
+        \input{tables/facultycount-replicated-corrected-1990s.tex}}
+
+    \textbf{Panel B: Estimated Separately for 2010--2021}
+
+    \makebox[\textwidth][c]{
+            \input{tables/facultycount-replicated-corrected-2010s.tex}}
+
+    \label{tab:facultycount-replicated-corrected}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These tables show the second stage OLS and 2SLS estimates of regression specification \eqref{eqn:secondstage}, showing the effect of state funding changes on faculty outcomes, using the state funding shift-share (based in 1990--1993) to instrument for state funding in the columns labelled 2SLS.
+    Each panel gives estimates for data restricted to the noted decades.
+    Each observation is a public university-year, in the IPEDS data.
+    Each panel shows the effect of a $10$\% change in state funding per student at the university on the 10\% change in the number of professors per students.
+    Outcome-mean is the mean of the outcome, for Panel A the number of professors per student, for Panel B the number of faculty per student.
+    Each uses $\log$ faculty count per student as the outcome, though the outcome mean is count of faculty per student (not in $\log$ terms).
+    Standard errors are clustered at the state-year level, and university $+$ year fixed effects are included through-out.
+\end{table}
+
+
+\newpage
+\subsection{Replication of IPEDS Results for the Years 2011--2019}
+\label{sec:recession-analysis}
+\cite{hinrichs2022state} present an analysis of the same topic as the IPEDS analysis in this paper.
+Their analysis also includes faculty at 2-year colleges, which is not related to my analysis of lecturers and professors at 4-year universities.
+
+\cite{hinrichs2022state} analyses IPEDS data only in the years 2011--2019, as the Department of Education added a number of questions to the IPEDS survey asking how many part- and full-time professors are employed by the university.
+This means that they define the shift-share instrument with a base year of 2011, do not adjust for the student population size --- in neither the state nor the university under consideration (i.e., on neither shift nor share):
+\begin{align}
+    \label{eqn:replication-instrument}
+    Z^{2011}_{i,t} &=
+    \text{Total State Funding}_{s(i),t} \times
+    \left( \frac{\text{State Funding}_{i,2011}}{\text{Total Revenues}_{i,2011}} \right).
+\end{align}
+I replicate the $Z^{2011}_{i,t}$ formulation of the shift-share instrument, showing it is strong in predicting state funding (without adjusting for student population) in following years 2012--2019.
+There are only minor differences in the results presented to that for Table 2 in \cite{hinrichs2022state}, as their estimation is on the sample of universities across different samples.
+\autoref{tab:firststage-replicate} replicates this finding on the sample of universities who report faculty counts by rank.
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{Replication of First-Stage Estimates, Predicting State Funding by Funding Shift-Share, in IPEDS Data 2012--2019 \citep{hinrichs2022state}.}
+    \makebox[\textwidth][c]{\input{tables/firststage-replicate.tex}}
+    \label{tab:firststage-replicate}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These tables show the first stage OLS estimates of regressing state funding in years 2012-2019 but the 2011 base share version of the shift-share instrument, without adjusting for student population size.
+    Standard errors are clustered at the state-year level, and university $+$ year fixed effects are included where noted.
+    The F statistic is for the excluded instrument (not for overall regression), after accounting for fixed effects and cluster dependence \citep{olea2013robust}.
+\end{table}
+This definition contrasts with the analysis in \autoref{sec:empirics}, and \cite{NBERw23736}, \cite{NBERw23736}.
+All three use a shift-share based in the year 1990, or averaged 1990--1993, analyse outcomes in the 1990s and 2000s, and adjust for student population size.
+
+\begin{table}[H]
+    \singlespacing
+    \centering
+    \caption{Replication of Second-Stage Estimates, Effects of State Funding on Faculty Counts, in IPEDS Data 2012--2019 \citep{hinrichs2022state}.}
+    \makebox[\textwidth][c]{\input{tables/facultycount-replicate.tex}}
+    \label{tab:facultycount-replicate}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These tables show the second stage OLS and 2SLS estimates of regression specification \eqref{eqn:secondstage}, using the state funding shift-share based in 2011 (as described above) to instrument for state funding in the columns labelled 2SLS.
+    State funding is measured in \$ millions.
+    Each observation is a public university-year, in the IPEDS data.
+    This shows the effect of a state funding cut of \$$1,000,000$ on the number of faculty --- i.e.,
+    a cut of \$$1,000,000$ leads to 0.4 fewer lecturers according to column 2.
+    Outcome-mean is the mean of the outcome, the number faculty at the university.
+    Standard errors are clustered at the state-year level, and university $+$ year fixed effects are included through-out.
+\end{table}
+
+According to the \cite{hinrichs2022state} specification, faculty counts are correlated by OLS measures, but the IV estimates show that there is no relationship between raw counts of state funding and faculty counts in the 2010s --- replicating the main finding in \cite{hinrichs2022state}.
+
+On the other hand, there is a relationship between the amount of state funding per student and the number of faculty per student for decades previously.
+This means that not accounting for rising student enrolment mistakes the fundamental story --- see \autoref{sec:trends}.
+Furthermore, most of the substitution towards lecturers happened over the decades before 2010.
+\autoref{tab:facultycount-replicated-corrected} shows that the substitution towards lecturers was much larger in the 1990s and 2000s, and indistinguishable from zero for the later period.
+This both replicates the primary \cite{hinrichs2022state} finding, and shows when the substitution towards lecturers happened: in the 1990s and 2000s.
+Furthermore, the trends in falling state funding for universities were most intense in the 1990s until late 2000s, mostly plateauing for 2010 and onwards.
+Looking for the effects of stagnating state funding for higher education by only considering the years 2012--2019 is ignoring the time period when state funding stagnated, and when universities substituted towards lecturers.
