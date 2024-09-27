@@ -1,18 +1,19 @@
 # Less Funding, More Lecturers, and Fewer Professors
 
-Senan Hogan-Hennessy, latest revision: 23 September 2024
+Senan Hogan-Hennessy, latest revision: 27 September 2024
 
 [![DOI](https://zenodo.org/badge/592568213.svg)](https://zenodo.org/doi/10.5281/zenodo.11373226)
 
 ## Stagnating State Funding for Higher Education and its Effect on Faculty at US Universities
 
-Public universities employ more lecturers and fewer professors than at any other point in the last thirty years, relative to student enrolment.
-At the same time, state funding for higher education has stagnated.
+Public universities employ more lecturers and fewer professors today than at any other point in the last thirty years, relative to student enrolment. At the same time, state funding for higher education has stagnated.
 This paper shows that the decline in state funding led to a substitution away from professors toward lecturers at US public universities.
-Using a shift-share approach to instrument for state funding, I find that universities employ 4.4\% more lecturers per student following a 10\% funding cut.
-This shift is accompanied by a reduction in assistant professors and full professors per student by 1.4\% and 1.2\%, respectively.
-Incumbent professors' salaries, promotion rates, and quit rates at Illinois universities remain unaffected by funding cuts, indicating that the substitution arose from limiting the hiring of new tenure-track/tenured professors.
-Stagnating state funding impacts public universities and faculty, likely contributing to the deterioration of student outcomes at public universities since the 1990s.
+Using a shift-share approach to instrument for state funding, I find that universities employ 4.4% more lecturers per student following a 10% funding cut. 
+This shift is accompanied by a reduction in assistant and full professors by 1.4% and 1.2% per student.
+These effects are concentrated to 1990–2009, with waning national trends for 2010 and onwards.
+Incumbent professors’ salaries, promotion rates, and quit rates
+at Illinois universities remain unaffected by large funding cuts in the 2010s, indicating that the substitution arose from limiting the hiring of new professors.
+Stagnating state funding impacts public universities and faculty, likely contributing to deteriorating student outcomes at public universities since the 1990s.
 
 - [state-funding-faculty-2024.pdf](https://github.com/shoganhennessy/state-funding-faculty/blob/main/state-funding-faculty-2024.pdf) is the latest version of the working paper.
 - [state-funding-faculty-presentation.pdf](https://github.com/shoganhennessy/state-funding-faculty/blob/main/state-funding-faculty-presentation.pdf) is the latest version of the associated slides.
