@@ -451,7 +451,7 @@ F-statistic(proj model): 1.309 on 1 and 11 DF, p-value: 0.2768
 +     add.lines = outcome.means,
 +     dep.var.caption = "Dependent Variable: Employment Count by Professor Group",
 +     dep.var.labels = c(
-+         "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
++         "Lecturers", "Asst. Professors", "Professors", "All Faculty"),
 +     column.labels = rep(c("OLS", "2SLS"), 4),
 +     digits = digits.no,
 +     digits.extra = digits.no,
@@ -598,7 +598,7 @@ R2             0.893    0.843    0.973   0.973    0.992   0.992    0.983    0.97
 +     add.lines = outcome.means,
 +     dep.var.caption = "Dependent Variable: Yearly New Hires by Professor Group",
 +     dep.var.labels = c(
-+         "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
++         "Lecturers", "Asst. Professors", "Professors", "All Faculty"),
 +     column.labels = rep(c("OLS", "2SLS"), 4),
 +     digits = digits.no,
 +     digits.extra = digits.no,

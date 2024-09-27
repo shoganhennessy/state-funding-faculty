@@ -557,7 +557,7 @@ R2                                0.382             0.453
 +     dep.var.caption =
 +         "Dependent Variable: Log Faculty Count per Students, by Position",
 +     dep.var.labels = c(
-+         "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
++         "Lecturers", "Asst. Professors", "Professors", "All Faculty"),
 +     column.labels = rep(c("OLS", "2SLS"), 4),
 +     digits = digits.no,
 +     digits.extra = digits.no,
@@ -766,7 +766,7 @@ R2                           0.341    0.327    0.440    0.440    0.438    0.433 
 +     dep.var.caption =
 +         "Dependent Variable: Faculty Count per 1,000 Students, by Position",
 +     dep.var.labels = c(
-+         "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
++         "Lecturers", "Asst. Professors", "Professors", "All Faculty"),
 +     column.labels = rep(c("OLS", "2SLS"), 4),
 +     digits = digits.no,
 +     digits.extra = digits.no,
@@ -1011,7 +1011,7 @@ F-statistic(proj model): 0.4229 on 1 and 31 DF, p-value: 0.5203
 +     dep.var.caption =
 +         "Dependent Variable: Log Faculty Count per Students, by Position",
 +     dep.var.labels = c(
-+         "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
++         "Lecturers", "Asst. Professors", "Professors", "All Faculty"),
 +     column.labels = rep(c("OLS", "2SLS"), 4),
 +     digits = digits.no,
 +     digits.extra = digits.no,
@@ -1151,7 +1151,7 @@ R2             0.639    0.549    0.741    0.002    0.819    0.734    0.845   -0.
 +     dep.var.caption =
 +         "Dependent Variable: Faculty Count per 1,000 Students, by Position",
 +     dep.var.labels = c(
-+         "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
++         "Lecturers", "Asst. Professors", "Professors", "All Faculty"),
 +     column.labels = rep(c("OLS", "2SLS"), 4),
 +     digits = digits.no,
 +     digits.extra = digits.no,

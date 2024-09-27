@@ -38,6 +38,9 @@ State funding has been falling, so that the instrument describes shocks to unive
     On the other hand, rises in tuition revenues (per-student) may arise as result of tuition hikes following state funding cuts, which would mean controlling for tuition constitutes a bad control.
     Nonetheless, estimates including tuition revenues (per-student) as a control in the second stage of the IV estimates produce results of very similar magnitude and direction, and so are omitted (see \autoref{sec:results-firststage}).
 }
+It might be the case that funding cuts have systematically different effects on universities, and faculty, than funding increases.
+The identification strategy here identifies the effect of funding changes, and refers to funding cuts throughout to reflect the systematic falls of state funding (per student) at US public universities.
+I leave it to future research to develop a separate identification strategy that can distinguish the different effects of funding cuts and increases; this paper can not.
 
 The first-stage is then as follows, including institution and year fixed effects, where $X_{i,t}$ represents the amount of state funding divided by the number of full-time students attending the university.
 \begin{equation}
@@ -74,10 +77,10 @@ I use the instrument defined in \autoref{eqn:public-instrument} to overcome the 
     \label{eqn:secondstage}
     Y_{i,t} = \alpha_i + \gamma_t + \beta \widehat X_{i,t} + \varepsilon_{i,t}
 \end{equation}
-I estimate the system by two stage least squares, including institution and year fixed effects.\footnote{
-    Note that dividing by student count also implicitly controls for the size of the university, so that this model implicitly accounts for yearly variation in professor count and university revenues arising from a university's size of growth/decline.
-}
+I estimate the system by two-stage least-squares, including institution and year fixed effects.
 $Y_{i,t}$ represents faculty outcomes for university $i$ in year $t$, $\alpha_i, \gamma_t$ university and year fixed effects, and $\widehat X_{i,t}$ state funding for university $i$ estimated in first-stage \eqref{eqn:firststage}.
+Dividing by student count in both outcome and explanatory variables also implicitly controls for the size of the university, so that this model implicitly accounts for yearly variation in professor count and university revenues arising from a university's size of growth/decline.
+Nonetheless, including institution and year fixed effects also controls for the threat to identification of funding cuts possibly being aimed at larger institutions --- even if the primary specifications did not account for student population sizes.
 
 Additionally, I investigate the effect of state funding cuts on professors using the Illinois data (IBHED).
 State funding cuts may affect faculty in years after they join the university, so I base the instrument in the year that the professor was hired, and include fixed effects for the hiring year.\footnote{
@@ -112,6 +115,8 @@ The approach estimates the first-stage \eqref{eqn:firststage-lp} by ordinary lea
 The second-stage \eqref{eqn:secondstage-lp} is estimated by a regression of 
 faculty outcomes in future years $t+k$ on (predicted) state funding cuts in year $t$.
 Fixed effects, and two-way standard error clustering are maintained throughout, as before.
+This method requires no further identifying assumptions beyond those for the regular IV methods.
+If the conditions for the shift-share IV apply (\autoref{sec:iv-model-uni}), then identification holds for using LP methods.
 
 The LP method estimates the cumulative effect of a state funding cut in year $t$, and its cumulative follow-on funding cuts in intermediate years, on faculty outcomes in year $t+k$.\footnote{
     See \citet[Section~8.3]{jorda2023local} for a technical definition, and discussion of the differences in estimands when accounting (or not) for the intermediate values.

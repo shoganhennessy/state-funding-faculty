@@ -24,7 +24,7 @@ A number of statistical packages, for the $R$ language \citep{R2022}, made the e
     \item \textit{Lpirfs} \citep{lpirfs2019} implemented estimation of the \cite{jorda2005} local projections methods, with instrumental variables, crucial to the local projections estimates presented in this project.
 \end{itemize}
 
-\subsection{IPEDS First Stage}
+\subsection{IPEDS First-Stage}
 \label{sec:appendix-ipeds-firststage}
 
 \begin{table}[H]
@@ -96,7 +96,7 @@ A number of statistical packages, for the $R$ language \citep{R2022}, made the e
 \end{table}
 
 \newpage
-\subsection{Illinois IBHED First Stage}
+\subsection{Illinois IBHED First-Stage}
 \label{sec:iv-model-indiv}
 
 This paper uses data on individual professors in the Illinois university system, to investigate the effects of changes in university revenues on the individual professors at the universities.
@@ -122,7 +122,7 @@ The formulation here takes as given that the professor is already employed at th
 \begin{table}[h!]
     \singlespacing
     \centering
-    \caption{First Stage Estimates, for State Funding by Funding Shift-Share in IBHED Data.}
+    \caption{First-Stage Estimates, for State Funding by Funding Shift-Share in IBHED Data.}
     \textbf{Panel A: units in \$ per student}
     
     \makebox[\textwidth][c]{\input{tables/firststage-reg-rawcount.tex}}
@@ -135,7 +135,7 @@ The formulation here takes as given that the professor is already employed at th
     \justify
     \footnotesize
     \textbf{Note}:
-    These tables show the first stage OLS estimates of regression specification \eqref{eqn:secondstage1_indiv}, showing the effect of the funding shift-share on state funding to gauge performance as an instrument.
+    These tables show the first-stage OLS estimates of regression specification \eqref{eqn:secondstage1_indiv}, showing the effect of the funding shift-share on state funding to gauge performance as an instrument.
     Each observation is a professor-year, in the IBHED data, and funding data are merged from IPEDS.
     %Panel A shows the effect of an funding shift-share of \$-1 per student in the state on the number of \$'s of state funding per student at the university --- i.e.,
     %\$-1 funding shift-share per student in the state leads to \$1.176 less state funding per student at the university according to preferred specification column 1.
@@ -331,7 +331,7 @@ There were no observable differences in the hiring rate of male versus female fa
         \begin{tabular}{@{\extracolsep{5pt}}lcccccl} 
             \\[-1.8ex]\hline 
             \hline \\[-1.8ex]
-            & First-stage & Lecturers & Asst. Professors & Full Professors & All Faculty & Observations \\ 
+            & First-stage & Lecturers & Asst. Professors & Professors & All Faculty & Observations \\ 
             \cline{2-7} 
             \\[-1.8ex]
             \input{tables/facultycount-rawcounts-heterogeneity.tex}
@@ -346,7 +346,7 @@ There were no observable differences in the hiring rate of male versus female fa
         \begin{tabular}{@{\extracolsep{5pt}}lcccccl} 
             \\[-1.8ex]\hline 
             \hline \\[-1.8ex]
-            & First-stage & Lecturers & Asst. Professors & Full Professors & All Faculty & Observations \\ 
+            & First-stage & Lecturers & Asst. Professors & Professors & All Faculty & Observations \\ 
             \cline{2-7} 
             \\[-1.8ex]
             \input{tables/facultycount-heterogeneity.tex}
@@ -500,7 +500,7 @@ There are only minor differences in the results presented to that for Table 2 in
     \justify
     \footnotesize
     \textbf{Note}:
-    These tables show the first stage OLS estimates of regressing state funding in years 2012-2019 but the 2011 base share version of the shift-share instrument, without adjusting for student population size.
+    These tables show the first-stage OLS estimates of regressing state funding in years 2012-2019 but the 2011 base share version of the shift-share instrument, without adjusting for student population size.
     Standard errors are clustered at the state-year level, and university $+$ year fixed effects are included where noted.
     The F statistic is for the excluded instrument (not for overall regression), after accounting for fixed effects and cluster dependence \citep{olea2013robust}.
 \end{table}
@@ -510,7 +510,7 @@ All three use a shift-share based in the year 1990, or averaged 1990--1993, anal
 \begin{table}[H]
     \singlespacing
     \centering
-    \caption{Replication of Second-Stage Estimates, Effects of State Funding on Faculty Counts, in IPEDS Data 2012--2019 \citep{hinrichs2022state}.}
+    \caption{Replication of IV Estimates, Effects of State Funding on Faculty Counts, in IPEDS Data 2012--2019 \citep{hinrichs2022state}.}
     \makebox[\textwidth][c]{\input{tables/facultycount-replicate.tex}}
     \label{tab:facultycount-replicate}
     \justify

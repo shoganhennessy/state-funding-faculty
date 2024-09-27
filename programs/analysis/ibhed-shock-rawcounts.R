@@ -342,7 +342,7 @@ stargazer(
     add.lines = outcome.means,
     dep.var.caption = "Dependent Variable: Employment Count by Professor Group",
     dep.var.labels = c(
-        "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
+        "Lecturers", "Asst. Professors", "Professors", "All Faculty"),
     column.labels = rep(c("OLS", "2SLS"), 4),
     digits = digits.no,
     digits.extra = digits.no,
@@ -474,7 +474,7 @@ stargazer(
     add.lines = outcome.means,
     dep.var.caption = "Dependent Variable: Yearly New Hires by Professor Group",
     dep.var.labels = c(
-        "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
+        "Lecturers", "Asst. Professors", "Professors", "All Faculty"),
     column.labels = rep(c("OLS", "2SLS"), 4),
     digits = digits.no,
     digits.extra = digits.no,

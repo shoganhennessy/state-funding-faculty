@@ -321,7 +321,7 @@ stargazer(
     dep.var.caption =
         "Dependent Variable: Faculty Count, by Position",
     dep.var.labels = c(
-        "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
+        "Lecturers", "Asst. Professors", "Professors", "All Faculty"),
     column.labels = rep(c("OLS", "2SLS"), 4),
     digits = digits.no,
     digits.extra = digits.no,
@@ -376,7 +376,7 @@ substitution_rawcount.plot <-
         coefs = c(
             "Lecturers" = "`lect_funding(fit)`",
             "Asst. Professors" = "`asst_funding(fit)`",
-            "Full Professors" = "`full_funding(fit)`",
+            "Professors" = "`full_funding(fit)`",
             "All Faculty" = "`all_funding(fit)`"),
         legend.title = "",
         plot.distributions = TRUE,

@@ -30,12 +30,19 @@ IPEDS reports the count of professors employed by position; IPEDS data on averag
     Notably, IPEDS data on faculty counts do not suffer from these problems.
 }\footnote{
     In a contemporaneous working paper, \cite{hinrichs2022state} analyses the effect of state funding cuts on university faculty, using the same shift-share variation.
-    \cite{hinrichs2022state} bases the shift--share instrument in the year 2011, despite major upheavals in the level of state funding for state funding for higher education around the 2008 Great Recession, and years following (see \autoref{sec:trends});
+    \cite{hinrichs2022state} analyses the years 2012--2019, despite national trends in state funding and faculty counts happening largely in the preceding decades (see \autoref{sec:trends,sec:decade-analysis});
     \cite{hinrichs2022state} also does not mention the data inconsistencies in IPEDS data for average faculty salaries.
-    These two major differences explain the different conclusions that our contemporary papers come to; in \autoref{sec:recession-analysis} I replicate the \cite{hinrichs2022state} approach with my primary specification, and further discuses the differences in findings.
+    These two major differences explain the different conclusions that our contemporary papers come to; in \autoref{sec:recession-analysis} I replicate the \cite{hinrichs2022state} approach with my primary specification, and show my results replicate theirs for 2012--2019 (null) and are nonetheless strong for the 1990--2010 time period.
 }
-This gives a resulting panel data-set, where each row represents a university-year, and includes columns for university funding and tuition revenue, plus total count for each faculty position (lecturer, assistant professor, tenured professor, and total faculty), and other university characteristics.
-\autoref{tab:ipeds-summary} presents summary statistics for these variables in IPEDS data.
+This gives a resulting panel data-set, where each row represents a university-year, and includes columns for university funding and tuition revenue, plus total count for each faculty position (lecturers, assistant professors, professors, and total faculty), and other university characteristics.
+I take IPEDS reported count of ``Instructional Staff: Instructor, Lecturer, or No Academic Rank'' and refer to this count as lecturers for brevity, IPEDS count of ``Assistant Professors'' as assistant professors, IPEDS count of ``Associate Professors'' and ``Full Professors'' as professors.\footnote{
+    Some universities use the role of associate professor interchangeably with professor (or play the same role in practice as a full professor).
+    My definition avoids splitting these hairs by summing all ranks above assistant professor.
+}
+\autoref{tab:ipeds-summary} presents summary statistics for these variables in IPEDS data.\footnote{
+    IPEDS started collecting information on the composition of instructional staff working part and full-time, as well as salaries, from the 2010 survey and onwards.
+    This paper focuses on trends that were more stark in the 1990--2009 time period, so does not present systematic evidence on this topic; \cite{hinrichs2022state} considers this time period and finds no relationship.
+}
 
 IPEDS provides information at the university level, but only provides aggregated information within a university.
 To investigate outcomes for individual faculty members, I integrate individual-level data for all faculty members at all Illinois public universities 2010--2021.
@@ -44,7 +51,7 @@ IBHED freely provides this information, as the state of Illinois is required to 
     Real salary is computed by scaling nominal salary and benefits to 2021 dollars by the CPI-U.
 } for all administrators, faculty members, and instructors employed by each public college or university.\footnote{
     Public Act 96-0266, effective 1 January 2010, is the relevant Illinois law that requires publicly publishing salary data for all public university faculty salary and benefits \citep{illinois-public-act}.
-    A pdf copy of Public Act 096-0266 is included in the supplmentary data of this paper.
+    A copy of Public Act 096-0266 is included in the supplmentary data of this paper.
     This law applies to all nine Illinois public universities: Chicago State University, Eastern Illinois University, Governors State University, Illinois State University, Northeastern Illinois University, Northern Illinois University, Southern Illinois University (all five campuses), University of Illinois (all four campuses), Western Illinois University.
 }
 These data provide the basis to build a panel of Illinois public university faculty across years 2010--2021; I define a faculty member as an individual by their first plus last name and university pairing,\footnote{
@@ -89,10 +96,10 @@ There are large differences in the average number of professors per student betw
 Public universities start with 40 students per professor, and by 2021 there are 52.4 students professors for every full professor --- with the largest rise coming in the 2008--2011 time period.
 The general trend is similar for the number of assistant professors at both public and private universities.
 Private and public universities have similar numbers of associate and full professors before the year 2000.
-After 2000, the number of professors at public univeristies fell drastically, with the average public university has 6 fewer full professors per hundred students than the average private university by 2021.
+After 2000, the number of professors at public universities fell drastically, with the average public university has 6 fewer full professors per hundred students than the average private university by 2021.
 Over the same time period, we see the rise in use of lecturers; lecturers were employed at similar rates in private and public sectors in 1990.
 Since 1990, both sectors began employing more lecturers on a per-student basis.
-In sum, this means public universities have begun relying on lecturers, because they decreased their professor counts, compared to private unviersities who started employing more lecturers and professors.
+In sum, this means public universities have begun relying on lecturers, because they decreased their professor counts, compared to private universities who started employing more lecturers and professors.
 
 \subsection{Trends in Illinois}
 \label{sec:trends-illinois}
@@ -105,5 +112,8 @@ State agencies, and higher education institutions, employed accounting technique
     Fiscal year 2016 refers to June 2015 to June 2016, so is the same as the academic year definition.
 }
 While most public universities were able to stay open, there were drastic revenue and spending cuts in response to the budget impasse, as it continued through fiscal year 2017, and ended with a new budget restoring funding to state institutions for 2018.
-This means that Illinois public universities exhibit sizable changes in their state funding over 2010--2021, of similar order to those for the rest of the country over 1990--2021.
+This means that Illinois public universities exhibit sizeable changes in their state funding over 2010--2021, of similar order to those for the rest of the country over 1990--2021.
 Additionally, the 2016 episode stemmed entirely from political disagreements, and not from state decisions regarding higher education and its finances, exhibiting how state-level changes in funding affect public universities thanks to unrelated issues \citep{young2020squandered}.
+
+While the stagnation in state funding was more intense for the national sample of universities over 1990--2009, Illinois in particular experienced larger disruption and state funding cuts for 2010--2021.
+Additionally, analysis of individual Illinois professors is only possible as data begin in 2010; while it would be preferred to analyse Illinois professor outcomes for 1990--2009, data availability limits the analysis to 2010--2021.

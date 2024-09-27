@@ -386,7 +386,7 @@ stargazer(
     dep.var.caption =
         "Dependent Variable: Log Faculty Count per Students, by Position",
     dep.var.labels = c(
-        "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
+        "Lecturers", "Asst. Professors", "Professors", "All Faculty"),
     column.labels = rep(c("OLS", "2SLS"), 4),
     digits = digits.no,
     digits.extra = digits.no,
@@ -566,7 +566,7 @@ stargazer(
     dep.var.caption =
         "Dependent Variable: Faculty Count per 1,000 Students, by Position",
     dep.var.labels = c(
-        "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
+        "Lecturers", "Asst. Professors", "Professors", "All Faculty"),
     column.labels = rep(c("OLS", "2SLS"), 4),
     digits = digits.no,
     digits.extra = digits.no,
@@ -770,7 +770,7 @@ stargazer(
     dep.var.caption =
         "Dependent Variable: Log Faculty Count per Students, by Position",
     dep.var.labels = c(
-        "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
+        "Lecturers", "Asst. Professors", "Professors", "All Faculty"),
     column.labels = rep(c("OLS", "2SLS"), 4),
     digits = digits.no,
     digits.extra = digits.no,
@@ -895,7 +895,7 @@ stargazer(
     dep.var.caption =
         "Dependent Variable: Faculty Count per 1,000 Students, by Position",
     dep.var.labels = c(
-        "Lecturers", "Asst. Professors", "Full Professors", "All Faculty"),
+        "Lecturers", "Asst. Professors", "Professors", "All Faculty"),
     column.labels = rep(c("OLS", "2SLS"), 4),
     digits = digits.no,
     digits.extra = digits.no,
