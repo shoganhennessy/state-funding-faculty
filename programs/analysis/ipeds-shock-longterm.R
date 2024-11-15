@@ -115,10 +115,10 @@ rm(ipeds.data)
 gc()
 
 
-# Long-run effects, where outcome is Y_{i, t+j} for j = -5, ..., 10 ------------
+# Long-run effects, where outcome is Y_{i, t + k} for k = 0, ..., 10 -----------
 
 # Run the simple linear regression in a loop, and plot the results
-# Make a note of the possible entangled X, Y channel effects, thus need for LP.
+# Make a note of the possibly entangled X, Y channel effects, thus need for LP.
 
 
 # Local Projections for staying-power of effects -------------------------------
@@ -175,13 +175,14 @@ firststage.lpreg <-
         # LP options
         diff_shock = FALSE,
         cumul_mult = FALSE,
-        # Add fixed effects + clsutered SEs in the panel
+        # Add fixed effects + clustered SEs in the panel
         panel_model = "within",
         panel_effect = "twoways",
         robust_cov = "vcovHC",
         robust_cluster = c("group", "time"),
         confint = 1.96,
         hor = time.horizon)
+lpreg.plot(firststage.lpreg, c(-1.15, 0.2), colour.list[1])
 # Save this plot
 ggsave("../../text/figures/firststage-lp.png",
     plot = lpreg.plot(firststage.lpreg, c(-1.15, 0.2), colour.list[1]),
