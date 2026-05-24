@@ -40,6 +40,8 @@
 \def\subsectionautorefname~#1\null{Subsection~#1\null}                     % Fix autoref for sections
 \def\equationautorefname~#1\null{Equation~(#1)\null}                       % Fix autoref for equations
 % IMPORTANT: follow style guide here https://github.com/Wookai/paper-tips-and-tricks
+% Option: figures at end.
+%\usepackage[nolists, tabhead, fighead]{endfloat}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -105,6 +107,11 @@
 \input{sections/05-results.tex}
 % Conclusion
 \input{sections/06-conclusion.tex}
+
+%% Place for the figures, if endfloat-ed.
+%\clearpage
+%    \processdelayedfloats
+%\clearpage
 
 % Bibliography
 \singlespacing
