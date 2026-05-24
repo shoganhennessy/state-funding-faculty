@@ -14,14 +14,36 @@ Column (2) shows estimates of the first-stage without including fixed effects, a
 Columns (3) and (4) include the tuition revenue as a control (explained in \autoref{foot:control}) to exhibit estimates with or without this control variable.
 Column (3) shows similar estimates to column (1) in both Panels A and B thanks to inclusion of fixed effects, so whether tuition revenue is a bad control does not affect empirical estimates.
 Column (1) represents the estimates for \autoref{eqn:firststage} with fixed effects (not including tuition revenue as a control variable), and is the preferred specification that I proceed with;
-all specifications (except column 4 in both panels) have a large F statistic on the excluded instrument.\footnote{
-    I calculate the F statistic on the excluded instrument, while also accounting for fixed effects and two-way standard error clustering, by the methods provided in \cite{olea2013robust}.
-}
-I use the same empirical strategy in the analysis of Illinois faculty, and \autoref{tab:firststage-illinois} presents first-stage estimates among the IBHED data; results are similar to those calculated in IPEDS data.\footnote{
-    Every IV specification presented in this paper uses a specification with a strong first-stage.
-    Results with weak first-stages are omitted as they would not be reliable causal effects.
-}
+all specifications (except column 4 in both panels) have a large F statistic on the excluded instrument.
+I use the same empirical strategy in the analysis of Illinois faculty, and \autoref{tab:firststage-illinois} presents first-stage estimates among the IBHED data; results are similar to those calculated in IPEDS data.
 These results show the funding shift-share instrument strongly predicts a university's state funding in the first-stage estimation.
+
+\begin{table}[!htp]
+    \singlespacing
+    \centering
+    \caption{First-Stage Estimates, Predicting State Funding by Funding Shift-Share, in IPEDS Data.}
+    \textbf{Panel A: units in \$ per student}
+    
+    \makebox[\textwidth][c]{\input{sections/tables/firststage-reg-rawcount.tex}}
+    
+    \textbf{Panel B: units in log \$ per student}
+    
+    \makebox[\textwidth][c]{\input{sections/tables/firststage-reg-fte.tex}}
+
+    \label{tab:firststage-reg}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These tables show the first-stage OLS estimates of regression specification \eqref{eqn:firststage}, showing the effect of the state funding shift-share on state funding to gauge performance as an instrument.
+    Each observation is a public university-year, in the IPEDS data.
+    Panel A shows the effect of a state funding shift-share of \$-1 per student in the state on the number of \$'s of state funding per student at the university --- i.e.,
+    \$-1 state funding shift-share per student in the state leads to \$1.176 less state funding per student at the university according to preferred specification column 1.
+    Panel B shows the effect of a $-10$\% change state funding shift-share per student in the state on $10$\% change in state funding per student at the university --- i.e.,
+    $-10$\% state funding shift-share per student in the state leads to $-9.77$\% less state funding per student at the university according to prefferred specification column 1.        
+    Standard errors are clustered at the state-year level, and university $+$ year fixed effects are included where noted.
+    The F statistic is for the excluded instrument (not for overall regression), after accounting for fixed effects and cluster dependence \citep{olea2013robust}.
+\end{table}
+
 
 The first-stage is strong in both IPEDS and IBHED data, and the argument for exogeneity comes from independence of the state funding mechanism to any individual public university campus (as in \autoref{sec:empirics}).
 The IV approach also assumes that shifts in state-wide funding for higher education (the instrument) affect outcomes only via affecting state funding for the university (exclusion restriction).
@@ -50,6 +72,34 @@ State funding cuts lead to measurable changes in the number of faculty at US pub
 \autoref{tab:facultycount-shock-reg} presents OLS and IV estimates for the effect of state funding cuts on the number of faculty at public universities, separately for each faculty position (lecturer, assistant professors and professors, total).
 The results are presented in two different units: Panel A shows how a \$1,000 state funding cut per-student changed the count of faculty, while Panel B shows how a 1\% increase in state funding led to a percent change in the number of faculty per students.
 
+\begin{table}[!htp]
+    \singlespacing
+    \centering
+    \caption{Effects of State Funding on Faculty Counts, in IPEDS Data 1990--2021, OLS and 2SLS Estimates.}
+
+    \textbf{Panel A: units in \$ per student}
+
+    \makebox[\textwidth][c]{\input{sections/tables/facultycount-shock-reg-rawcount.tex}}
+    
+    \textbf{Panel B: units in log \$ per student}
+    
+    \makebox[\textwidth][c]{\input{sections/tables/facultycount-shock-reg-fte.tex}}
+
+    \label{tab:facultycount-shock-reg}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These tables show the second stage OLS and 2SLS estimates of regression specification \eqref{eqn:secondstage}, showing the effect of state funding changes on faculty outcomes, using the state funding shift-share to instrument for state funding in the columns labelled 2SLS.
+    Each observation is a public university-year, in the IPEDS data.
+    Panel A shows the effect of a fall in state funding \$$-1,000$ per student on the number of professors --- i.e.,
+    an extra \$$1,000$ per student leads to 6 fewer lecturers according to column 2.
+    Panel B shows the effect of a $10$\% change in state funding per student at the university on the 10\% change in the number of professors per students --- i.e.,
+    an extra 10\% of state funding per student leads to 4.37\% fewer lecturers per student according to column 2.
+    Outcome-mean is the mean of the outcome, for Panel A the number of professors per student, for Panel B the number of faculty per student.
+    Panel B uses $\log$ faculty count per student as the outcome, though the outcome mean is count of faculty per student (not in $\log$ terms).
+    Standard errors are clustered at the state-year level, and university $+$ year fixed effects are included through-out.
+\end{table}
+
 An extra \$1,000 in state funding per student leads to the average university employing 6 more lecturers, while effects for the other positions are not discernible from zero (\autoref{tab:facultycount-shock-reg}, Panel A).
 A 10\% state funding cut lead to a 4.4\% increase in the number of lecturers per student, and a decrease of 1.35\% and 1.37\% for assistant and professors, respectively.
 A state funding cut of 10\% leads to a 0.65\% decrease in the total number of faculty per student (\autoref{tab:facultycount-shock-reg}, Panel B).
@@ -63,6 +113,47 @@ A 10\% state funding cut leads to 4.2\% (2.9--5.5 in a 95 percent confidence int
 A 10\% state funding cut leads to 1.5\% (0.6--2.2 in a 95 percent confidence interval) fewer assistant professors per student the following year, and around 1.1\% (0.2--2.0 confidence interval) fewer nine years later;
 the same cut leads to 1.2\% (0.6--1.8 in a 95 percent confidence interval) fewer professors per student the following year, and around 0.9\% (0.1--1.7 confidence interval) fewer nine years later.
 
+\begin{figure}[!htp]
+    \centering
+    \singlespacing
+    \caption{Local Projection Estimates for Effect of State Funding on Faculty Count per Student at Universities, by Professor Group.}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Lecturers.}
+        \includegraphics[width=\textwidth]{sections/figures/lecturer-count-lp.png}
+        \label{fig:lecturer-count-lp}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Assistant Professors.}
+        \includegraphics[width=\textwidth]{sections/figures/assistant-count-lp.png}
+        \label{fig:assistant-count-lp}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Full Professors.}
+        \includegraphics[width=\textwidth]{sections/figures/full-count-lp.png}
+        \label{fig:full-count-lp}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{All Professors.}
+        \includegraphics[width=\textwidth]{sections/figures/all-count-lp.png}
+        \label{fig:all-count-lp}
+    \end{subfigure}
+    \label{fig:count-lp}
+    \vspace{-1cm}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These figures show the local projections estimates of regression specification \eqref{eqn:secondstage}, with the state funding shift-share as an instrument for state funding.
+    The unit of analysis is the university, and uses IPEDS data.
+    The $x$-axis represents the year relative to the state funding shift-share (i.e., $x = 0$ represents the year of the state funding cut) and the $y$-axis represents the estimated effect in years relative to initial state funding shift-share.
+    The coefficient estimate is effect of state funding ($X_{i,t}$) on faculty count per student ($Y_{i,t}$), using the state funding shift-share instrument ($Z_{i,t}$), while accounting for auto-correlation between different time periods --- i.e., between $X_{i,t}, X_{i,t-1}$ and $Y_{i,t}, Y_{i,t-1}$.
+    These results use a $\log-\log$ specification, so the estimates are for the elasticity of professor count per student in a year $t+k$ with respect to state funding in year $t$, where years $k = 0, \hdots, 10$ are on the $x$-axis. 
+    Standard errors are clustered at the state-year level.
+\end{figure}
+
 These effects are a substitution of professors for lecturers at public universities, as the total number of faculty per students are relatively unrelated to funding cuts, but the lecturer count increases and professor count decreases.
 This agrees with a model for universities departments having fixed teaching requirements making human-resources decisions under constrained resources (e.g., \citealt{abe2015implications}), lending credibility to this type of model for understanding recent human resources decisions of public universities.
 Furthermore, if a university must teach more students, but cannot afford to hire a full-time professor who teaches 2--3 classes a year, then it makes sense that they hire 2--3 additional lecturers on part-time contracts for each class as a replacement.
@@ -75,10 +166,74 @@ Incumbent professors at Illinois universities are relatively unaffected by state
 \autoref{tab:faculty-shock-illinois-rolling} show estimates of a 10\% change in state funding per student on faculty salaries, rate of exiting the Illinois public university system, and rate of promotion.
 The estimates are not discernible from zero in any specification, including the shift-share IV estimates, so that faculty seem to have little or no state funding cuts passed on to them for these outcomes.
 
+\begin{table}[!htp]
+    \singlespacing
+    \centering
+    \caption{Effects of State Funding on Faculty Salaries and Exit Rate, in IBHED Panel Data 2010--2021, 2SLS Estimates.}
+    \label{tab:faculty-shock-illinois-rolling}
+    \makebox[\textwidth][c]{\input{sections/tables/facultysalaries-shock-illinois-rolling.tex}}
+    
+    \makebox[\textwidth][c]{\input{sections/tables/facultyleaving-shock-illinois-rolling.tex}}
+
+    \makebox[\textwidth][c]{\input{sections/tables/promotion-shock-illinois-rolling.tex}}
+
+    \justify
+    \footnotesize
+    \textbf{Note}: 
+    These tables show the second stage 2SLS estimates of regression specification \eqref{eqn:secondstage}, showing the effect of state funding changes on faculty outcomes at Illinois universities, using the state funding shift-share to instrument for state funding.
+    The shift-share instrument is based in the year the professor was hired, following definition in \autoref{sec:iv-model-indiv}.
+    Each observation is a faculty member--year at an Illinois public university, where funding data come from IPEDS and faculty outcomes from IBHED data.
+    The panels shows the effect of a $1$\% change in state funding per student at the university on faculties' salaries (base salary $+$ benefits), promotion rate (e.g., assistant professor to associate professor), and rate of leaving their university (i.e., by quitting, retiring, or moving to another university).
+    Standard errors are clustered at the university-year of hire level, and university $+$ year of hire fixed effects are included through-out.
+\end{table}
+
+
 It could be the case that effects on faculty do not materialise until multiple years after a funding cut, though the data do not support this possibility.
 LP estimates show that professors' salaries, including salaries, are not significantly affected in years following funding cuts (\autoref{fig:salaries-illinois-lp-rolling}) --- they do not receive lower rates of pay raises, or delayed salary cuts, in response to state funding cuts.
 Similarly, promotion rate and rate of exit from the Illinois public university system are also unaffected in later years (\autoref{fig:promoted-illinois-lp-rolling}, \ref{fig:exit-illinois-lp-rolling}).
 Lecturers receive a 0.75\% increase in salary in the second and third year after a 10\% increase in state funding (\autoref{fig:salaries-lecturer-illinois-lp-rolling}), though they are they only faculty who saw any effect of state funding cuts in terms of salaries.
+
+\begin{figure}[!htp]
+    \centering
+    \singlespacing
+    \caption{Local Projection Estimates for Effect of State Funding on Faculty Salaries at Illinois Public Universities, by Professor Group.}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Lecturers.}
+        \includegraphics[width=\textwidth]{sections/figures/salaries-lecturer-illinois-lp-rolling.png}
+        \label{fig:salaries-lecturer-illinois-lp-rolling}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Assistant Professors.}
+        \includegraphics[width=\textwidth]{sections/figures/salaries-assistant-illinois-lp-rolling.png}
+        \label{fig:salaries-assistant-illinois-lp-rolling}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Full Professors.}
+        \includegraphics[width=\textwidth]{sections/figures/salaries-full-illinois-lp-rolling.png}
+        \label{fig:salaries-full-illinois-lp-rolling}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.495\textwidth}
+        \centering
+        \caption{Administrator Professors.}
+        \includegraphics[width=\textwidth]{sections/figures/salaries-administrator-illinois-lp-rolling.png}
+        \label{fig:salaries-administrator-illinois-lp-rolling}
+    \end{subfigure}
+    \label{fig:salaries-illinois-lp-rolling}
+    \vspace{-1cm}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    These figures show the local projections estimates of regression specification \eqref{eqn:secondstage}, with the state funding shift-share as an instrument for state funding.
+    The unit of analysis is an individual faculty member (at an Illinois public university); funding data come from IPEDS, and faculty salaries from IBHED.
+    The $x$-axis represents the year relative to the state funding shift-share (i.e., $x = 0$ represents the year of the state funding cut) and the $y$-axis represents the estimated effect in years relative to initial state funding shift-share.
+    The coefficient estimate is effect of state funding ($X_{i(j),t}$) on faculty salaries ($Y_{j,t}$), using the state funding shift-share instrument ($Z_{i(j),t}$), while accounting for auto-correlation between different time periods --- i.e., between $X_{i(j),t}, X_{i(j),t-1}$ and $Y_{i(j),t}, Y_{i(j),t-1}$.
+    These results use a $\log-\log$ specification, so the estimates are for the elasticity of faculty salaries student in a year $t+k$ with respect to state funding in year $t$, where years $k = 0, \hdots, 4$ are on the $x$-axis. 
+    Standard errors are clustered at the university-year level, and \autoref{sec:iv-model-indiv} fully describes the differences in empirical specification when unit of analysis is an individual faculty member.
+\end{figure}
+
 
 These results show that faculty --- both lecturers and professors --- are relatively unaffected by state funding cuts, in the Illinois public university system.
 Illinois is a state with a large public university system, relative to student enrolment, with trends in state funding for education similar to national trends, and with both selective and non-selective universities.
@@ -111,6 +266,20 @@ I use these data as part of a shift-share analysis, showing that a 10\% state fu
     So this analysis of 2011--2021 data is not ground-truth evidence for mechanisms over 1990--2009.
 }
 
+\begin{figure}[!h]
+    \centering
+    \singlespacing
+    \caption{State Funding and Total Professor Hiring at Public Universities, Total for 2011--2021.}
+    \includegraphics[width=0.8\textwidth]{sections/figures/hiring-correlation.png}
+    \label{fig:hiring-correlation}
+    \justify
+    \footnotesize
+    \textbf{Note}:
+    This figure shows the correlation between state funding and total number of professors hired at each public university between 2011--2021.
+    Each dot is a US public university, with the $y$-axis the total number of professors (not lecturers) they hired 2011--2021, the $x$-axis the total state funding per student 2011--2021; the line is an OLS line of best-fit, with shaded region for 95\% confidence region of the correlation.
+    Data for the number of professors hired at public universities are provided by \cite{wapman2022quantifying,wapman2022zenodo}, and funding data from IPEDS.
+\end{figure}
+
 State funding cuts lead to lower professor hiring, and the persistent funding cuts to public universities led to lower professor hiring across the last three decades.
 The channels for faculty turn-over were unaffected by state funding cuts in the analysis of Illinois faculty, while professor hiring is related to funding cuts in both correlational terms and in a shift-share analysis.
 Combining these pieces of evidence means that reduced professor hiring was likely the main mechanism for how state funding cuts led to a substitution of professors for lecturers at public universities.
@@ -130,13 +299,8 @@ Additionally, this analysis uses the enrolment measure of full-time equivalent (
 The first-stage is strong of the same order as the original analysis (\autoref{tab:firststage-robustness-checks}).
 The relationship between state funding, in both raw count terms and log units, are roughly the same as for the main analysis (\autoref{tab:facultycount-robustness-checks}, \ref{tab:facultycount-rawcount-robustness-checks}), despite the multiple specification changes, additional controls, and different measures for enrolment.
 
-As another robustness check, I employ is a falsification test, testing whether the effects for public universities would be picked up among a sample of private universities.\footnote{
-    This is a robustness check similar to one performed in \citealt{NBERw27885}, as a robustness check for the same instrument.
-}
-Private universities do not rely on state funding in the same way that public universities do,\footnote{
-    Some private universities do receive state funding, mostly funding for smaller scale operating costs and other specific projects.
-}
-so we would expect state funding to not affect their faculty counts.
+As another robustness check, I employ is a falsification test, testing whether the effects for public universities would be picked up among a sample of private universities; this is a robustness check similar to one performed by \cite{NBERw27885}, as a robustness check for the same instrument.
+Private universities do not rely on state funding in the same way that public universities do, so we would expect state funding to not affect their faculty counts.
 If the state funding and faculty counts were related among private universities, this would be evidence that the IV model picks up otherwise concurrent trends in higher education, unrelated to stagnating state funding for public universities.
 To impute a base share of reliance on state funding, I assign private universities the average reliance on state funding in the base period of universities in the same state with the same Barrons selectivity ranking, and then compute the shift-share instrument from this value.
 \autoref{tab:facultycount-shock-private-robustness} shows that the first-stage is not strong among private universities; despite this, the IV results are still not significant for any faculty count, showing that state funding is not related to private universities' faculty counts.
