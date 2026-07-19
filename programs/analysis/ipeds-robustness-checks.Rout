@@ -873,7 +873,7 @@ R2                           0.647    0.646    0.861    0.845    0.942    0.942 
 +         full_prof_count > 0,
 +         all_prof_count > 0)
 > 
-> # First stage test, which is referenced in the text (don't bother TeX table)
+> # First-stage test, which is referenced in the text (don't bother TeX table)
 > ipeds_private.data %>%
 +     felm(log(totalrevenues_real / enrollment_reported) ~ 1 +
 +         I(-log(appropriationshock_perEnroll_real)) |

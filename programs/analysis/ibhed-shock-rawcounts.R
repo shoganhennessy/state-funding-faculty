@@ -218,7 +218,7 @@ institutional.data <- reg.data %>%
 
 # Illinois Faculty Composition Regressions -------------------------------------
 
-# RAw first stage
+# RAw first-stage
 firststage_raw.reg <- institutional.data %>%
     felm(I(stateappropriations_real / enrollment_reported) ~ 1 +
         I(-appropriationshock_perEnroll_real) |
@@ -234,7 +234,7 @@ firststage_raw.fstat <-
     nth(2) %>%
     as.numeric() %>%
     round(digits.no)
-# Show that the first stage, and its strength
+# Show that the first-stage, and its strength
 summary(firststage_raw.reg)
 
 ## Lecturer faculty Count

@@ -318,7 +318,7 @@ reg.data %>%
     print()
 
 
-# First stage Regressions ------------------------------------------------------
+# First-stage Regressions ------------------------------------------------------
 
 # Explain Revenues with a shock to (only) state appropriations.
 firststage_approp.reg <- reg.data %>%

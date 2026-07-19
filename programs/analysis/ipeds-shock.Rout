@@ -914,7 +914,7 @@ R2                           0.960       0.950         0.881            0.922   
 +         file = "../../text/tables/summary-quantiles.tex")
 > 
 > 
-> # First stage Regressions ------------------------------------------------------
+> # First-stage Regressions ------------------------------------------------------
 > 
 > # Explain Revenues with a shock to (only) state appropriations.
 > firststage_approp.reg <- reg.data %>%

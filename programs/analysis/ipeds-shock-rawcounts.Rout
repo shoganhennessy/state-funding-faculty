@@ -192,7 +192,7 @@ Ncells 2384605 127.4    4642077 248.0  3979143 212.6
 Vcells 4643013  35.5   10146329  77.5  8388559  64.0
 > 
 > 
-> # First stage Regressions ------------------------------------------------------
+> # First-stage Regressions ------------------------------------------------------
 > 
 > # Explain Revenues with a shock to (only) state appropriations.
 > firststage_raw.reg <- reg.data %>%

@@ -354,7 +354,7 @@ Vcells 8818880  67.3   22427171 171.2 22416568 171.1
 +         robust_cluster = c("group", "time"),
 +         confint = 1.96,
 +         hor = time.horizon)
-> # Save this plot of th first stage.
+> # Save this plot of th first-stage.
 > ggsave("../../text/figures/firststage-illinois-lp-rolling.png",
 +     plot = lpreg.plot(firststage.lpreg, c(-1.15, 0.2), colour.list[1]),
 +     units = "cm", width = fig.width, height = fig.height)

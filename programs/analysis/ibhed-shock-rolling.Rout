@@ -331,7 +331,7 @@ All benefits (2021 USD)            2,939   11,130  69,246
 ---------------------------------------------------------
 > 
 > 
-> # First stage Regressions -----------------------------------------------------
+> # First-stage Regressions -----------------------------------------------------
 > 
 > # Explain Revenues with a shock to (only) state appropriations.
 > firststage_approp.reg <- reg.data %>%

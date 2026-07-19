@@ -220,7 +220,7 @@ reg.data %>%
         out = "../../text/tables/illinois-summary-rolling.tex")
 
 
-# First stage Regressions -----------------------------------------------------
+# First-stage Regressions -----------------------------------------------------
 
 # Explain Revenues with a shock to (only) state appropriations.
 firststage_approp.reg <- reg.data %>%

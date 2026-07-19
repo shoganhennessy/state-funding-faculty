@@ -6,8 +6,8 @@
 This paper identifies the effects of changes in state funding on faculty.
 However, a university's state funding is not exogenous to state decisions for support of higher education.
 Instead, the state government undertakes a complex process of budgeting funding across many priorities, while higher education and faculty outcomes may not be independent in this process.
-This means that faculty outcomes would not be conditionally independent of faculty outcomes, and correlations between the two are not causal relationships.
-Shifts in state for higher education, however, provide opportunity to address such endogeneity.
+This means that state funding would not be conditionally independent of faculty outcomes, and correlations between the two are not causal relationships.
+Shifts in state funding for higher education, however, provide an opportunity to address this endogeneity.
 
 \subsection{State Funding Shift-Share}
 \label{sec:approp-shocks}
@@ -36,7 +36,7 @@ State funding has been falling, so that the instrument describes shocks to unive
     \cite{NBERw27885,webber2017state} note the tendency for public universities to respond to state funding cuts by increasing reliance on tuition, where \cite{NBERw23736} specifically instruments for tuition revenues with collected information on legislative tuition price controls.
     It may be argued that tuition revenues are confounder between the causal effect of changes in state funding on a university's total revenues, so that this analysis focuses on state support for higher education (not total revenue), as do \cite{NBERw27885}.
     On the other hand, rises in tuition revenues (per-student) may arise as result of tuition hikes following state funding cuts, which would mean controlling for tuition constitutes a bad control.
-    Nonetheless, estimates including tuition revenues (per-student) as a control in the second stage of the IV estimates produce results of very similar magnitude and direction, and so are omitted (see \autoref{sec:results-firststage}).
+    Nonetheless, estimates including tuition revenues (per-student) as a control in the second-stage of the IV estimates produce results of very similar magnitude and direction, and so are omitted (see \autoref{sec:results-firststage}).
 }
 It might be the case that funding cuts have systematically different effects on universities, and faculty, than funding increases.
 The identification strategy here identifies the effect of funding changes, and refers to funding cuts throughout to reflect the systematic falls of state funding (per student) at US public universities.
@@ -68,7 +68,7 @@ Nonetheless, yearly and institution fixed effects are included in regressions th
 \subsection{Instrumental Variables (IV) Model}
 \label{sec:iv-model-uni}
 I use the instrument defined in \autoref{eqn:public-instrument} to overcome the endogeneity concerns for state funding to each public university, for an IV approach.
-\autoref{eqn:firststage} is the first-stage for exogenous variation in the state funding for university $i$ in year $t$, and \autoref{eqn:secondstage} the second stage for the effect of state funding on faculty outcomes.\footnote{
+\autoref{eqn:firststage} is the first-stage for exogenous variation in the state funding for university $i$ in year $t$, and \autoref{eqn:secondstage} the second-stage for the effect of state funding on faculty outcomes.\footnote{
     The IV approach identifies the local average treatment effect, weighted towards larger values of the instrument in the continuous case.
     So we interpret this treatment effect as a weighted average of causal effects on faculty at public universities to state funding changes, specific to shift-share instruments, among compliers --- i.e., among universities who respond to funding cut and would not have made faculty-outcome changes absent the funding cut.
     Also, we assume that no universities state funding increased in response to the negative shift-share instrument (monotonicity).

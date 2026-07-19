@@ -268,7 +268,7 @@ firststage.lpreg <-
         robust_cluster = c("group", "time"),
         confint = 1.96,
         hor = time.horizon)
-# Save this plot of th first stage.
+# Save this plot of th first-stage.
 ggsave("../../text/figures/firststage-illinois-lp-rolling.png",
     plot = lpreg.plot(firststage.lpreg, c(-1.15, 0.2), colour.list[1]),
     units = "cm", width = fig.width, height = fig.height)

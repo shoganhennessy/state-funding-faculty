@@ -653,7 +653,7 @@ ipeds_private.data <- ipeds_private.data %>%
         full_prof_count > 0,
         all_prof_count > 0)
 
-# First stage test, which is referenced in the text (don't bother TeX table)
+# First-stage test, which is referenced in the text (don't bother TeX table)
 ipeds_private.data %>%
     felm(log(totalrevenues_real / enrollment_reported) ~ 1 +
         I(-log(appropriationshock_perEnroll_real)) |
